@@ -1,11 +1,12 @@
-import logo from './logo.svg';
 import './App.css';
-import StudyPage from './StudyPage';
+import LogIn from './LogIn';
 
 function App() {
   return (
     <div className="App">
-      
+      <header className="App-header">
+        <LogIn />
+      </header>
     </div>
   );
 }
