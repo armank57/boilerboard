@@ -94,7 +94,7 @@ function LogIn() {
                                     </Grid>
                                     <Grid xs={12}>
                                         <Typography align="right">
-                                            <Link to="reset-password">
+                                            <Link to="/reset-password" style={{ textDecoration: 'none' }}>
                                                 Forgot Password?
                                             </Link>
                                         </Typography>
