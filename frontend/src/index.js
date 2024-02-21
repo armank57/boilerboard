@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import LogIn from './LogIn';
 import ResetPassword from './ResetPassword';
 
 
@@ -23,11 +24,16 @@ import ResetPassword from './ResetPassword';
       <Route path="*" element={<NotFound />} />
   */
 const root = ReactDOM.createRoot(document.getElementById('root'));
+// note: route with exact path should be Landing page
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
       <Routes>
+        <Route 
+          exact path="/" 
+          element={<LogIn />} 
+        />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
