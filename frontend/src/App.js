@@ -5,7 +5,7 @@ import StudyPage from './StudyPage';
 function App() {
   return (
     <div className="App">
-      <StudyPage />
+      
     </div>
   );
 }
