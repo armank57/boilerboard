@@ -10,8 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from datetime import timedelta
-import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,8 +32,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'corsheaders',
     'django.contrib.auth',
+    'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -46,14 +44,6 @@ INSTALLED_APPS = [
     'core',
     'core.user',
     'core.auth',
-    'core.discussion',
-    'core.course',
-    'core.section',
-    'core.module',
-    'core.posts',
-    'core.quiz2',
-    'core.voice_chat',
-    
 ]
 
 REST_FRAMEWORK = {
@@ -68,12 +58,12 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'BoilerBoard.urls'
@@ -157,44 +147,5 @@ AUTH_USER_MODEL = 'core_user.User'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3000"
 ]
-
-# EMAIL CONDFIG
-EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'arun02.sc@gmail.com'
-EMAIL_HOST_PASSWORD = 'ybwy kdwv ebvq bhtj'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = "BoilerBoard@email.com"
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "UPDATE_LAST_LOGIN": False,
-
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-    "TOKEN_TYPE_CLAIM": "token_type",
-    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-
-    "JTI_CLAIM": "jti",
-
-    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
-}
-
-PASSWORD_RESET_TIMEOUT = 900
