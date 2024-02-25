@@ -1,11 +1,14 @@
 import './LogIn.css';
 import { React, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Box, Button, Card, CardContent, Container, TextField, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 function LogIn() {
+    const navigate = useNavigate();
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -26,16 +29,37 @@ function LogIn() {
 
     const createAccountHandler = () => {
         console.log('Create Account');
+        navigate('/create-account');
     };
     
-    const loginHandler = (e) => {
+    const loginHandler = async (e) => {
         e.preventDefault();
-        
+
         console.log('Email:', email);
         console.log('Password:', password);
 
         // TODO: Send email and password to server
-    };
+        try {
+            const response = await axios.post('http://localhost:8000/api/auth/login/', {
+                username: email, // replace with the name of your username field
+                password: password, // replace with the name of your password field
+            });
+
+            if (response.data.access) {
+                // Login successful
+                console.log('Login successful:', response.data);
+                // You can save the tokens in local storage or context
+                localStorage.setItem('access', response.data.access);
+                localStorage.setItem('refresh', response.data.refresh);
+                // Redirect to home page or dashboard
+            } else {
+                // Login failed
+                alert('Login failed:', response.data);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+        }
+    }
 
     return (
         <div className="login">
