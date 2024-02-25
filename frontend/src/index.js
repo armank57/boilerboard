@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import LogIn from './LogIn';
 import ResetPassword from './ResetPassword';
+import Discussions from './Discussions';
 
 
 /*
@@ -35,6 +36,8 @@ root.render(
           element={<LogIn />} 
         />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/create-account" element={<h1>Create Account</h1>} />
+        <Route path="/discussions" element={<Discussions />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
