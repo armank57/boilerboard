@@ -41,7 +41,7 @@ function LogIn() {
         // TODO: Send email and password to server
         try {
             const response = await axios.post('http://localhost:8000/api/auth/login/', {
-                username: email, // replace with the name of your username field
+                email: email, // replace with the name of your username field
                 password: password, // replace with the name of your password field
             });
 
@@ -51,13 +51,13 @@ function LogIn() {
                 // You can save the tokens in local storage or context
                 localStorage.setItem('access', response.data.access);
                 localStorage.setItem('refresh', response.data.refresh);
-                // Redirect to home page or dashboard
+                // TODO: Redirect to home page or dashboard
             } else {
                 // Login failed
                 alert('Login failed:', response.data);
             }
         } catch (error) {
-            console.error('Login error:', error);
+            alert(error);
         }
     }
 
