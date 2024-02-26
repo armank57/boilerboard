@@ -14,3 +14,4 @@
 /core/user/migrations/__pycache__
 /core/user/__pycache__
 /DS.store
+/frontend/node_modules
