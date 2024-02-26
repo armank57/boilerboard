@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
 function RegistrationForm() {
     const navigate = useNavigate();
     const [validated, setValidated] = useState(false);
@@ -12,16 +11,44 @@ function RegistrationForm() {
         password: "",
         first_name: "",
         last_name: "",
+        conf_password: "",
     });
     const [error, setError] = useState(null);
+
+    const handleEmailChange = (e) => {
+        setForm({ ...form, email: e.target.value});
+        if(!e.target.value.includes("@purdue.edu") && e.target.value) {
+            setError("Provide email with a Purdue domain.")
+            // return true;
+        } else {
+            setError("");
+            // return false;
+        }
+    };
+
+    
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const registrationForm = event.currentTarget;
+
     
         if(registrationForm.checkValidity() === false) {
-            event.stopPropogation();
+            event.stopPropagation();
         }
+
+        if(!form.email.includes("@purdue.edu")) {
+            event.stopPropagation();
+            alert("Please Provide a valid Purdue Email Address!");
+            return;
+        }
+
+        if(form.conf_password !== form.password) {
+            event.stopPropagation();
+            alert("Passwords do not match!");
+            return;
+        }
+
         setValidated(true);
     
         const data = {
@@ -31,6 +58,7 @@ function RegistrationForm() {
             first_name: form.first_name,
             last_name: form.last_name,
         };
+
 
         axios.post("http://localhost:8000/api/auth/register/", data).then((res) => {
             // Registering the Account and tokens in the store
@@ -43,10 +71,10 @@ function RegistrationForm() {
             navigate("/");
         }).catch((err) => {
             if(err.message) {
-                setError(err.request.response);
+                // console.log(err.request.response);
+                setError("Please provide the requested information in order to create an account.")
             }
-        });
-        
+        }); 
     };
 
     return (
@@ -103,7 +131,7 @@ function RegistrationForm() {
                 <Form.Label>Email</Form.Label>
                 <Form.Control 
                     value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value})}
+                    onChange={handleEmailChange}
                     required
                     type="email"
                     placeholder="Enter a Purdue email address"
@@ -122,6 +150,21 @@ function RegistrationForm() {
                     required
                     type="password"
                     placeholder="Enter Password"
+                />
+                <Form.Control.Feedback type="invalid">
+                    Password needs to be at least 8 characters long.
+                </Form.Control.Feedback>
+
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Confirm Password</Form.Label>
+                <Form.Control 
+                    value={form.conf_password}
+                    minLength="8"
+                    onChange={(e) => setForm({ ...form, conf_password: e.target.value})}
+                    required
+                    type="password"
+                    placeholder="Confirm Password"
                 />
                 <Form.Control.Feedback type="invalid">
                     This field is required
