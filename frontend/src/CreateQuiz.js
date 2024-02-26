@@ -140,67 +140,69 @@ function CreateQuiz() {
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid container direction="column" spacing={2} sx={{ p: 2 }}>
+                <Grid container direction="row" sx={{ display: 'flex', justifyContent: 'center' }}>
                     {questions.map((question, questionIndex) => (
-                        <Paper variant="outlined" sx={{ p: 2, mb: 2, border: '2px solid' }} key={`question-${questionIndex}`}>
-                            <Grid container direction="row" sx={{ my: 2, display: 'flex', justifyContent: 'center' }} spacing={2}>
-                                <Grid item xs={8}>
-                                    <InputLabel htmlFor={`question-${questionIndex}`}>Question {questionIndex + 1}</InputLabel>
-                                    <TextField
-                                        type="text"
-                                        value={question.question}
-                                        onChange={handleQuestionChange(questionIndex)}
-                                        variant="outlined"
-                                        placeholder={`Question ${questionIndex + 1}`}
-                                        helperText="Enter your question here"
-                                        color="secondary"
-                                        sx={{ my: 1 }}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <QuestionAnswerIcon />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        fullWidth
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <InputLabel htmlFor={`correct-answer-${questionIndex}`}>Correct Answer</InputLabel>
-                                    <Select
-                                        id={`correct-answer-${questionIndex}`}
-                                        value={question.correctAnswer}
-                                        color="secondary"
-                                        onChange={handleCorrectAnswerChange(questionIndex)}
-                                        sx={{ mt: 2 }}
-                                        fullWidth
-                                    >
-                                        {question.answerList.map((value, answerIndex) => (
-                                            <MenuItem key={answerIndex} value={answerIndex}>
-                                                {`${value}`}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </Grid>
-                            </Grid>
-                            <Grid container direction="row" spacing={2}>
-                                {question.answerList.map((value, answerIndex) => (
-                                    <Grid item xs={6} key={`answer-${answerIndex}`}>
-                                        <InputLabel htmlFor={`answer-${questionIndex}-${answerIndex}`}>Option {answerIndex + 1}</InputLabel>
+                        <Grid item sx={{ m: 1 }}>
+                            <Paper variant="outlined" sx={{ p: 2, mb: 2, border: '2px solid', maxWidth: '42vw' }} key={`question-${questionIndex}`}>
+                                <Grid container direction="row" sx={{ my: 2, display: 'flex', justifyContent: 'center' }} spacing={2}>
+                                    <Grid item xs={8}>
+                                        <InputLabel htmlFor={`question-${questionIndex}`}>Question {questionIndex + 1}</InputLabel>
                                         <TextField
-                                            color="secondary"
-                                            id={`answer-${questionIndex}-${answerIndex}`}
                                             type="text"
-                                            value={value}
-                                            onChange={handleAnswerChange(questionIndex, answerIndex)}
+                                            value={question.question}
+                                            onChange={handleQuestionChange(questionIndex)}
                                             variant="outlined"
-                                            sx={{ my: 0 }}
+                                            placeholder={`Question ${questionIndex + 1}`}
+                                            helperText="Enter your question here"
+                                            color="secondary"
+                                            sx={{ my: 1 }}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <QuestionAnswerIcon />
+                                                    </InputAdornment>
+                                                ),
+                                            }}
                                             fullWidth
                                         />
                                     </Grid>
-                                ))}
-                            </Grid>
-                        </Paper>
+                                    <Grid item xs={4}>
+                                        <InputLabel htmlFor={`correct-answer-${questionIndex}`}>Correct Answer</InputLabel>
+                                        <Select
+                                            id={`correct-answer-${questionIndex}`}
+                                            value={question.correctAnswer}
+                                            color="secondary"
+                                            onChange={handleCorrectAnswerChange(questionIndex)}
+                                            sx={{ mt: 2 }}
+                                            fullWidth
+                                        >
+                                            {question.answerList.map((value, answerIndex) => (
+                                                <MenuItem key={answerIndex} value={answerIndex}>
+                                                    {`${value}`}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" spacing={2}>
+                                    {question.answerList.map((value, answerIndex) => (
+                                        <Grid item xs={6} key={`answer-${answerIndex}`}>
+                                            <InputLabel htmlFor={`answer-${questionIndex}-${answerIndex}`}>Option {answerIndex + 1}</InputLabel>
+                                            <TextField
+                                                color="secondary"
+                                                id={`answer-${questionIndex}-${answerIndex}`}
+                                                type="text"
+                                                value={value}
+                                                onChange={handleAnswerChange(questionIndex, answerIndex)}
+                                                variant="outlined"
+                                                sx={{ my: 0 }}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Paper>
+                        </Grid>
                     ))}
                 </Grid>
             </Box>

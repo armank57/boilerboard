@@ -37,6 +37,18 @@ export default function StudyPage() {
     setSelectedAnswer(index);
   };
 
+  const checkAnswer = () => {
+    if (selectedAnswer == null) {
+      alert('Please select an answer!');
+    }
+    else if (selectedAnswer == selectedQuiz.questionList[currentQuestionIndex].correctAnswer) {
+      alert('Correct!');
+    }
+    else {
+      alert('Incorrect!');
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <AppBar position="static" color="secondary">
@@ -84,22 +96,25 @@ export default function StudyPage() {
                 <List>
                   <ListItem>
                     <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
+                    <Button size="small" variant="contained" onClick={checkAnswer}>
+                      Check Answer
+                    </Button>
                   </ListItem>
                   {selectedQuiz.questionList[currentQuestionIndex].answerList.map((answer, index) => (
                     <Button
                       variant="outlined"
                       key={index}
                       onClick={() => handleAnswerClick(index)}
-                      sx={{ my: 1, backgroundColor: selectedAnswer === index ? 'lightgray' : 'white', textTransform: 'none'}}
+                      sx={{ my: 1, backgroundColor: selectedAnswer === index ? 'lightgray' : 'white', textTransform: 'none' }}
                     >
                       {answer}
                     </Button>
                   ))}
                   <Box mt={2} display="flex" justifyContent="space-between">
-                    <Button variant="contained" disabled={currentQuestionIndex === 0} onClick={() => {setCurrentQuestionIndex(currentQuestionIndex - 1); setSelectedAnswer(null);}}>
+                    <Button variant="contained" disabled={currentQuestionIndex === 0} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex - 1); setSelectedAnswer(null); }}>
                       Previous
                     </Button>
-                    <Button variant="contained" disabled={currentQuestionIndex === selectedQuiz.questionList.length - 1} onClick={() => {setCurrentQuestionIndex(currentQuestionIndex + 1); setSelectedAnswer(null)}}>
+                    <Button variant="contained" disabled={currentQuestionIndex === selectedQuiz.questionList.length - 1} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex + 1); setSelectedAnswer(null) }}>
                       Next
                     </Button>
                   </Box>
