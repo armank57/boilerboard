@@ -4,16 +4,23 @@ from core.abstract.models import AbstractModel, AbstractManager
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 
-class CourseManager(AbstractManager):
-    def create_course(self, name, course_subject, description, creator, **kwargs):
+class CourseManager(models.Manager):
+    def get_object_by_course_id(self, course_id):
+        try: 
+            instance = self.get(course_id=course_id)
+            return instance
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return Http404
+
+    def create_course(self, name, subject, description, creator, **kwargs):
         if name is None:
             raise TypeError('Courses must have a name.')
-        if course_subject is None:
+        if subject is None:
             raise TypeError('Courses must have a subject.')
         if description is None:
             raise TypeError('Courses must have a description.')
 
-        course = self.model(name=name, course_subject=course_subject, description=description, creator=creator, **kwargs)
+        course = self.model(name=name, subject=subject, description=description, creator=creator, **kwargs)
         course.save(using=self._db)
 
         return course
@@ -42,16 +49,16 @@ class CourseManager(AbstractManager):
 
         return course
 
-    def update_course(self, course, name, course_subject, description, **kwargs):
+    def update_course(self, course, name, subject, description, **kwargs):
         if name is None:
             raise TypeError('Courses must have a name.')
-        if course_subject is None:
+        if subject is None:
             raise TypeError('Courses must have a subject.')
         if description is None:
             raise TypeError('Courses must have a description.')
 
         course.name = name
-        course.course_subject = course_subject
+        course.subject = subject
         course.description = description
         course.save(using=self._db)
 
@@ -71,7 +78,6 @@ class Course(AbstractModel):
     course_subject = models.CharField(max_length=10)
     description = models.CharField(max_length=255)
     creator = models.ForeignKey(to="core_user.User", on_delete=models.CASCADE)
-    
 
     objects = CourseManager()
 
@@ -79,7 +85,7 @@ class Course(AbstractModel):
         return f"{self.name}"
     
     def subject(self):
-        return f"{self.course_subject}"
+        return f"{self.subject}"
     
     class Meta:
-        db_table = "core_course"
+        db_table = "core.course"

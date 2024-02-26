@@ -20,6 +20,6 @@ from django.urls import include,path
 admin.site.site_header = 'BoilerBoard Administration'
 
 urlpatterns = [
-   path('admin/', admin.site.urls),
+   path('admin/', admin.site.urls), # when you need to migrate, comment this out, then uncomment
    path('api/', include(('core.routers', 'core'), namespace="core-api")),
 ]

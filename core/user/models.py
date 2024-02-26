@@ -3,19 +3,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from core.abstract.models import AbstractManager, AbstractModel
+from core.abstract.models import AbstractModel, AbstractManager
 
 
 # Create your models here.
 
 class UserManager(BaseUserManager, AbstractManager):
-    def get_object_by_public_id(self, public_id):
-        try: 
-            instance = self.get(public_id=public_id)
-            return instance
-        except (ObjectDoesNotExist, ValueError, TypeError):
-            return Http404
-        
     def create_user(self, username, email, password, **kwargs):
         
         if username is None:
@@ -71,7 +64,6 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=225)
     last_name = models.CharField(max_length=225)
     email = models.EmailField(db_index=True, unique=True)
-    joined_courses = models.ManyToManyField(to="core_course.Course", related_name="students", blank=True)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False) # This is the same thing as admin
     is_instructor = models.BooleanField(default=False)
@@ -80,19 +72,12 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     updated = models.DateTimeField(auto_now_add=True)
 
     avatar = models.ImageField(null=True)
-    user_rating = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     objects = UserManager()
-
-    def join_course(self, course):
-        return self.joined_courses.add(course)
-    def leave_course(self, course):
-        return self.joined_courses.remove(course)
-    def in_course(self, course):
-        return self.joined_courses.filter(id=course.id).exists()
 
     def __str__(self): 
         return f"{self.email}"
