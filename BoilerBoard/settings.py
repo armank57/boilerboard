@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'core',
     'core.user',
     'core.auth',
+    'core.discussion',
+    'core.course',
 ]
 
 REST_FRAMEWORK = {
