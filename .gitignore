@@ -1,5 +1,16 @@
 # dependencies
 
 /venv
+/docs
 /node_modules
-/BoilerBoard/__pycache__/
+/BoilerBoard/__pycache__
+/core/__pycache__
+/core/user/__pycache__
+/core/migrations/__pycache__
+/core/auth/__pycache__
+/core/auth/migrations/__pycache__
+/core/auth/serializers/__pycache__
+/core/auth/viewsets/__pycache__
+/core/user/migrations/__pycache__
+/core/user/__pycache__
+/DS.store
