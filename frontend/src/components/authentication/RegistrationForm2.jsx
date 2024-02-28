@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 // import { Form, Button } from "react-bootstrap";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import axios from "axios";
+//import { useNavigate } from "react-router-dom";
 import { Alert, Box, Button, Card, CardContent, Container, TextField, Collapse, IconButton } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import Grid from '@mui/material/Unstable_Grid2';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useUserActions } from "../../hooks/user.actions";
 
 function RegistrationForm2() {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [validated, setValidated] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
+    const userActions = useUserActions();
     const [form, setForm] = useState({
         username: "",
         email: "",
@@ -110,16 +112,7 @@ function RegistrationForm2() {
             last_name: form.last_name,
         }
 
-        axios.post("http://localhost:8000/api/auth/register/", data).then((res) => {
-            // Registering the Account and tokens in the store
-
-            localStorage.setItem("auth", JSON.stringify({
-                access: res.data.access,
-                refresh: res.data.refresh,
-                user: res.data.user
-            }));
-            navigate("/");
-        }).catch((err) => {
+        userActions.register(data).catch((err) => {
             if(err.message) {
                 console.log(err.request.response);
                 const obj = JSON.parse(err.request.response);
@@ -137,7 +130,36 @@ function RegistrationForm2() {
                     setError("Fill Required Fields")
                 }
             }
-        }); 
+        })
+
+        // axios.post("http://localhost:8000/api/auth/register/", data).then((res) => {
+        //     // Registering the Account and tokens in the store
+
+        //     localStorage.setItem("auth", JSON.stringify({
+        //         access: res.data.access,
+        //         refresh: res.data.refresh,
+        //         user: res.data.user
+        //     }));
+        //     navigate("/");
+        // }).catch((err) => {
+        //     if(err.message) {
+        //         console.log(err.request.response);
+        //         const obj = JSON.parse(err.request.response);
+        //         if(obj.email && obj.username && obj.email[0] === "user with this email already exists." && obj.username[0] === "user with this username already exists.") {
+        //             setErrorOpen(true);
+        //             setError("Email and Username Already Exists!");
+        //         } else if (obj.email && obj.email[0] === "user with this email already exists.") {
+        //             setErrorOpen(true);
+        //             setError("Email Already Exists!");
+        //         } else if (obj.username && obj.username[0] === "user with this username already exists.") {
+        //             setErrorOpen(true);
+        //             setError("Username Already Exists!");
+        //         } else {
+        //             setErrorOpen(true);
+        //             setError("Fill Required Fields")
+        //         }
+        //     }
+        // }); 
 
     };
 
@@ -289,7 +311,7 @@ function RegistrationForm2() {
                                     <Collapse in={errorOpen}>
                                         <Alert
                                             severity="error"
-                                            fullWidth
+                                            fullwidth
                                             action={<IconButton onClick={errorClick}><CloseIcon></CloseIcon></IconButton>}
                                         >{error}</Alert>
                                     </Collapse>
