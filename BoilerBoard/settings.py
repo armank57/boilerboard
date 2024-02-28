@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'core',
     'core.user',
     'core.auth',
+    'core.quiz2',
 ]
 
 REST_FRAMEWORK = {

@@ -1,6 +1,6 @@
 # dependencies
 
-/venv
+/.venv
 /docs
 /node_modules
 /BoilerBoard/__pycache__
@@ -13,4 +13,6 @@
 /core/auth/viewsets/__pycache__
 /core/user/migrations/__pycache__
 /core/user/__pycache__
+/core/quiz2/migrations/__pycache__
+/core/quiz2/__pycache__
 /DS.store
