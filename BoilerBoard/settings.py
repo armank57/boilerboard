@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin', # when you need to migrate, comment this out, then uncomment
     'django.contrib.auth',
     'corsheaders',
     'django.contrib.contenttypes',
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'core',
     'core.user',
     'core.auth',
+    'core.course',
 ]
 
 REST_FRAMEWORK = {
