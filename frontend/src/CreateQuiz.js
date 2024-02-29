@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-    InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Divider, InputAdornment, Paper
+    InputLabel, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
+    Box, Grid, InputAdornment, Paper
 } from '@mui/material';
 
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
@@ -92,7 +92,7 @@ function CreateQuiz() {
         setQuestions(newQuestions);
     };
 
-    const handleClick = () => {
+    const handleClick = async () => {
         for (let i = 0; i < questions.length; i++) {
             console.log(questions[i].question);
             console.log(questions[i].answerList);
@@ -102,7 +102,42 @@ function CreateQuiz() {
             alert('Please fill in all fields.');
             return;
         }
-    }
+    
+        // Create the data object for the POST request
+        const data = {
+            name: "My Quiz", // Replace with your quiz name
+            questionList: questions.map(q => ({
+                text: q.question,
+                answers: q.answerList.map((a, i) => ({
+                    text: a,
+                    is_correct: i === q.correctAnswer
+                }))
+            }))
+        };
+
+        const userToken = localStorage.getItem('access');
+    
+        // Send the POST request
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/quiz/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const quiz = await response.json();
+            console.log(quiz);
+        } catch (error) {
+            console.error('Error creating quiz:', error);
+        }
+    };
+
+    
 
     return (
         <ThemeProvider theme={theme}>
@@ -142,7 +177,7 @@ function CreateQuiz() {
                 </Grid>
                 <Grid container direction="row" sx={{ display: 'flex', justifyContent: 'center' }}>
                     {questions.map((question, questionIndex) => (
-                        <Grid item sx={{ m: 1 }}>
+                        <Grid item sx={{ m: 1 }} key={questionIndex}>
                             <Paper variant="outlined" sx={{ p: 2, mb: 2, border: '2px solid', maxWidth: '42vw' }} key={`question-${questionIndex}`}>
                                 <Grid container direction="row" sx={{ my: 2, display: 'flex', justifyContent: 'center' }} spacing={2}>
                                     <Grid item xs={8}>
