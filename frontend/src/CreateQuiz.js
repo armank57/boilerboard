@@ -35,9 +35,11 @@ function Quiz(questionList, quizName) {
     this.quizName = quizName;
 }
 
+
 function CreateQuiz() {
     const [questionNum, setQuestionNum] = useState(0);
     const [questions, setQuestions] = useState([]);
+    const [quizName, setQuizName] = useState('');
 
     const validateFields = () => {
         for (let question of questions) {
@@ -58,7 +60,7 @@ function CreateQuiz() {
 
     useEffect(() => {
         if (questions.length < questionNum) {
-            setQuestions(questions.concat(Array(questionNum - questions.length).fill(new Question('', ['', '', '', ''], ''))));
+            setQuestions(questions.concat(Array.from({ length: questionNum - questions.length }, () => new Question('', ['', '', '', ''], ''))));
         }
         else if (questions.length > questionNum) {
             setQuestions(questions.slice(0, questionNum));
@@ -70,6 +72,10 @@ function CreateQuiz() {
             return;
         }
         setQuestionNum(event.target.value);
+    };
+
+    const changeQuizName = (event) => {
+        setQuizName(event.target.value);
     };
 
     const handleQuestionChange = (index) => (event) => {
@@ -105,12 +111,13 @@ function CreateQuiz() {
     
         // Create the data object for the POST request
         const data = {
-            name: "My Quiz", // Replace with your quiz name
-            questionList: questions.map(q => ({
-                text: q.question,
-                answers: q.answerList.map((a, i) => ({
-                    text: a,
-                    is_correct: i === q.correctAnswer
+            "author": "userid", //replace with user id
+            "title": quizName,
+            "questionList": questions.map(q => ({
+                "text": q.question,
+                "answerList": q.answerList.map((a, i) => ({
+                    "text": a,
+                    "is_correct": i === q.correctAnswer
                 }))
             }))
         };
@@ -138,7 +145,6 @@ function CreateQuiz() {
     };
 
     
-
     return (
         <ThemeProvider theme={theme}>
             <AppBar position="static" color="secondary">
@@ -155,6 +161,20 @@ function CreateQuiz() {
             </AppBar>
             <Box sx={{ m: 2 }}>
                 <Grid container direction="row" sx={{ my: 4 }}>
+                <Grid item sx={{ m: 2 }}>
+                        <Typography variant="h6">
+                            Quiz Name
+                        </Typography>
+                    </Grid>
+                    <Grid item sx={{ m: 2 }}>
+                        <TextField
+                            type="text"
+                            value={quizName}
+                            onChange={changeQuizName}
+                            variant="outlined"
+                            InputProps={{ inputProps: { min: 0 } }}
+                        />
+                    </Grid>
                     <Grid item sx={{ m: 2 }}>
                         <Typography variant="h6">
                             Number of Questions
@@ -177,8 +197,8 @@ function CreateQuiz() {
                 </Grid>
                 <Grid container direction="row" sx={{ display: 'flex', justifyContent: 'center' }}>
                     {questions.map((question, questionIndex) => (
-                        <Grid item sx={{ m: 1 }} key={questionIndex}>
-                            <Paper variant="outlined" sx={{ p: 2, mb: 2, border: '2px solid', maxWidth: '42vw' }} key={`question-${questionIndex}`}>
+                        <Grid item sx={{ m: 1 }} key={`question-${questionIndex}`}>
+                            <Paper variant="outlined" sx={{ p: 2, mb: 2, border: '2px solid', maxWidth: '42vw' }}>
                                 <Grid container direction="row" sx={{ my: 2, display: 'flex', justifyContent: 'center' }} spacing={2}>
                                     <Grid item xs={8}>
                                         <InputLabel htmlFor={`question-${questionIndex}`}>Question {questionIndex + 1}</InputLabel>
