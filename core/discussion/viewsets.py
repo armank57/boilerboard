@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from core.abstract.viewsets import AbstractViewSet
 from core.discussion.models import Discussion
 from core.discussion.serializers import DiscussionSerializer
@@ -7,7 +7,7 @@ from rest_framework import status
 
 class DiscussionViewset(AbstractViewSet): 
     http_method_names = ['post', 'get']
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     serializer_class = DiscussionSerializer
 
     def get_queryset(self):

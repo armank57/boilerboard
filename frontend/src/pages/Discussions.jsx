@@ -1,10 +1,15 @@
 import { React, useState, useEffect } from 'react';
-import { Card, CardContent, Container, Typography } from '@mui/material';
+import { Card, CardContent, Container, Typography, TextField, Grid} from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+
 
 function Discussions() {
     const [discussions, setDiscussions] = useState([]);
+    const [searchQuery, setSearchQuery]  = useState("")
+    
 
     const theme = createTheme({
         palette: {
@@ -21,6 +26,30 @@ function Discussions() {
         },
     });
 
+    
+
+    const SearchBar = ({setSearchQuery}) => (
+        <form>
+            <TextField 
+                id="search-bar"
+                className="text"
+                onInput={(e) => {
+                    setSearchQuery(e.target.value);
+                }}
+                style= {{
+                    background: theme.palette.primary.main
+                }}
+                label="Enter a Discussion Name"
+                placeholder="Search..."
+                variant="outlined"
+                size="small"
+            />
+            <IconButton type="submit" aria-label="search">
+                <SearchIcon style={{ fill: "yellow" }} />
+            </IconButton>
+        </form>
+    );
+
     useEffect(() => {
         // TODO: Replace with your actual API endpoint
         setDiscussions([
@@ -29,7 +58,7 @@ function Discussions() {
         ]);
 
         // TODO: Set discussions from back-end API
-        axios.get('http://localhost:8000/api/discussions')
+        axios.get('http://localhost:8000/api/discussion/')
             .then(response => {
                 setDiscussions(response.data);
             })
@@ -48,7 +77,7 @@ function Discussions() {
             }}>
                 <CardContent>
                     <Typography variant="h5">
-                        {discussion.title}
+                        {discussion.name}
                     </Typography>
                     <Typography variant="body1" style={{
                         overflow: 'hidden',
@@ -57,7 +86,7 @@ function Discussions() {
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical'
                     }}>
-                        {discussion.content}
+                        {discussion.description}
                     </Typography>
                 </CardContent>
             </Card>
@@ -67,10 +96,17 @@ function Discussions() {
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>
-                <Container maxWidth="md">
-                    <Typography variant="h3" style={{ paddingBottom: '20px' }}>
-                        Discussions
-                    </Typography>
+                <Container maxWidth="md" style={{paddingTop: "20px" }}>
+                    <Grid container direction="row" display="flex" justifyContent="space-between">
+                        <Grid item>
+                            <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
+                                Discussions 
+                            </Typography>    
+                        </Grid>
+                        <Grid item style={{paddingTop: "10px"}}>
+                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                        </Grid>
+                    </Grid>
                     <div>
                         {discussionMapper()}
                     </div>
