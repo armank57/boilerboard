@@ -17,6 +17,6 @@ class DiscussionSerializer(AbstractSerializer):
     
     class Meta: 
         model = Discussion
-        fields = ['id', 'creator', 'course', 'name', 'description', 'created', 'updated']
+        fields = ['id', 'creator', 'course', 'name', 'description', 'rating', 'created', 'updated']
 
     
