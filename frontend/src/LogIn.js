@@ -41,23 +41,34 @@ function LogIn() {
         // TODO: Send email and password to server
         try {
             const response = await axios.post('http://localhost:8000/api/auth/login/', {
-                email: email, // replace with the name of your username field
-                password: password, // replace with the name of your password field
+                email: email, 
+                password: password,
+            }, {
+                validateStatus: function (status) {
+                    return status < 500; // Resolve only if the status code is less than 500                
+                }
             });
 
-            if (response.data.access) {
+            if (response.status === 200) {
                 // Login successful
                 console.log('Login successful:', response.data);
                 // You can save the tokens in local storage or context
-                localStorage.setItem('access', response.data.access);
-                localStorage.setItem('refresh', response.data.refresh);
+                localStorage.setItem("auth", JSON.stringify({
+                    access: response.data.access,
+                    refresh: response.data.refresh,
+                    user: response.data.user
+                }));
                 // TODO: Redirect to home page or dashboard
-            } else {
+                
+            } else if (response.status === 401) {
                 // Login failed
-                alert('Login failed:', response.data);
+                // TODO: Style this login failed message
+                alert(`Login failed: ${response.data.detail}`);
             }
         } catch (error) {
-            alert(error);
+            // Network error or any other error with status code 500 or above
+            alert('Error:', error);
+            console.log(error);
         }
     }
 
