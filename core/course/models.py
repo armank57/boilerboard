@@ -71,6 +71,7 @@ class Course(AbstractModel):
     course_subject = models.CharField(max_length=10)
     description = models.CharField(max_length=255)
     creator = models.ForeignKey(to="core_user.User", on_delete=models.CASCADE)
+    
 
     objects = CourseManager()
 
@@ -78,7 +79,7 @@ class Course(AbstractModel):
         return f"{self.name}"
     
     def subject(self):
-        return f"{self.subject}"
+        return f"{self.course_subject}"
     
     class Meta:
         db_table = "core.course"
