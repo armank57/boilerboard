@@ -122,7 +122,9 @@ function CreateQuiz() {
             }))
         };
 
-        const userToken = localStorage.getItem('access');
+        let userToken = localStorage.getItem('auth');
+        userToken = JSON.parse(userToken).access;
+        console.log(userToken)
     
         // Send the POST request
         try {
@@ -139,8 +141,10 @@ function CreateQuiz() {
             }
             const quiz = await response.json();
             console.log(quiz);
+            alert('Quiz created successfully!');
         } catch (error) {
             console.error('Error creating quiz:', error);
+            alert('Error creating quiz:', error);
         }
     };
 
@@ -152,7 +156,7 @@ function CreateQuiz() {
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>
                         Physics 101 Quiz Creator
                     </Typography>
-                    <Link to="/">
+                    <Link to="/study-page">
                         <Button variant="contained" color="primary">
                             Back to Study Page
                         </Button>

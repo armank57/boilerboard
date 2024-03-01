@@ -16,3 +16,14 @@
 /core/quiz2/migrations/__pycache__
 /core/quiz2/__pycache__
 /DS.store
+/frontend/node_modules
+/core/migrations/__pycache__
+/core/__pycache__
+/core/course/migrations/__pycache__
+/core/course/__pycache__
+/core/quiz/migrations/__pycache__
+/core/quiz/__pycache__
+/core/abstract/__pycache__
+/core/quiz2/__pycache__
+/core/quiz2/migrations/__pycache__
+/core/quiz2/abstract/__pycache__
