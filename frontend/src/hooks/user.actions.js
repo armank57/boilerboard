@@ -9,6 +9,8 @@ function useUserActions() {
         login,
         register,
         logout,
+        sendResetPasswordEmail,
+        resetPassword,
     };
 
     //Login the User
@@ -33,8 +35,33 @@ function useUserActions() {
             navigate("/");
         });
     } 
-}
 
+    function sendResetPasswordEmail(data) {
+        axios.post(`${baseURL}/auth/send-user-email/`, data).then((res) => {
+            navigate("/reset-password-dialogue/")
+        }).catch((err) => {
+            if (err.message) {
+                console.log(err.message)
+            }
+            navigate("/reset-password-dialogue/")
+        })
+    }
+
+    function resetPassword(data, public_id, token) {
+        axios.post(`${baseURL}/auth/reset-password/${public_id}/${token}`, data).then((res) => {
+            setUserData(res.data);
+            navigate("/");
+        }).catch((err) => {
+            if(err.message) {
+                console.log(err.message);
+                if(err.message === "Request failed with status code 400") {
+                    alert("Your reset session has expired, please try again");
+                    navigate("/reset-password/");
+                }
+            }
+        })
+    }
+}
 // Get the User
 function getUser() {
     const auth = JSON.parse(localStorage.getItem("auth")) || null;
