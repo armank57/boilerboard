@@ -9,7 +9,19 @@ import SearchIcon from "@mui/icons-material/Search";
 function Discussions() {
     const [discussions, setDiscussions] = useState([]);
     const [searchQuery, setSearchQuery]  = useState("")
-    
+
+    const filterData = ((query, data) => {
+        if (!query) {
+          return data;
+        } else if (!data) {
+
+        } else {
+            
+          return data.filter((d) => d.name.toLowerCase().includes(query));
+        }
+    });
+
+    const dataFiltered = filterData(searchQuery, discussions);
 
     const theme = createTheme({
         palette: {
@@ -33,7 +45,7 @@ function Discussions() {
             <TextField 
                 id="search-bar"
                 className="text"
-                onInput={(e) => {
+                onChange={(e) => {
                     setSearchQuery(e.target.value);
                 }}
                 style= {{
@@ -45,7 +57,7 @@ function Discussions() {
                 size="small"
             />
             <IconButton type="submit" aria-label="search">
-                <SearchIcon style={{ fill: "yellow" }} />
+                <SearchIcon style={{ fill: "white" }} />
             </IconButton>
         </form>
     );
@@ -61,6 +73,7 @@ function Discussions() {
         axios.get('http://localhost:8000/api/discussion/')
             .then(response => {
                 setDiscussions(response.data);
+                console.log(response.data[0].name)
             })
             .catch(error => {
                 console.error('Error fetching discussions:', error);
