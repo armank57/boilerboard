@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from core.course.serializers import CourseSerializer
 from core.course.models import Course
 from core.abstract.viewsets import AbstractViewSet
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission, SAFE_METHODS, AllowAny
 from rest_framework.decorators import action
 
 # Create your views here.
@@ -55,6 +55,22 @@ class CourseViewSet(AbstractViewSet):
         course = self.get_object()
         user = self.request.user
         user.leave_course(course)
+        serializer = self.serializer_class(course)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True)
+    def add_module(self, request, *args, **kwargs):
+        course = self.get_object()
+        module = self.request.data.get('module')
+        module.in_course(module)
+        serializer = self.serializer_class(course)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(methods=['post'], detail=True)
+    def remove_module(self, request, *args, **kwargs):
+        course = self.get_object()
+        module = self.get_object()
+        course.remove_module(module)
         serializer = self.serializer_class(course)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
