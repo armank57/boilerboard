@@ -9,6 +9,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LogIn from './LogIn';
 import ResetPassword from './ResetPassword';
 import Discussions from './Discussions';
+import CourseHome from './CourseHome';
 
 
 /*
@@ -38,6 +39,7 @@ root.render(
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-account" element={<h1>Create Account</h1>} />
         <Route path="/discussions" element={<Discussions />} />
+        <Route path="/courses" element={<CourseHome />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -2,6 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { Button, Card, CardContent, Container, Tabs, Tab, Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // TODO: Configure back end properly
 // TODO: Display only top 10 posts based on recency
