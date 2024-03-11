@@ -10,6 +10,7 @@ import LogIn from './LogIn';
 import ResetPassword from './ResetPassword';
 import Discussions from './Discussions';
 import CourseHome from './CourseHome';
+import Course from './pages/Course';
 
 
 /*
@@ -40,6 +41,7 @@ root.render(
         <Route path="/create-account" element={<h1>Create Account</h1>} />
         <Route path="/discussions" element={<Discussions />} />
         <Route path="/courses" element={<CourseHome />} />
+        <Route path="/courses/:courseID" element={<Course />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
