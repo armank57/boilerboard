@@ -42,7 +42,7 @@ function CourseHome() {
                 }}>
                     <CardContent>
                         <Typography variant="h5">
-                            {course.title}
+                            {course.name}
                         </Typography>
                         <Typography variant="body1" style={{
                             overflow: 'hidden',
