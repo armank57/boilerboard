@@ -36,7 +36,7 @@ class UserSerializer(AbstractSerializer):
             'is_superuser',
             'is_instructor',
             'avatar',
-            'rating',
+            'user_rating',
         ]
 
         read_only_fields = ['is_active']

@@ -1,8 +1,9 @@
 from core.abstract.viewsets import AbstractViewSet
 from core.posts.serializers import PostSerializer
-from core.posts.models import Post
+from core.posts.models import Post, Rating
 
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Create your views here
@@ -25,4 +26,24 @@ class PostViewSet(AbstractViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def upvote(self, request, pk=None):
+        # Only should be called if the user has not already upvoted the post
+        post = self.get_object()
+        user = request.user
+        Rating.objects.create(user=user, post=post, upvote=True)
+        data = {'message': 'Upvote added successfully.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def remove_upvote(self, request, pk=None):
+        # Only should be called if the user has already upvoted the post
+        post = self.get_object()
+        user = request.user
+        rating = Rating.objects.get(user=user, post=post)
+        rating.delete()
+        data = {'message': 'Upvote removed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
     

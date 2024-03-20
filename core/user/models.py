@@ -73,7 +73,7 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     updated = models.DateTimeField(auto_now_add=True)
 
     avatar = models.ImageField(null=True)
-    rating = models.IntegerField(default=0)
+    user_rating = models.IntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
