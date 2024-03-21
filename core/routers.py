@@ -4,6 +4,7 @@ from core.auth.viewsets import RegisterViewSet, LoginViewSet, RefreshViewSet
 from core.course.viewsets import CourseViewSet
 from core.module.viewsets import ModuleViewSet
 from core.quiz2.viewsets.viewsets import Quiz2ViewSet
+from core.voice_chat.views import VoiceChatRoomViewSet
 
 router = routers.SimpleRouter()
 
@@ -14,6 +15,7 @@ router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
 router.register(r'course', CourseViewSet, basename='course')
 router.register(r'module', ModuleViewSet, basename='module')
 router.register(r'quiz', Quiz2ViewSet, basename='quiz')
+router.register(r'voice_chat', VoiceChatRoomViewSet, basename='voice-chat')
 
 urlpatterns = [
     *router.urls,
