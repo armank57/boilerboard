@@ -1,5 +1,6 @@
 from django.db import models
 from core.abstract.models import AbstractModel, AbstractManager
+from core.course.models import Course
 # Create your models here.
 
 class ModuleManager(AbstractManager):
@@ -58,7 +59,8 @@ class ModuleManager(AbstractManager):
     
 class Module(AbstractModel):
     name = models.CharField(max_length=255)
-    course = models.ForeignKey('core_course.Course', related_name='modules', on_delete=models.CASCADE)
+    section = models.ForeignKey('core_section.Section', related_name="modules", on_delete=models.CASCADE)
+    subsection = models.IntegerField(default=0)
     
     objects = ModuleManager()
 

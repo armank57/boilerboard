@@ -1,18 +1,18 @@
 from rest_framework import serializers
 from core.abstract.serializers import AbstractSerializer
 from core.module.models import Module
-from core.course.models import Course
-from core.course.serializers import CourseSerializer
+from core.section.models import Section
+"""from core.section.serializers import SectionSerializer"""
 class ModuleSerializer(AbstractSerializer):
-    course = CourseSerializer(read_only=True)
+    section = serializers.SlugRelatedField(queryset=Section.objects.all(), slug_field='public_id')
     
     class Meta:
         model = Module
         fields = [
             'id',
             'name',
-            'course',
-            'quizzes',
+            'section',
+            'subsection',
             'created',
             'updated',
         ]

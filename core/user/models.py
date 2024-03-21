@@ -9,6 +9,13 @@ from core.abstract.models import AbstractModel, AbstractManager
 # Create your models here.
 
 class UserManager(BaseUserManager, AbstractManager):
+    def get_user_by_username(self, username):
+        try: 
+            instance = self.get(username=username)
+            return instance
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return Http404
+
     def create_user(self, username, email, password, **kwargs):
         
         if username is None:

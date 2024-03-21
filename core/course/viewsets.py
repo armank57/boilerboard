@@ -42,6 +42,13 @@ class CourseViewSet(AbstractViewSet):
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
+    @action(methods=['get'], detail=True)
+    def is_in_course(self, request, *args, **kwargs):
+        course = self.get_object()
+        user = self.request.user
+        isInCourse = user.in_course(course)
+        return Response(isInCourse, status=status.HTTP_200_OK)
+
     @action(methods=['post'], detail=True)
     def join_course(self, request, *args, **kwargs):
         course = self.get_object()

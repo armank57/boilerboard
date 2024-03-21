@@ -11,6 +11,7 @@ import ResetPassword from './ResetPassword';
 import Discussions from './Discussions';
 import CourseHome from './CourseHome';
 import Course from './pages/Course';
+import NewModule from './components/NewModule';
 
 
 /*
@@ -42,6 +43,7 @@ root.render(
         <Route path="/discussions" element={<Discussions />} />
         <Route path="/courses" element={<CourseHome />} />
         <Route path="/courses/:courseID" element={<Course />} />
+        <Route path="/courses/:courseID/:sectionID/new-module" element={<NewModule />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -32,7 +32,7 @@ function CourseHome() {
 
     function CourseMapper() {
         return courses.map((course, index) => (
-            <Link to={`/courses/${course.id}`} key={index} style={{ textDecoration: 'none' }}>
+            <Link to={`/courses/${course.id}/`} key={index} style={{ textDecoration: 'none' }}>
                 <Card style={{ 
                     backgroundColor: theme.palette.primary.main, 
                     marginBottom: '20px',

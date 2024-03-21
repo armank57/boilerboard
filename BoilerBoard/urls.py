@@ -19,6 +19,6 @@ from django.urls import include,path
 
 
 urlpatterns = [
-   path('admin/', admin.site.urls), # when you need to migrate, comment this out, then uncomment
-   path('api/', include(('core.routers', 'core'), namespace="core-api")),
+    path('admin/', admin.site.urls), # when you need to migrate, comment this out, then uncomment
+    path('api/', include(('core.routers', 'core'), namespace="core-api")),
 ]
