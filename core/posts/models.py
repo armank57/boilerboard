@@ -29,6 +29,18 @@ class Rating(models.Model):
         unique_together = ('user', 'post')
 
 
+class BadContent(models.Model):
+    user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True)
+    reported = models.BooleanField(default=False)
+    reportedContent = models.TextField(default='hi')
+    post = models.ForeignKey('Post', related_name="badContentList", on_delete=models.CASCADE, null=True)
+
+    # ensures that a user can only rate a post once
+    class Meta:
+        unique_together = ('user', 'post')
+
+
 class Post(AbstractModel):
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -37,6 +49,8 @@ class Post(AbstractModel):
     # to access ratings for a post, use post.ratings.all()
     # to access posts rated by a user, use user.rated_posts.all()
     ratings = models.ManyToManyField('core_user.User', through=Rating, related_name='rated_posts')
+
+    reports = models.ManyToManyField('core_user.User', through=BadContent, related_name='bad_content')
 
     objects = PostManager()
 

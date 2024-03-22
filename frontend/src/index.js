@@ -13,6 +13,7 @@ import CourseHome from './CourseHome';
 import CreateQuiz from './CreateQuiz';
 import StudyPage from './StudyPage';
 import ViewProfile from './ViewProfile';
+import ReportContent from './ReportContent';
 
 
 /*
@@ -46,6 +47,7 @@ root.render(
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/study-page" element={<StudyPage />} />
         <Route path="/view-profile" element={<ViewProfile />} />
+        <Route path="/report-content" element={<ReportContent />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

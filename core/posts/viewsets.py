@@ -1,6 +1,6 @@
 from core.abstract.viewsets import AbstractViewSet
 from core.posts.serializers import PostSerializer
-from core.posts.models import Post, Rating
+from core.posts.models import Post, Rating, BadContent
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -44,6 +44,24 @@ class PostViewSet(AbstractViewSet):
         rating = Rating.objects.get(user=user, post=post)
         rating.delete()
         data = {'message': 'Upvote removed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def report_content(self, request, pk=None):
+        # Only should be called if the user has not already reported the post
+        post = self.get_object()
+        user = request.user
+        BadContent.objects.create(user=user, post=post, reported=True, reportedContent=request.data['reportedContent'])
+        data = {'message': 'Report added successfully.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def remove_reported_content(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        BadContent = BadContent.objects.get(user=user, post=post)
+        BadContent.delete()
+        data = {'message': 'Content removed successful.'}
         return Response(data, status=status.HTTP_201_CREATED)
     
     
