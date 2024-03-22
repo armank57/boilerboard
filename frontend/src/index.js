@@ -12,6 +12,7 @@ import Discussions from './Discussions';
 import CourseHome from './CourseHome';
 import CreateQuiz from './CreateQuiz';
 import StudyPage from './StudyPage';
+import ViewProfile from './ViewProfile';
 
 
 /*
@@ -44,6 +45,7 @@ root.render(
         <Route path="/courses" element={<CourseHome />} />
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/study-page" element={<StudyPage />} />
+        <Route path="/view-profile" element={<ViewProfile />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
