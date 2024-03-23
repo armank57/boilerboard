@@ -36,9 +36,9 @@ root.render(
     <BrowserRouter>
       <App />
       <Routes>
-        <Route 
-          exact path="/" 
-          element={<LogIn />} 
+        <Route
+          exact path="/"
+          element={<LogIn />}
         />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-account" element={<h1>Create Account</h1>} />
@@ -47,7 +47,7 @@ root.render(
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/study-page" element={<StudyPage />} />
         <Route path="/view-profile" element={<ViewProfile />} />
-        <Route path="/report-content" element={<ReportContent />} />
+        <Route path="/report-content/:postId" element={<ReportContent />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const theme = createTheme({
     palette: {
@@ -35,12 +36,43 @@ function getUser() {
 
 export default function ReportContent() {
     const [user, setUser] = useState(getUser());
-    const [posts, setPosts] = useState([]);
+    const [post, setPost] = useState([]);
+    const [reason, setReason] = useState('');
+    const { postId } = useParams();
+
+    const reportContent = async () => {
+
+        const data = {
+            "reportedContent": reason,
+        };
+    
+        // Send the POST request
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/post/${postId}/report_content/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`, // Replace user.token with your actual token
+                },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const quiz = await response.json();
+            console.log(quiz);
+            alert('Successfully reported content!');
+        } catch (error) {
+            console.error('Error reporting content:', error);
+            alert('Error reporting content:', error);
+        }
+    };
+
 
     useEffect(() => {
-        const fetchPosts = async () => {
+        const fetchPost = async (publicId) => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/post/', {
+                const response = await fetch(`http://127.0.0.1:8000/api/post/${publicId}`, {
                     headers: {
                         'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`, // Replace user.token with your actual token
                     }
@@ -48,20 +80,15 @@ export default function ReportContent() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const posts = await response.json();
-                console.log(posts);
-                setPosts(posts);
-                posts.map((post) => {
-                    post.badContentList.map((badContent) => {
-                      console.log(badContent.reportedContent);
-                    });
-                  });
+                const post = await response.json();
+                console.log(post);
+                setPost(post);
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
         };
 
-        fetchPosts();
+        fetchPost(postId); // Replace with the publicId of the post you want to fetch
     }, []);
 
     return (
@@ -73,6 +100,40 @@ export default function ReportContent() {
                     </Typography>
                 </Toolbar>
             </AppBar>
+            <Paper sx={{ flexGrow: 1, p: 3, marginLeft: 'auto', marginRight: 'auto', marginTop: 2, maxWidth: '50%' }}>
+                <Typography variant="h5" component="div">
+                    {post.title}
+                </Typography>
+                <Typography variant="body1" sx={{ marginTop: 2, marginBottom: 2 }} component="div">
+                    {post.content}
+                </Typography>
+                <Typography variant="body1" component="div">
+                    Upvotes: {post.ratings}
+                </Typography>
+                <Typography variant="body1" component="div">
+                    Author: {post.author}
+                </Typography><TextField
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                    id="reason"
+                    label="Reason for reporting"
+                    name="reason"
+                    autoComplete="reason"
+                    autoFocus
+                    value={reason}
+                    onChange={(event) => setReason(event.target.value)}
+                />
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={reportContent}
+                >
+                    Report Content
+                </Button>
+            </Paper>
         </ThemeProvider>
     );
 }
