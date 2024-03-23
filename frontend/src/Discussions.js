@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react';
-import { Button, Card, CardContent, Container, Tabs, Tab, Typography } from '@mui/material';
+import { Button, Card, CardContent, Container, MenuItem, Select, Tabs, Tab, TextField, Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,9 @@ function Discussions() {
     const [discLength, setDiscLength] = useState(numPosts); // State for discussions length
     const [loadCount, setLoadCount] = useState(numPosts); // State for load count, used for loading more discussions
     const [currentTopic, setCurrentTopic] = useState('All'); // State for current topic, used for filtering discussions
+
+    // Static list of topics to tab-by
+    const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other']; 
 
     const theme = createTheme({
         palette: {
@@ -36,34 +39,15 @@ function Discussions() {
 
         // The following setDiscussions is filler content with several discussions
         // that should be deleted once the back-end API is set up
-        setDiscussions([
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'Homework'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'Homework'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'Exams'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'Exams'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 1', content: 'This is the first discussion.', topic: 'General'},
-            {title: 'Discussion 2', content: 'This is the second discussion. Testing very long discussion with a lot of words to see how it overflows because blah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah Hello.', topic: 'Homework'}
-        ]);
-        // TODO: Set discussions from back-end API
-        axios.get('http://localhost:8000/api/discussions/')
+        // TODO: Link discussions to each course they are a part of
+        axios.get('http://127.0.0.1:8000/api/post/', {
+            headers: {
+                'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            }
+        })
             .then(response => {
                 setDiscussions(response.data);
+                console.log(discussions);
             })
             .catch(error => {
                 console.error('Error fetching discussions:', error);
@@ -102,10 +86,7 @@ function Discussions() {
     }
 
     function tabMapper() {
-        return discussions
-            .map(discussion => discussion.topic)
-            .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
-            .map((topic, index) => (
+        return topics.map((topic, index) => (
                 <Tab key={index} label={topic} value={topic} />
             ));
     }
@@ -117,15 +98,31 @@ function Discussions() {
 
     function switchTab(event, newValue) {
         setCurrentTopic(newValue);
+        setLoadCount(numPosts);
     }
 
+    // TODO: Connect this discussions page to a course
+    // TODO: Implement sorting and searching
+    // TODO: Style the UI for post previews better and add number of upvotes and replies
+    // TODO: Create a new post button that links to a new post page
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>
                 <Container maxWidth="md">
                     <Typography variant="h3" style={{ paddingBottom: '20px' }}>
-                        Discussions
+                        Course Name
                     </Typography>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                        <TextField label="Search" variant="outlined" />
+                        <Select variant="outlined">
+                            <MenuItem value="date">Date</MenuItem>
+                            <MenuItem value="popularity">Popularity</MenuItem>
+                            {/* Add more options as needed */}
+                        </Select>
+                        <Button variant="contained" color="primary" onClick={() => window.open('/create-post', '_blank')}>
+                            Create Post
+                        </Button>
+                    </div>
                     <Tabs value={currentTopic} 
                         onChange={switchTab}
                         indicatorColor="secondary"

@@ -12,6 +12,7 @@ import Discussions from './Discussions';
 import CourseHome from './CourseHome';
 import CreateQuiz from './CreateQuiz';
 import StudyPage from './StudyPage';
+import CreatePost from './CreatePost';
 
 
 /*
@@ -41,6 +42,7 @@ root.render(
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-account" element={<h1>Create Account</h1>} />
         <Route path="/discussions" element={<Discussions />} />
+        <Route path="/create-post" element={<CreatePost />} />
         <Route path="/courses" element={<CourseHome />} />
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/study-page" element={<StudyPage />} />
