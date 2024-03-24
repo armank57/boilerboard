@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
+import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography, Grid } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 // TODO: Connect this to be within a course!
 // TODO: Make this function return back to the Discussions page upon Submission or Cancel
 // TODO: Add a cancel button
 function CreatePost() {
+    const navigate = useNavigate();
+    
     const [title, setTitle] = useState('');
     const [topic, setTopic] = useState('General'); // Default topic is General
     const [content, setContent] = useState('');
@@ -51,12 +54,14 @@ function CreatePost() {
                 setTitle('');
                 setTopic('General');
                 setContent('');
+                navigate('/discussions');
             } else {
                 alert('Failed to submit post');
             }
         } catch (error) {
             console.error('Failed to submit post:', error);
         }
+
     };
 
     return (
@@ -101,9 +106,18 @@ function CreatePost() {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                     />
-                    <Button variant="contained" color="primary" type="submit" fullWidth style={{ marginTop: '20px' }}>
-                        Submit
-                    </Button>
+                    <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                            <Button variant="contained" color="secondary" type="submit" fullWidth>
+                                Submit
+                            </Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Button variant="contained" color="secondary" fullWidth onClick={() => navigate(-1)}>
+                                Cancel
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Box>
             </Container>
         </ThemeProvider>

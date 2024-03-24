@@ -9,6 +9,7 @@ class PostSerializer(AbstractSerializer):
     ratings = serializers.SerializerMethodField()
     user_has_upvoted = serializers.SerializerMethodField()
     is_author = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -23,7 +24,8 @@ class PostSerializer(AbstractSerializer):
             'updated',
             'ratings',
             'user_has_upvoted',
-            'is_author'
+            'is_author',
+            'author_name'
         ]
     
     def get_ratings(self, obj):
@@ -38,3 +40,7 @@ class PostSerializer(AbstractSerializer):
     def get_is_author(self, obj):
         user = self.context['request'].user
         return obj.author == user
+    
+    def get_author_name(self, obj):
+        return obj.author.username
+    
