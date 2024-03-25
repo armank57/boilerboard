@@ -21,6 +21,8 @@ class VoiceChatRoomViewSet(viewsets.ModelViewSet):
         room = self.get_object()
         if room.creator != request.user:
             return Response({'status': 'You are not authorized to delete this room'}, status=status.HTTP_403_FORBIDDEN)
+        if room.online_users.count() > 0:
+            return Response({'status': 'You cannot delete a room with users in it'}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'])

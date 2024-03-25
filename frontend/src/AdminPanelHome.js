@@ -91,10 +91,10 @@ function AdminPanelHome() {
     const requestData = {
       name: courseName,
       description: courseDescription
-      //
+      //course_subject:, creator:
     };
   
-    axios.post('http://localhost:8000/api/courses/', requestData)
+    axios.post('http://localhost:8000/api/course/', requestData)
       .then(response => {
         console.log(response);
         // Reset the input fields after successful creation

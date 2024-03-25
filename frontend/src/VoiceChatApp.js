@@ -42,6 +42,8 @@ function VoiceChatApp() {
     useEffect(() => {
         // Fetch all rooms when the component mounts
         fetchRooms();
+        const intervalId = setInterval(fetchRooms, 3000);
+        return () => clearInterval(intervalId);
     }, []);
 
     useEffect(() => {
