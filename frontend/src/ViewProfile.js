@@ -106,7 +106,7 @@ export default function ViewProfile() {
               </Typography>
               <Paper>
                 <List>
-                  {posts.map((post) => (
+                  {posts.filter(post => post.is_author).map((post) => (
                     <ListItem key={post.id}>
                       <ListItemText
                         primary={post.title}

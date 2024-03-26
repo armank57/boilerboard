@@ -111,7 +111,7 @@ export default function ReportContent() {
                     Upvotes: {post.ratings}
                 </Typography>
                 <Typography variant="body1" component="div">
-                    Author: {post.author}
+                    Author: {post.author_name}
                 </Typography><TextField
                     variant="outlined"
                     margin="normal"

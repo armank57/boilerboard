@@ -14,6 +14,8 @@ import CreateQuiz from './CreateQuiz';
 import StudyPage from './StudyPage';
 import ViewProfile from './ViewProfile';
 import ReportContent from './ReportContent';
+import CreatePost from './CreatePost';
+import ViewPost from './ViewPost';
 
 
 /*
@@ -43,6 +45,8 @@ root.render(
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-account" element={<h1>Create Account</h1>} />
         <Route path="/discussions" element={<Discussions />} />
+        <Route path="/post/:id" element={<ViewPost />} />
+        <Route path="/create-post" element={<CreatePost />} />
         <Route path="/courses" element={<CourseHome />} />
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/study-page" element={<StudyPage />} />

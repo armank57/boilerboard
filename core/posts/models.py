@@ -5,7 +5,7 @@ from core.abstract.models import AbstractModel, AbstractManager
 # Create your models here.
 
 class PostManager(AbstractManager):
-    def create_post(self, title, content, author, **kwargs):
+    def create_post(self, title, content, author, topic, **kwargs):
         #print('Title:', title)
         if title is None:
             raise TypeError('Posts must have a title.')
@@ -14,7 +14,7 @@ class PostManager(AbstractManager):
         if author is None:
             raise TypeError('Posts must have an author.')
 
-        post = self.model(title=title, content=content, author=author, **kwargs)
+        post = self.model(title=title, content=content, author=author, topic=topic, **kwargs)
         post.save(using=self._db)
 
         return post
@@ -45,6 +45,7 @@ class Post(AbstractModel):
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    topic = models.CharField(max_length=255, null=True)
 
     # to access ratings for a post, use post.ratings.all()
     # to access posts rated by a user, use user.rated_posts.all()

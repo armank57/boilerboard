@@ -16,9 +16,12 @@ class PostSerializer(AbstractSerializer):
     ratings = serializers.SerializerMethodField()
     reports = serializers.SerializerMethodField()
     user_has_upvoted = serializers.SerializerMethodField()
+    is_author = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
     user_has_reported = serializers.SerializerMethodField()
     badContentList = BadContentSerializer(many=True)
     
+    # TODO: Add a foreign key for course id
     class Meta:
         model = Post
         fields = [
@@ -26,9 +29,13 @@ class PostSerializer(AbstractSerializer):
             'title',
             'content',
             'author',
+            'topic',
             'created',
             'updated',
             'ratings',
+            'user_has_upvoted',
+            'is_author',
+            'author_name',
             'reports',
             'badContentList',
             'user_has_upvoted',
@@ -43,6 +50,14 @@ class PostSerializer(AbstractSerializer):
     def get_user_has_upvoted(self, obj):
         user = self.context['request'].user
         return Rating.objects.filter(user=user, post=obj, upvote=True).exists()
+    
+    def get_is_author(self, obj):
+        user = self.context['request'].user
+        return obj.author == user
+    
+    def get_author_name(self, obj):
+        return obj.author.username
+    
     
     def get_reports(self, obj):
         # Calculate the number of upvotes
