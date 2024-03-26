@@ -1,10 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, TextField, List, ListItem, ListItemText, Container, Typography, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import toast, { Toaster } from 'react-hot-toast';
-import DailyIframe from '@daily-co/daily-js';
+// import { Daily } from 'daily-js';
 
 const theme = createTheme({
     palette: {
@@ -21,14 +21,20 @@ const theme = createTheme({
     },
 });
 
+// const daily = new Daily({
+//     domain: 'boilerboard.daily.co',
+//     apiKey: '6baf453028501054b40fe396a23dafb4dc6a29ffa38886101b20427f95b87b59',
+// });
+
 function VoiceChatApp() {
     const [roomName, setRoomName] = useState('');
     const [rooms, setRooms] = useState([]);
     const [joinedRoom, setJoinedRoom] = useState(null);
-    const callRef = useRef();
+    // const [voiceChatRoom, setVoiceChatRoom] = useState(null);
 
     let userToken = localStorage.getItem('auth');
     userToken = JSON.parse(userToken).access;
+    console.log(userToken);
 
     const fetchRooms = () => {
         axios.get('http://localhost:8000/api/voice_chat/', {
@@ -55,12 +61,6 @@ function VoiceChatApp() {
     }, [rooms, joinedRoom]);
 
     const handleCreateRoom = () => {
-        // Check if the room name only contains letters and numbers
-        const isValidRoomName = /^[a-zA-Z0-9]+$/.test(roomName);
-        if (!isValidRoomName) {
-            toast.error('Room name can only contain letters and numbers.');
-            return;
-        }
         // Create a new room
         axios.post('http://localhost:8000/api/voice_chat/', { name: roomName }, {
             headers: {
@@ -101,6 +101,15 @@ function VoiceChatApp() {
 
     };
 
+    // const joinVoiceChatRoom = async (roomId) => {
+    //     try {
+    //         const room = await daily.room(roomId).join();
+    //         setVoiceChatRoom(room);
+    //     } catch (error) {
+    //         console.error('Failed to join voice chat room:', error);
+    //     }
+    // };
+
     const handleJoinRoom = (roomId) => {
         axios.post(`http://localhost:8000/api/voice_chat/${roomId}/join/`, {}, {
             headers: {
@@ -108,31 +117,26 @@ function VoiceChatApp() {
             }
         })
             .then(response => {
-                const joinedRoom = rooms.find(room => room.id === roomId);
-                setJoinedRoom(joinedRoom);
+                setJoinedRoom(rooms.find(room => room.id === roomId));
                 fetchRooms();
                 toast.success('Joined room successfully');
-    
-                // Create a Daily.co video call iframe
-                callRef.current = DailyIframe.createFrame({
-                    showLeaveButton: true,
-                    iframeStyle: {
-                        position: 'relative',
-                        width: '100%',
-                        height: '500px',
-                    },
-                });
-    
-                // Join the Daily.co video call
-                callRef.current.join({
-                    url: `https://boilerboard.daily.co/${joinedRoom.name}`,
-                });
             })
             .catch(error => {
                 console.error(error);
                 toast.error('Failed to join room');
             });
     };
+
+    // const leaveVoiceChatRoom = async () => {
+    //     if (voiceChatRoom) {
+    //         try {
+    //             await voiceChatRoom.leave();
+    //             setVoiceChatRoom(null);
+    //         } catch (error) {
+    //             console.error('Failed to leave voice chat room:', error);
+    //         }
+    //     }
+    // };
 
     const handleLeaveRoom = (roomId) => {
         axios.post(`http://localhost:8000/api/voice_chat/${roomId}/leave/`, {}, {
@@ -144,10 +148,6 @@ function VoiceChatApp() {
                 setJoinedRoom(null);
                 fetchRooms();
                 toast.success('Left room successfully');
-
-                // Destroy the iframe when leaving the room
-                console.log('leaving');
-                window.location.reload();
             })
             .catch(error => {
                 console.error(error);
@@ -208,7 +208,6 @@ function VoiceChatApp() {
                         <Typography variant="h6" style={{ paddingTop: '20px' }}>
                             Online users in {joinedRoom.name}:
                         </Typography>
-                        <div ref={callRef} />
                         <List>
                             {joinedRoom.online_users.map((user) => (
                                 <ListItem key={user.id}>

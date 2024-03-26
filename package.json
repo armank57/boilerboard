@@ -1,6 +1,12 @@
 {
   "dependencies": {
+    "@daily-co/daily-js": "^0.61.1",
+    "@daily-co/daily-react": "^0.18.0",
+    "agora-rtc-react": "^2.1.0",
+    "agora-rtc-sdk-ng": "^4.20.2",
     "axios": "^1.6.7",
-    "react-hot-toast": "^2.4.1"
+    "react": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "recoil": "^0.7.7"
   }
 }
