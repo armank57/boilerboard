@@ -91,7 +91,7 @@ export default function ViewProfile() {
                       Email: {user ? user.email : "View Profile"}
                     </Typography>
                     <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
-                      Rating: {user ? user.user_rating : "View Profile"}
+                      Total Upvotes: {user ? user.user_rating : "View Profile"}
                     </Typography>
                   </Grid>
                 </CardContent>

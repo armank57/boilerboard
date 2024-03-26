@@ -64,7 +64,7 @@ export default function ReportContent() {
             alert('Successfully reported content!');
         } catch (error) {
             console.error('Error reporting content:', error);
-            alert('Error reporting content:', error);
+            alert('Error reporting content, you may have already reported this post.');
         }
     };
 
