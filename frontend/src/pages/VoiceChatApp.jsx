@@ -56,6 +56,24 @@ function VoiceChatApp() {
         }
     }, [rooms, joinedRoom]);
 
+    useEffect(() => {
+        // Add event listener for beforeunload event
+        window.addEventListener('beforeunload', (event) => {
+            if (joinedRoom) {
+                handleLeaveRoom(joinedRoom.id);
+            }
+        });
+    
+        // Remove event listener on cleanup
+        return () => {
+            window.removeEventListener('beforeunload', (event) => {
+                if (joinedRoom) {
+                    handleLeaveRoom(joinedRoom.id);
+                }
+            });
+        };
+    }, [joinedRoom]);
+
     const handleCreateRoom = () => {
         // Check if the room name only contains letters and numbers
         const isValidRoomName = /^[a-zA-Z0-9_]+$/.test(roomName);
