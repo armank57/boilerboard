@@ -4,12 +4,11 @@ from core.abstract.serializers import AbstractSerializer
 from core.posts.models import Post, Rating, BadContent
 from core.user.models import User
 
-class BadContentSerializer(serializers.ModelSerializer):
+class BadContentSerializer(AbstractSerializer):
     class Meta:
         model = BadContent
-        fields = [
-            'reportedContent'
-        ]
+        fields = ['reportedContent'
+                  ]
 
 class PostSerializer(AbstractSerializer):
     author = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
@@ -19,7 +18,7 @@ class PostSerializer(AbstractSerializer):
     is_author = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
     user_has_reported = serializers.SerializerMethodField()
-    badContentList = BadContentSerializer(many=True)
+    badContentList = serializers.SerializerMethodField()
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -46,6 +45,10 @@ class PostSerializer(AbstractSerializer):
         # Calculate the number of upvotes
         ratings = Rating.objects.filter(post=obj, upvote=True).count()
         return ratings
+    
+    def get_badContentList(self, obj):
+        bad_contents = BadContent.objects.filter(post=obj, reported=True)
+        return BadContentSerializer(bad_contents, many=True).data
     
     def get_user_has_upvoted(self, obj):
         user = self.context['request'].user

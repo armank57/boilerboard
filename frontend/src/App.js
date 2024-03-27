@@ -22,6 +22,7 @@ import ResponsiveAppBar from './ResponsiveAppBar';
 import ViewProfile from './pages/ViewProfile';
 import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
+import ViewReported from './pages/ViewReported';
 
 function App() {
   // TODO reset password path configure for user
@@ -92,6 +93,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ReportContent />
+        </ProtectedRoute>
+      } />
+      <Route path="/view-reported/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <ViewReported />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

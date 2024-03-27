@@ -40,7 +40,6 @@ export default function ViewProfile() {
     useEffect(() => {
         const fetchPosts = async () => {
         try {
-            // TODO get posts from actual user
             const response = await fetch('http://127.0.0.1:8000/api/post/', {
             headers: {
                 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`, // Replace user.token with your actual token
@@ -62,15 +61,15 @@ export default function ViewProfile() {
 
     return (
         <ThemeProvider theme={theme}>
-        <Typography variant="h4" sx={{ flexGrow: 1 }} style={{color: "white", paddingLeft: "20px"}}>
+        <Typography variant="h4" sx={{ flexGrow: 1 }} style={{color: "white", paddingLeft: "10px"}}>
                 {user.first_name + " " + user.last_name}
         </Typography>
         <Grid container direction="row" sx={{ my: 4 }}>
             <Grid item xs={6}>
             <Box sx={{ marginTop: 5, marginLeft: 5 }}>
                 <Grid container direction="column" sx={{ my: 4 }}>
-                <Toolbar style={{paddingBottom: "10px"}}>
-                    <Avatar src="src/avatar/dude.jpg" alt="Profile" sx={{ marginRight: 2, width: 60, height: 60 }} />
+                <Toolbar>
+                    <Avatar src={user.avatar} alt="Profile" sx={{ marginRight: 2, width: 60, height: 60 }} />
                     <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}} >
                     {user ? user.username : "View Profile"}
                     </Typography>
@@ -88,7 +87,7 @@ export default function ViewProfile() {
                         Email: {user ? user.email : "View Profile"}
                         </Typography>
                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
-                        Rating: {user ? user.user_rating : "View Profile"}
+                        Total Upvotes: {user ? user.user_rating : "View Profile"}
                         </Typography>
                     </Grid>
                     </CardContent>
@@ -103,7 +102,7 @@ export default function ViewProfile() {
                 </Typography>
                 <Paper>
                     <List>
-                    {posts.map((post) => (
+                    {posts.filter(post => post.is_author).map((post) => (
                         <ListItem key={post.id}>
                         <ListItemText
                             primary={post.title}
