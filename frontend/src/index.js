@@ -12,6 +12,8 @@ import Discussions from './Discussions';
 import CourseHome from './CourseHome';
 import Course from './pages/Course';
 import NewModule from './components/NewModule';
+import CreateQuiz from './CreateQuiz';
+import StudyPage from './StudyPage';
 
 
 /*
@@ -44,6 +46,8 @@ root.render(
         <Route path="/courses" element={<CourseHome />} />
         <Route path="/courses/:courseID" element={<Course />} />
         <Route path="/courses/:courseID/:sectionID/new-module" element={<NewModule />} />
+        <Route path="/create-quiz" element={<CreateQuiz />} />
+        <Route path="/study-page" element={<StudyPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

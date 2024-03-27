@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'core.user',
     'core.auth',
     'core.course',
+    'core.quiz2',
     'core.module',
     'core.section',
 ]

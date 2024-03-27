@@ -1,4 +1,5 @@
 import './App.css';
+import StudyPage from './StudyPage';
 
 function App() {
   return (
