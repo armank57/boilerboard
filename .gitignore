@@ -29,6 +29,7 @@
 /core/quiz2/__pycache__
 /core/user/__pycache__
 /core/migrations
+**/__pycache__/
 /DS.store
 
 /frontend/node_modules
