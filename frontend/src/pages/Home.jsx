@@ -41,7 +41,7 @@ function Home() {
                 <h1 style={{color: "white"}}>{user.username.toUpperCase()}</h1>
                 <p style={{color: "white"}}>Welcome {user.first_name} {user.last_name} to BoilerBoard!</p>
             </div>
-            <ThemeProvider theme={theme}>
+            {/* <ThemeProvider theme={theme}>
                 <Button style={{
                     backgroundColor: theme.palette.secondary.main,
                     color: "black",
@@ -51,7 +51,7 @@ function Home() {
                 }} onClick={handleLogout}>
                     Logout
                 </Button>
-            </ThemeProvider>
+            </ThemeProvider> */}
         </div>
     );
 }

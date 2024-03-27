@@ -1,62 +1,26 @@
 import { React, useState, useEffect } from 'react';
-import { Card, CardContent, Container, Typography, TextField, Grid, Button, Menu, MenuItem} from '@mui/material';
+import { Button, Card, CardContent, Container, MenuItem, Select, Tabs, Tab, TextField, Typography, Grid, Box, Badge } from '@mui/material';
+import { ThumbUp, Comment } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate, Link } from 'react-router-dom';
 
+// TODO: Configure back end properly
+// TODO: Display only top 10 posts based on recency
+// TODO: Make the posts clickable to view the full post
 
 function Discussions() {
-    const [discussions, setDiscussions] = useState([]);
-    const [searchQuery, setSearchQuery]  = useState("");
-    const [search, setSearch] = useState("");
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [dropDownOpen, setDropDownOpen] = useState(false)
-    const [sortOption, setSortOption] = useState(1);
-    // const [discussionsFiltered, setDiscussionsFiltered] = useState(discussions);
-    
-    const handleDropDownClick = (event) => {
-        setAnchorEl(event.target.value);
-        setDropDownOpen(true)
-        console.log(event.target.value)
-        // dropDownOpen = true;
-    }
-    
-    const handleDropDownClose = (e) => {
-        setAnchorEl(null);
-        setDropDownOpen(false);
-        setSortOption(e.target.value);
-    }
+    const navigate = useNavigate();
 
-    const filterData = ((query, data) => {
-        if (!query) {
-            return data;
-        } else if (!data) {
+    const numPosts = 5; // Number of posts to display initially + load more
 
-        } else {
-            const result = [];
-            for(let i = 0; i < data.length; i++) {
-                if(data.name && data.name.includes(query)) {
-                    result[i] = data.name;
-                }
-            }
-            return result;
-            // return data.filter((d) => d.name.toLowerCase().includes(query));
-        }
-    });
+    const [discussions, setDiscussions] = useState([]); // State for discussions array which consists of posts that are fetched from database
+    const [discLength, setDiscLength] = useState(numPosts); // State for discussions length
+    const [loadCount, setLoadCount] = useState(numPosts); // State for load count, used for loading more discussions
+    const [currentTopic, setCurrentTopic] = useState('All'); // State for current topic, used for filtering discussions
 
-    
-
-
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        console.log("change");
-        setSearchQuery(...searchQuery, e.target.value)
-
-    };
-
-
+    // Static list of topics to tab-by
+    const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
 
     const theme = createTheme({
         palette: {
@@ -71,188 +35,163 @@ function Discussions() {
             fontFamily: 'Quicksand, sans-serif',
             fontWeightBold: 700,
         },
-        MuiTextField: {
-                styleOverrides: {
-                root: {
-                    "& .MuiStandardInput-root": {
-                    "&:hover fieldset": {
-                        borderColor: "white",
-                    },
-                    "&.Mui-focused fieldset": {
-                        borderColor: "blue",
-                    },
-                    },
-                },
-            },
-        },
     });
 
-
-    const SearchBar = () => (
-        <form>
-            <TextField
-                id="search-bar"
-                // value=
-                className="text"
-                onChange={handleSearch}
-                sx={{ input: { color: 'white' } }}
-                label="Enter a Discussion Name"
-                placeholder="Search..."
-                variant="standard"
-                size="small"
-            />
-            <IconButton type="submit" aria-label="search">
-                <SearchIcon style={{ fill: "white" }} />
-            </IconButton>
-        </form>
-    );
-
-
+    // TODO: add 'discussions' to dependency array
     useEffect(() => {
-        // TODO: Replace with your actual API endpoint
-        // setDiscussions([
-        //     {title: 'Discussion 1', content: 'This is the first discussion.'},
-        //     {title: 'Discussion 2', content: 'This is the second discussion. Testing very long discussion with a lot of words to see how it overflows because blah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah blablah blah Hello.'}
-        // ]);
-
-        // TODO: Set discussions from back-end API
-        axios.get('http://localhost:8000/api/discussion/')
+        // TODO: Link discussions to each course they are a part of
+        axios.get('http://127.0.0.1:8000/api/post/', {
+            headers: {
+                'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            }
+        })
             .then(response => {
                 setDiscussions(response.data);
-                console.log(response.data[0].rating)
+                console.log(discussions);
             })
             .catch(error => {
                 console.error('Error fetching discussions:', error);
-            });
-    }, []);
-
-    function compareByRating(a, b) {
-        return a.rating - b.rating
-    }
-    function compareByCreated(a, b) {
-        return a.created - b.created;
-    }
-    function compareByUpdate(a, b) {
-        return a.updated - b.updated;
-    }
-
-    const discussionMapper = () => {
-        const discussionsFiltered = discussions.filter((d) => {
-            if(!searchQuery || searchQuery === "")  {
-                console.log("filter");
-                return d;
-            } else {
-                console.log("filter");
-                return d.name.toLowerCase().includes(searchQuery);
             }
-        });
-        const discussionSort = () => {
-            if(sortOption === 2) {
-                return discussionsFiltered.sort(compareByRating)
-            } else if (sortOption === 1){
-                return discussionsFiltered.sort(compareByCreated)
-            } else {
-                return discussionsFiltered.sort(compareByUpdate)
-            }
-        }
+            );
+        setDiscLength(discussions.length);
+    }, [loadCount, discLength, currentTopic]);
 
-        return discussionsFiltered.sort((a, b) => sortOption === 2 ? a.rating - b.rating : sortOption === 1 ? a.created-b.created : a.updated - b.updated).map((discussion, index) => (
-            <Card key={index} style={{
-                backgroundColor: theme.palette.primary.main,
-                marginBottom: '20px',
-                height: '100px',
-                overflow: 'hidden'
-            }}>
-                <CardContent>
-                    <Grid container direction="row" display="flex" justifyContent="space-between">
-                        <Grid item>
-                            <Typography variant="h5">
-                                {discussion.name}
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography varient="h5">
-                                {discussion.rating}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                    <Typography variant="body1" style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
+    function discussionMapper() {
+        return discussions
+            .filter(discussion => currentTopic === 'All' || discussion.topic === currentTopic) // Filter discussions based on currentTopic
+            .slice(0, loadCount)
+            .map((discussion, index) => (
+                <Link to={`/post/${discussion.id}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
+                    <Card style={{
+                        backgroundColor: theme.palette.primary.main,
+                        marginBottom: '20px',
+                        height: '100px',
+                        overflow: 'hidden'
                     }}>
-                        {discussion.description}
-                    </Typography>
-                </CardContent>
-            </Card>
+                        <CardContent>
+                            <Grid container justifyContent="space-between">
+                                <Grid item xs={11}>
+                                    <Typography variant="h5">
+                                        {discussion.title}
+                                    </Typography>
+                                    <Typography variant="body1" style={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical'
+                                    }}>
+                                        {discussion.content}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={0.5}>
+                                    <Box mb={2}>
+                                        <Badge color="primary">
+                                            <ThumbUp />
+                                        </Badge>
+                                    </Box>
+                                    <Badge color="primary">
+                                        <Comment />
+                                    </Badge>
+                                </Grid>
+                                <Grid item xs={0.5}>
+                                    <Box mb={2}>
+                                        <Typography>
+                                            {discussion.ratings}
+                                        </Typography>
+                                    </Box>
+                                    <Typography>
+                                        {discussion.comments}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </CardContent>
+                    </Card>
+                </Link>
+            ));
+    }
+
+    function tabMapper() {
+        return topics.map((topic, index) => (
+            <Tab key={index} label={topic} value={topic} />
         ));
     }
 
+    function loadMore() {
+        setLoadCount(loadCount + numPosts);
+    }
 
+    function switchTab(event, newValue) {
+        setCurrentTopic(newValue);
+        setLoadCount(numPosts);
+    }
+
+    const fieldStyling = {
+        input: { color: 'white'}, 
+        fieldset: { borderColor: "white"},
+        "& .MuiOutlinedInput-root:hover": {
+            "& fieldset": {
+                borderColor: "pink"
+            },
+            "&.Mui-focused fieldset": {
+                borderColor: "pink",
+            }
+        }
+    }
+
+    // TODO: Connect this discussions page to a course
+    // TODO: Implement sorting and searching
+    // TODO: Style the UI for post previews better and add number of upvotes and replies
+    // TODO: Create a new post button that links to a new post page
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>
-                <Container maxWidth="md" style={{paddingTop: "20px" }}>
-                    <Grid container direction="row" display="flex" justifyContent="space-between">
-                        <Grid item>
-                            <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
-                                Discussions
-                            </Typography>   
-                        </Grid>
-                        <Grid item style={{paddingTop:"16px"}}>
-                            <Grid container direction="column" display="flex">
-                                <Grid item>
-                                    <Button
-                                        id="basic-button"
-                                        aria-controls={dropDownOpen ? 'basic-menu' : ""}
-                                        aria-haspopup="true"
-                                        aria-expanded={dropDownOpen ? 'true' : ""}
-                                        onClick={handleDropDownClick}
-                                    >
-                                        Sort
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    <Menu
-                                        id="basic-menu"
-                                        anchorEl={anchorEl}
-                                        open={dropDownOpen}
-                                        onClose={handleDropDownClose}
-                                        anchorOrigin={{
-                                            vertical: "",
-                                            horizontal: "center"
-                                        }}
-                                        transformOrigin={{
-                                            vertical: "top",
-                                            horizontal: "left"
-                                        }}
-                                        MenuListProps={{
-                                        'aria-labelledby': 'basic-button',
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleDropDownClose} value={1}>Created</MenuItem>
-                                        <MenuItem onClick={handleDropDownClose} value={2}>Rating</MenuItem>
-                                        <MenuItem onClick={handleDropDownClose} value={3}>Updated</MenuItem>
-                                    </Menu>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid item style={{paddingTop: "8px"}}>
-                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        </Grid>
+                <Container maxWidth="md">
+                    <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
+                        Course Name
+                    </Typography>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                        <TextField label="Search" variant="outlined" />
+                        <Select variant="outlined" sx={ {input: {color: "white"}} } >
+                            <MenuItem value="date">Date</MenuItem>
+                            <MenuItem value="popularity">Popularity</MenuItem>
+                            {/* Add more options as needed */}
+                        </Select>
+                        <Button variant="contained" color="primary" onClick={() => navigate('/create-post')}>
+                            Create Post
+                        </Button>
+                    </div>
+                    <Tabs value={currentTopic}
+                        onChange={switchTab}
+                        indicatorColor="secondary"
                         
-                    </Grid>
-                    <div>
+                    >
+                        <Tab label="All" value="All" TabIndicatorProps={{textColor: "white"}}/>
+                        {tabMapper()}
+                    </Tabs>
+                    <div >
                         {discussionMapper()}
                     </div>
                 </Container>
+                {(loadCount <= discussions.filter(discussion => currentTopic === 'All' || discussion.topic === currentTopic).length) ?
+                    <Container maxWidth="sm" style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginTop: '20px'
+                    }}>
+                        <Button onClick={loadMore}
+                            variant="contained"
+                            color="secondary"
+                            style={{ margin: '20px' }}
+                        >
+                            Load More
+                        </Button>
+                    </Container>
+                    : null
+                }
             </ThemeProvider>
         </div>
     );
 }
 
-
 export default Discussions;
-
