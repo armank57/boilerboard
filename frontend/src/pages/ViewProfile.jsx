@@ -68,7 +68,7 @@ export default function ViewProfile() {
             <Grid item xs={6}>
             <Box sx={{ marginTop: 5, marginLeft: 5 }}>
                 <Grid container direction="column" sx={{ my: 4 }}>
-                <Toolbar>
+                <Toolbar style={{paddingBottom: "10px"}}>
                     <Avatar src={user.avatar} alt="Profile" sx={{ marginRight: 2, width: 60, height: 60 }} />
                     <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}} >
                     {user ? user.username : "View Profile"}

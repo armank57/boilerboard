@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import axios from 'axios';
@@ -36,6 +36,7 @@ function getUser() {
 export default function ViewReported() {
     const [user, setUser] = useState(getUser());
     const [posts, setPosts] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -59,36 +60,32 @@ export default function ViewReported() {
         fetchPosts();
     }, []);
 
+
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="static" color="secondary">
-                <Toolbar>
-                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        View Reported Posts
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-
+            <Typography variant="h4" sx={{ flexGrow: 1 }} style={{color: "white", paddingLeft: "10px"}}>
+                        Reported Posts
+            </Typography>
             <Grid item xs={6}>
                 <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
                     <List>
                         {posts.map((post) => (
                             <ListItem key={post.id}>
-                                <Paper sx={{ width: "90%" }}>
-                                    <ListItemText
-                                        sx={{ m: 2 }}
-                                        primary={post.title}
-                                        secondary={post.content}
-                                    />
-                                    <Typography variant="body5" sx={{ m: 2, marginTop: 4 }}>
-                                        Reasons for report:
-                                    </Typography>
-                                    {post.badContentList.map((badContent, index) => (
-                                        <Typography key={index} variant="body2" color="error" sx={{ m: 2, marginTop: 0}}>
-                                            {index + 1}. {badContent.reportedContent}
+                                    <Paper sx={{ width: "90%" }}>
+                                        <ListItemText
+                                            sx={{ m: 2 }}
+                                            primary={post.title}
+                                            secondary={post.content}
+                                        />
+                                        <Typography variant="body5" sx={{ m: 2, marginTop: 4 }}>
+                                            Reasons for report:
                                         </Typography>
-                                    ))}
-                                </Paper>
+                                        {post.badContentList.map((badContent, index) => (
+                                            <Typography key={index} variant="body2" color="error" sx={{ m: 2, marginTop: 0}}>
+                                                {index + 1}. {badContent.reportedContent}
+                                            </Typography>
+                                        ))}
+                                    </Paper>
                             </ListItem>
                         ))}
                     </List>
