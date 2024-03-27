@@ -29,6 +29,8 @@ function VoiceChatApp() {
 
     let userToken = localStorage.getItem('auth');
     userToken = JSON.parse(userToken).access;
+    let userName = JSON.parse(localStorage.getItem('auth')).user.username;
+    let dailyToken = '6baf453028501054b40fe396a23dafb4dc6a29ffa38886101b20427f95b87b59';
 
     const fetchRooms = () => {
         axios.get('http://localhost:8000/api/voice_chat/', {
@@ -56,11 +58,32 @@ function VoiceChatApp() {
 
     const handleCreateRoom = () => {
         // Check if the room name only contains letters and numbers
-        const isValidRoomName = /^[a-zA-Z0-9]+$/.test(roomName);
+        const isValidRoomName = /^[a-zA-Z0-9_]+$/.test(roomName);
         if (!isValidRoomName) {
-            toast.error('Room name can only contain letters and numbers.');
+            toast.error('Room name can only contain letters and numbers, and underscores.');
             return;
         }
+        // Create daily room
+        axios.post('https://api.daily.co/v1/rooms', {
+            name: roomName,
+            privacy: 'public',
+            properties: {
+                start_video_off: true,
+                enable_prejoin_ui: false,
+                enable_people_ui: false,
+            },
+        }, {
+            headers: {
+                'Authorization': `Bearer ${dailyToken}`
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         // Create a new room
         axios.post('http://localhost:8000/api/voice_chat/', { name: roomName }, {
             headers: {
@@ -115,7 +138,9 @@ function VoiceChatApp() {
     
                 // Create a Daily.co video call iframe
                 callRef.current = DailyIframe.createFrame({
-                    showLeaveButton: true,
+                    userName: userName,
+                    showUserNameChangeUI: false,
+                    showLeaveButton: false,
                     iframeStyle: {
                         position: 'relative',
                         width: '100%',
