@@ -1,17 +1,16 @@
 from core.abstract.viewsets import AbstractViewSet
 from core.posts.serializers import PostSerializer
-from core.posts.models import Post, Rating
+from core.posts.models import Post, Rating, BadContent
 
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 
 # Create your views here
 
 class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')
-    permission_classes = (AllowAny, )
+    permission_classes = []
     serializer_class = PostSerializer
 
     def get_queryset(self):
@@ -23,7 +22,6 @@ class PostViewSet(AbstractViewSet):
         return obj
     
     def create(self, request, *args, **kwargs):
-        print("I am creating a post")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -46,6 +44,24 @@ class PostViewSet(AbstractViewSet):
         rating = Rating.objects.get(user=user, post=post)
         rating.delete()
         data = {'message': 'Upvote removed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def report_content(self, request, pk=None):
+        # Only should be called if the user has not already reported the post
+        post = self.get_object()
+        user = request.user
+        BadContent.objects.create(user=user, post=post, reported=True, reportedContent=request.data['reportedContent'])
+        data = {'message': 'Report added successfully.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def remove_reported_content(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        BadContent = BadContent.objects.get(user=user, post=post)
+        BadContent.delete()
+        data = {'message': 'Content removed successful.'}
         return Response(data, status=status.HTTP_201_CREATED)
     
     

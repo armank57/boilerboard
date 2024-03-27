@@ -21,6 +21,7 @@ import StudyPage from './pages/StudyPage';
 import ResponsiveAppBar from './ResponsiveAppBar';
 import ViewProfile from './pages/ViewProfile';
 import VoiceChatApp from './pages/VoiceChatApp';
+import ReportContent from './pages/ReportContent';
 
 function App() {
   // TODO reset password path configure for user
@@ -85,6 +86,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <VoiceChatApp />
+        </ProtectedRoute>
+      } />
+      <Route path="/report-content/:postId" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <ReportContent />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

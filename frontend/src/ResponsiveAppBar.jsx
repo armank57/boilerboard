@@ -66,7 +66,7 @@ function ResponsiveAppBar() {
 
   return (
     <div style={{paddingBottom: "20px"}}>
-      <AppBar position="static" >
+      <AppBar position="static" sx={{bgcolor: "#ceb888"}} >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <CottageIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -82,7 +82,7 @@ function ResponsiveAppBar() {
                 fontFamily: 'monospace',
                 fontWeight: 700,
                 letterSpacing: '.3rem',
-                color: 'inherit',
+                color: 'black',
                 textDecoration: 'none',
               }}
             >
@@ -119,7 +119,7 @@ function ResponsiveAppBar() {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <MenuItem key={page} sx={{color: "#d3d3d3"}} onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
@@ -150,7 +150,7 @@ function ResponsiveAppBar() {
                 <Button
                   key={page}
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
+                  sx={{ my: 2, color: 'black', display: 'block' }}
                 >
                   {page}
                 </Button>
