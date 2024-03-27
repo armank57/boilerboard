@@ -30,4 +30,5 @@
 /core/user/__pycache__
 /core/migrations
 /DS.store
+
 /frontend/node_modules
