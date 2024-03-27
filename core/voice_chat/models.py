@@ -47,3 +47,6 @@ class VoiceChatRoom(AbstractModel):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table = 'core_voice_chat'
