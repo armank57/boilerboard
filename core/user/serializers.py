@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.abstract.serializers import AbstractSerializer
-from core.course.models import Course
+#from core.course.models import Course
 from core.user.models import User
 
 class UserSerializer(AbstractSerializer): 
@@ -14,9 +14,9 @@ class UserSerializer(AbstractSerializer):
         rep = super().to_representation(instance)
         i = 0
         for f in rep['joined_courses']:
-            course = Course.objects.all().get(id=f)
+            #course = Course.objects.all().get(id=f)
             #Course.objects.get_object_by_public_id(f)
-            rep['joined_courses'][i] = course.name
+            #rep['joined_courses'][i] = course.name
             i += 1
         #UserSerializer(creator).data
         return rep
