@@ -16,6 +16,7 @@ import ViewProfile from './ViewProfile';
 import ReportContent from './ReportContent';
 import CreatePost from './CreatePost';
 import ViewPost from './ViewPost';
+import ViewReported from './ViewReported';
 
 
 /*
@@ -52,6 +53,7 @@ root.render(
         <Route path="/study-page" element={<StudyPage />} />
         <Route path="/view-profile" element={<ViewProfile />} />
         <Route path="/report-content/:postId" element={<ReportContent />} />
+        <Route path="/view-reported" element={<ViewReported />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

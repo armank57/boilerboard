@@ -14,6 +14,7 @@ class PostViewSet(AbstractViewSet):
     serializer_class = PostSerializer
 
     def get_queryset(self):
+        print("GETTING POSTS")
         return Post.objects.all()
     
     def get_object(self):
