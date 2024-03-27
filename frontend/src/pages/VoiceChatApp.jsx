@@ -56,6 +56,24 @@ function VoiceChatApp() {
         }
     }, [rooms, joinedRoom]);
 
+    useEffect(() => {
+        // Add event listener for beforeunload event
+        window.addEventListener('beforeunload', (event) => {
+            if (joinedRoom) {
+                handleLeaveRoom(joinedRoom.id);
+            }
+        });
+    
+        // Remove event listener on cleanup
+        return () => {
+            window.removeEventListener('beforeunload', (event) => {
+                if (joinedRoom) {
+                    handleLeaveRoom(joinedRoom.id);
+                }
+            });
+        };
+    }, [joinedRoom]);
+
     const handleCreateRoom = () => {
         // Check if the room name only contains letters and numbers
         const isValidRoomName = /^[a-zA-Z0-9_]+$/.test(roomName);
@@ -102,7 +120,19 @@ function VoiceChatApp() {
         setRoomName('');
     };
 
-    const handleDeleteRoom = (roomId) => {
+    const handleDeleteRoom = (roomId, roomName) => {
+        axios.delete(`https://api.daily.co/v1/rooms/${roomName}`, {
+            headers: {
+                'Authorization': `Bearer ${dailyToken}`
+            }
+        })
+        .then(() => {
+            console.log('Room successfully deleted in Daily API');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
         // Delete a room
         axios.delete(`http://localhost:8000/api/voice_chat/${roomId}/`, {
             headers: {
@@ -223,7 +253,7 @@ function VoiceChatApp() {
                             ) : (
                                 <Button variant="contained" color="secondary" onClick={() => handleJoinRoom(room.id)}>Join</Button>
                             )}
-                            <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteRoom(room.id)}>
+                            <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteRoom(room.id, room.name)}>
                                 <DeleteIcon />
                             </IconButton>
                         </ListItem>
