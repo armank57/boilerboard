@@ -19,14 +19,9 @@ function Post() {
     const navigate = useNavigate();
     const user = getUser();
 
-    function get_post_options() {
-        if(user.is_instructor) {
-            return ['Remove'];
-        }
-        return ['Report']
-    }
+    
 
-    const post_options = get_post_options();
+    
     
     useEffect(() => {
         axios.get(`http://localhost:8000/api/post/${id}`, {
@@ -53,6 +48,19 @@ function Post() {
             </Box>
         );
     };
+
+    function get_post_options() {
+        if(user.username === post.author_name && user.is_instructor) {
+            return ['Remove', 'Report'];
+        } else if(user.id === post.author.id) {
+            return ['Remove', 'Report']
+        } else if (user.instructor) {
+            return ['Remove']
+        }
+        return ['Report']
+    }
+
+    const post_options = get_post_options();
 
     const handleUpvote = async () => {
         try {

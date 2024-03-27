@@ -33,6 +33,7 @@ class PostViewSet(AbstractViewSet):
         # Only should be called if the user has not already upvoted the post
         post = self.get_object()
         user = request.user
+        # author = post.author
         Rating.objects.create(user=user, post=post, upvote=True)
         data = {'message': 'Upvote added successfully.'}
         return Response(data, status=status.HTTP_201_CREATED)

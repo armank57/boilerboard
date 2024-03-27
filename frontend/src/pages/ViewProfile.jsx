@@ -59,6 +59,15 @@ export default function ViewProfile() {
         fetchPosts();
     }, []);
 
+    var total_rating = 0;
+    for(let i = 0; i < posts.length; i++) {
+        if (posts[i].author_name === user.username) {
+            total_rating += posts[i].ratings;
+        }
+    }
+
+    const total_upvotes = total_rating;
+
     return (
         <ThemeProvider theme={theme}>
         <Typography variant="h4" sx={{ flexGrow: 1 }} style={{color: "white", paddingLeft: "10px"}}>
@@ -87,7 +96,7 @@ export default function ViewProfile() {
                         Email: {user ? user.email : "View Profile"}
                         </Typography>
                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
-                        Total Upvotes: {user ? user.user_rating : "View Profile"}
+                        Rating: {total_upvotes}
                         </Typography>
                     </Grid>
                     </CardContent>
