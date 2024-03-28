@@ -160,7 +160,7 @@ function ResponsiveAppBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: deepOrange[500] }}>{user.first_name.charAt(0).toUpperCase()}</Avatar>
+                  <Avatar sx={{ bgcolor: "#313336", color: "white" }}>{user.first_name.charAt(0).toUpperCase()}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu

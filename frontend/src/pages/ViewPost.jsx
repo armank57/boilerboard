@@ -19,11 +19,6 @@ function Post() {
     const navigate = useNavigate();
     const user = getUser();
 
-    
-
-    
-    
-
     const fetchPostData = () => {
         axios.get(`http://localhost:8000/api/post/${id}`, {
             headers: {
@@ -31,12 +26,22 @@ function Post() {
             }
         })
             .then(response => {
-                setPost(response.data);
-                setLoading(false);
+                if (response.data) {
+                    setPost(response.data);
+                    setLoading(false);
+                    console.log(response.data);
+                } else {
+                    navigate('/discussions');
+                }
             })
             .catch(error => {
-                console.error('Error fetching discussions:', error);
                 setLoading(false);
+                if (error.response && error.response.status === 404) {
+                    console.error('Post not found:', error);
+                    navigate('/discussions');
+                } else {
+                    console.error('Error fetching post:', error);
+                }
             });
     };
 
@@ -54,9 +59,10 @@ function Post() {
 
     function get_post_options() {
         if(user.username === post.author_name && user.is_instructor) {
-            return ['Remove', 'Report'];
-        } else if(user.id === post.author.id) {
-            return ['Remove', 'Report']
+            return ['Edit', 'Remove', 'Report'];
+        } else if(user.username === post.author_name) {
+            // user is the author of the post
+            return ['Edit', 'Remove', 'Report']
         } else if (user.instructor) {
             return ['Remove']
         }
@@ -106,43 +112,28 @@ function Post() {
         setAnchorElPost(event.currentTarget);
     }
 
-    const handleClosePostOptions = (event) => {
-        if (event.currentTarget.innerText === "Remove") {
-            try {
-                const response =  axios.post(`http://localhost:8000/api/post/${id}/remove_reported_content/`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to remove post:', error);
-            } 
-        } else if(event.currentTarget.innerText === "Report") { // If the user selected
+    const handleClosePostOptions = async (post_option) => {
+        if (post_option === "Remove") {
+            if (window.confirm('Are you sure you want to remove this post?')) {
+                try {
+                    await axios.delete(`http://localhost:8000/api/post/${id}/`, {
+                        headers: {
+                            'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to remove post:', error);
+                }
+                navigate('/discussions');
+            }
+        } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
+        } else if (post_option === "Edit") { 
+            navigate(`/edit-post/${id}`);
         }
         setAnchorElPost(null);
     }
-
-    const handleOpenPostOptions = (event) => {
-        setAnchorElPost(event.currentTarget);
-    }
-
-    const handleClosePostOptions = (event) => {
-        if (event.currentTarget.innerText === "Remove") {
-            try {
-                const response =  axios.post(`http://localhost:8000/api/post/${id}/remove_reported_content/`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to remove post:', error);
-            } 
-        } else if(event.currentTarget.innerText === "Report") { // If the user selected
-            navigate(`/report-content/${id}`)
-        }
-        setAnchorElPost(null);
-    }
+    
     
     // TODO: Add a chip that shows the course number next to the topic
     return (
@@ -178,9 +169,9 @@ function Post() {
                                 onClose={handleClosePostOptions}
                             >
                                 {post_options.map((post_option) => (
-                                <MenuItem key={post_option} onClick={handleClosePostOptions} >
-                                    <Typography textAlign="center">{post_option}</Typography>
-                                </MenuItem>
+                                    <MenuItem key={post_option} onClick={() => handleClosePostOptions(post_option)} >
+                                        <Typography textAlign="center">{post_option}</Typography>
+                                    </MenuItem>
                                 ))}
                             </Menu>
                     </Grid>
@@ -192,6 +183,9 @@ function Post() {
                 <Typography color="textSecondary">
                     Created: {new Date(post.created).toLocaleString()}
                 </Typography>
+                <Typography color="textSecondary">
+                    Last Updated: {new Date(post.updated).toLocaleString()}
+                </Typography>
                 <Typography variant="body2" component="p">
                     {post.content}
                 </Typography>
@@ -202,6 +196,9 @@ function Post() {
                 >
                     {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
                 </IconButton>
+                <Typography variant="body2" component="span">
+                    {post.ratings}
+                </Typography>
             </CardContent>
         </Card>
     </Container>
