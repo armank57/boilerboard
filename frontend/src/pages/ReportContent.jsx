@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
     palette: {
@@ -38,9 +39,10 @@ export default function ReportContent() {
     const [post, setPost] = useState([]);
     const [reason, setReason] = useState('');
     const { postId } = useParams();
+    const navigate = useNavigate();
+
 
     const reportContent = async () => {
-
         const data = {
             "reportedContent": reason,
         };
@@ -61,6 +63,7 @@ export default function ReportContent() {
             const quiz = await response.json();
             console.log(quiz);
             alert('Successfully reported content!');
+            navigate('/discussions');
         } catch (error) {
             console.error('Error reporting content:', error);
             alert('Error reporting content, you may have already reported this post.');
