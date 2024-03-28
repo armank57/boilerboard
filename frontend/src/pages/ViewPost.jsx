@@ -106,26 +106,6 @@ function Post() {
         setAnchorElPost(event.currentTarget);
     }
 
-    const handleClosePostOptions = (event) => {
-        if (event.currentTarget.innerText === "Remove") {
-            try {
-                const response =  axios.post(`http://localhost:8000/api/post/${id}/remove_reported_content/`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to remove post:', error);
-            } 
-        } else if(event.currentTarget.innerText === "Report") { // If the user selected
-            navigate(`/report-content/${id}`)
-        }
-        setAnchorElPost(null);
-    }
-
-    const handleOpenPostOptions = (event) => {
-        setAnchorElPost(event.currentTarget);
-    }
 
     const handleClosePostOptions = (event) => {
         if (event.currentTarget.innerText === "Remove") {
