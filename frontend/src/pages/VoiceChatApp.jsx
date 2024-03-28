@@ -239,6 +239,9 @@ function VoiceChatApp() {
                     variant="outlined"
                     margin="normal"
                     fullWidth
+                    InputLabelProps={{
+                        style: { color: theme.typography.color },
+                    }}
                 />
                 <Button
                     variant="contained"
