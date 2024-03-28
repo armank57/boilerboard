@@ -26,13 +26,22 @@ function Post() {
             }
         })
             .then(response => {
-                setPost(response.data);
-                setLoading(false);
-                console.log(response.data);
+                if (response.data) {
+                    setPost(response.data);
+                    setLoading(false);
+                    console.log(response.data);
+                } else {
+                    navigate('/discussions');
+                }
             })
             .catch(error => {
-                console.error('Error fetching discussions:', error);
                 setLoading(false);
+                if (error.response && error.response.status === 404) {
+                    console.error('Post not found:', error);
+                    navigate('/discussions');
+                } else {
+                    console.error('Error fetching post:', error);
+                }
             });
     };
 
@@ -103,16 +112,19 @@ function Post() {
         setAnchorElPost(event.currentTarget);
     }
 
-    const handleClosePostOptions = (post_option) => {
+    const handleClosePostOptions = async (post_option) => {
         if (post_option === "Remove") {
-            try {
-                const response =  axios.post(`http://localhost:8000/api/post/${id}/remove_reported_content/`, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to remove post:', error);
+            if (window.confirm('Are you sure you want to remove this post?')) {
+                try {
+                    await axios.delete(`http://localhost:8000/api/post/${id}/`, {
+                        headers: {
+                            'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to remove post:', error);
+                }
+                navigate('/discussions');
             }
         } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
