@@ -9,7 +9,7 @@ function Post() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchPostData = () => {
         axios.get(`http://localhost:8000/api/post/${id}`, {
             headers: {
                 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
@@ -17,14 +17,16 @@ function Post() {
         })
             .then(response => {
                 setPost(response.data);
-                console.log(response.data);
                 setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching discussions:', error);
                 setLoading(false);
-            }
-            );
+            });
+    };
+
+    useEffect(() => {
+        fetchPostData();
     }, [id]);
 
     if (loading && !post) { 
@@ -37,13 +39,38 @@ function Post() {
 
     const handleUpvote = async () => {
         try {
-            const response = await axios.post(`http://localhost:8000/api/post/${id}/upvote/`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            if (post.user_has_upvoted) {
+                const response = await axios.post(`http://localhost:8000/api/post/${id}/remove_upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setPost(prevPost => ({
+                        ...prevPost,
+                        upvotes_count: prevPost.upvotes_count - 1,
+                        user_has_upvoted: false
+                    }));
                 }
-            });
+            } else {
+                const response = await axios.post(`http://localhost:8000/api/post/${id}/upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setPost(prevPost => ({
+                        ...prevPost,
+                        upvotes_count: prevPost.upvotes_count + 1,
+                        user_has_upvoted: true
+                    }));
+                }
+            }
+            fetchPostData();
         } catch (error) {
-            console.error('Failed to upvote post:', error);
+            console.error('Failed to update upvote status:', error);
         }
     }
     
