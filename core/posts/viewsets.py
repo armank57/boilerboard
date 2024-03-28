@@ -33,6 +33,7 @@ class PostViewSet(AbstractViewSet):
         # Only should be called if the user has not already upvoted the post
         post = self.get_object()
         user = request.user
+        # author = post.author
         Rating.objects.create(user=user, post=post, upvote=True)
         data = {'message': 'Upvote added successfully.'}
         return Response(data, status=status.HTTP_201_CREATED)
@@ -60,8 +61,12 @@ class PostViewSet(AbstractViewSet):
     def remove_reported_content(self, request, pk=None):
         post = self.get_object()
         user = request.user
-        BadContent = BadContent.objects.get(user=user, post=post)
-        BadContent.delete()
+        # BadContent = BadContent.objects.get(user=user, post=post)
+        # BadContent.delete()
+        if request.user.is_instructor: 
+            post.delete()
+        else: 
+            return Response({'status': 'Unauthorized: Need Instructor permissions to remove post'}, status=status.HTTP_403_FORBIDDEN)
         data = {'message': 'Content removed successful.'}
         return Response(data, status=status.HTTP_201_CREATED)
     
