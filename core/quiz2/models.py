@@ -24,6 +24,7 @@ class Quiz2(AbstractModel):
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
+    endorsed = models.BooleanField(default=False)
 
     ratings = models.ManyToManyField('core_user.User', through=QuizRating, related_name='rated_quizzes')
 

@@ -45,6 +45,7 @@ class Post(AbstractModel):
     content = models.TextField()
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=255, null=True)
+    endorsed = models.BooleanField(default=False)
 
     # to access ratings for a post, use post.ratings.all()
     # to access posts rated by a user, use user.rated_posts.all()

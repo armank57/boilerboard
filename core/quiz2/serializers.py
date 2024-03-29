@@ -53,6 +53,7 @@ class Quiz2Serializer(serializers.ModelSerializer):
             'created',
             'updated',
             'ratings',
+            'endorsed',
             'user_has_upvoted'
         ]
     def create(self, validated_data):

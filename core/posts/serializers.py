@@ -33,6 +33,7 @@ class PostSerializer(AbstractSerializer):
             'updated',
             'ratings',
             'user_has_upvoted',
+            'endorsed',
             'is_author',
             'author_name',
             'reports',
