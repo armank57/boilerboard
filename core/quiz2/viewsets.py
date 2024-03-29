@@ -4,8 +4,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from core.user.models import User
-from core.quiz2.models import Quiz2, Question, Answer
+from core.quiz2.models import Quiz2, Question, Answer, QuizRating
 from core.quiz2.serializers import Quiz2Serializer
+from rest_framework.decorators import action
 
 class Quiz2ViewSet(AbstractViewSet): 
     serializer_class = Quiz2Serializer
@@ -27,6 +28,23 @@ class Quiz2ViewSet(AbstractViewSet):
         print(serializer.validated_data)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def upvote(self, request, pk=None):
+        user = request.user
+        quiz = self.get_object()
+        QuizRating.objects.create(user=user, quiz2=quiz, upvote=True)
+        data = {'message': 'Upvote added successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def remove_upvote(self, request, pk=None):
+        user = request.user
+        quiz = self.get_object()
+        rating = QuizRating.objects.get(user=user, quiz2=quiz)
+        rating.delete()
+        data = {'message': 'Upvote removed successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
         
     
     
