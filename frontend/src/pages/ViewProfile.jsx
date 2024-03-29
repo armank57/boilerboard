@@ -31,6 +31,7 @@ const theme = createTheme({
 export default function ViewProfile() {
     const [user, setUser] = useState(getUser());
     const [posts, setPosts] = useState([]);
+    const [courses, setCourses] = useState([]);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -50,6 +51,14 @@ export default function ViewProfile() {
                 console.error('Error fetching posts:', error);
             }
         };
+        
+        axios.get('http://localhost:8000/api/course')
+            .then(response => {
+                setCourses(response.data.filter(course => course.students.includes(user.id)));
+            })
+            .catch(error => {
+                console.error('Error fetching courses:', error);
+            });
 
         fetchPosts();
     }, []);
@@ -62,6 +71,39 @@ export default function ViewProfile() {
     }
 
     const total_upvotes = total_rating;
+
+    function CourseMapper() {
+        return courses.map((course, index) => (
+            <Grid item xs={4} key={index}>
+            <Link to={`/courses/${course.id}/`} style={{ textDecoration: 'none' }}>
+                <Card style={{ 
+                    backgroundColor: '#d3d3d3', 
+                    marginBottom: '20px',
+                    marginRight: '5px',
+                    marginLeft: '5px',
+                    height: '100px',
+                    overflow: 'hidden',
+                    cursor: 'pointer'
+                }}>
+                    <CardContent>
+                        <Typography variant="h5">
+                            {course.course_subject + ' ' + course.code}
+                        </Typography>
+                        <Typography variant="body1" style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical'
+                        }}>
+                            {course.name}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Link>
+            </Grid>
+        ));
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -139,7 +181,46 @@ export default function ViewProfile() {
                         </Grid>
                     </Box>
                 </Grid>
+            <Grid item xs={6}>
+            <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
+                <Grid container direction="column" sx={{ my: 4 }}>
+                <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}}>
+                    Posts
+                </Typography>
+                <Paper sx={{height: "200px", overflow: "scroll"}}>
+                    <List>
+                    {posts.filter(post => post.is_author).map((post) => (
+                        <ListItem key={post.id}>
+                        <ListItemText
+                            primary={post.title}
+                            secondary={post.content}
+                        />
+                        </ListItem>
+                    ))}
+                    </List>
+                </Paper>
+                </Grid>
+            </Box>
             </Grid>
+            <Grid item xs={6}>
+                <Box sx={{ marginLeft: 5, marginRight: 5 }}>
+                    <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}}>
+                        Courses
+                    </Typography>
+                </Box>
+                <Card sx={{ marginLeft: 5}} 
+                    style={{
+                    height: '150px',
+                    overflow: 'scroll',
+                }}>
+                    <CardContent>
+                        <Grid container direction="row">
+                            {CourseMapper()}
+                        </Grid>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
         </ThemeProvider>
     );
 }

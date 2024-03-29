@@ -50,12 +50,15 @@ function NewModule() {
                 // Module created
                 console.log('Module created:', response.data);
                 navigate('/courses');
+            } else if (response.status === 500) {
+                alert("Module with that name already exists in this section")
             } else {
                 // Module not created
                 console.error('Module not created:', response);
             }
         } catch (error) {
             console.error('Error creating module:', error);
+            alert("Error:" + error)
         }
     }
     return (

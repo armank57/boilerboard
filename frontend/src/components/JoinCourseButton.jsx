@@ -39,6 +39,7 @@ function CourseButton( props ) {
         })
         .catch(error => {
             alert('An error occurred while trying to update the course.');
+            console.log(error)
         });
     };
 

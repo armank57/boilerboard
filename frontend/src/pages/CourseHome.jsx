@@ -1,10 +1,11 @@
 import { React, useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Button, Card, CardContent, Container, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Container, Grid, Typography } from '@mui/material';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Course from './Course';
 function CourseHome() {
-    const [courses, setCourses] = useState([]);
+    const [subejcts, setSubjects] = useState([]);
     const theme = createTheme({
         palette: {
             primary: {
@@ -21,20 +22,40 @@ function CourseHome() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/course')
+        axios.get('http://localhost:8000/api/subject')
             .then(response => {
-                setCourses(response.data);
+                setSubjects(response.data);
             })
             .catch(error => {
-                console.error('Error fetching courses:', error);
+                console.error('Error fetching subjects:', error);
             });
     }, []);
 
-    function CourseMapper() {
+    function SubjectMapper() {
+        return subejcts.map((subject, index) => (
+            <Grid item key={index} xs={6}>
+                <Typography variant="h4" style={{ marginLeft: '10px', color: "white" }}>
+                    {subject.name}
+                </Typography>
+                <Card style={{ 
+                    backgroundColor: theme.palette.primary.main, 
+                    marginBottom: '20px',
+                    height: '200px',
+                    overflow: 'scroll',
+                }}>
+                    <CardContent>
+                        {CourseMapper(subject.code, subject.courses)}
+                    </CardContent>
+                </Card>
+            </Grid>  
+        ));
+    }
+
+    function CourseMapper(code, courses) {
         return courses.map((course, index) => (
             <Link to={`/courses/${course.id}/`} key={index} style={{ textDecoration: 'none' }}>
                 <Card style={{ 
-                    backgroundColor: theme.palette.primary.main, 
+                    backgroundColor: '#d3d3d3', 
                     marginBottom: '20px',
                     height: '100px',
                     overflow: 'hidden',
@@ -42,15 +63,9 @@ function CourseHome() {
                 }}>
                     <CardContent>
                         <Typography variant="h5">
-                            {course.title}
+                            {code + ' ' + course.code}
                         </Typography>
-                        <Typography variant="body1" style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                        }}>
+                        <Typography>
                             {course.description}
                         </Typography>
                     </CardContent>
@@ -65,9 +80,9 @@ function CourseHome() {
                 <Typography variant="h3" style={{ marginBottom: '20px', color: "white" }}>
                     Courses
                 </Typography>
-                <div>
-                    {CourseMapper()}
-                </div>
+                <Grid container spacing={2}>
+                    {SubjectMapper()}
+                </Grid>
                 <Link to="/discussions">
                     <Button variant="contained" color="secondary">
                         Discussions

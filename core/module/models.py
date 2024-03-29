@@ -69,3 +69,8 @@ class Module(AbstractModel):
     
     def __str__(self):
         return self.name
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['section', 'name'], name='unique_module')
+        ]
