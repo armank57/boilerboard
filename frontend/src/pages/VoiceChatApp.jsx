@@ -123,6 +123,21 @@ function VoiceChatApp() {
      };
 
     const handleDeleteRoom = (roomId, roomName) => {
+<<<<<<< HEAD
+=======
+        axios.delete(`https://api.daily.co/v1/rooms/${roomName}`, {
+            headers: {
+                'Authorization': `Bearer ${dailyToken}`
+            }
+        })
+        .then(() => {
+            console.log('Room successfully deleted in Daily API');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+>>>>>>> 3642f6498f82887a48610f7948f4a85f5336a106
         // Delete a room
         axios.delete(`http://localhost:8000/api/voice_chat/${roomId}/`, {
             headers: {
