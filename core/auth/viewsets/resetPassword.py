@@ -11,10 +11,10 @@ class UserResetPasswordViewset(ViewSet):
     http_method_names = ['post']
 
     def create(self, request, public_id, token, *args,  **kwargs): 
-         serializer = self.serializer_class(data=request.data, context={'public_id': public_id, 'token': token})
-         serializer.is_valid(raise_exception=True)
+        serializer = self.serializer_class(data=request.data, context={'public_id': public_id, 'token': token})
+        serializer.is_valid(raise_exception=True)
         
-         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
     
     # def post(self, request, public_id, token, *args, **kwargs): 
     #     serializer = self.serializer_class(data=request.data, context={'public_id': public_id, 'token': token })
@@ -29,7 +29,7 @@ class SendUserPasswordEmailViewset(ViewSet):
     permission_classes = (AllowAny, )
     http_method_names = ['post']
 
-    print("hello")
+    # print("hello")
 
     def create(self, request, *args, **kwargs): 
         # print("hello")
@@ -44,3 +44,4 @@ class SendUserPasswordEmailViewset(ViewSet):
         serializer.is_valid(raise_exception=True)
         
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+    

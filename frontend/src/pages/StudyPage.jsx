@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
+import axios from 'axios';
 import { Question, Quiz } from './CreateQuiz.jsx';
 
 const theme = createTheme({
@@ -33,27 +34,32 @@ export default function StudyPage() {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
 
-    useEffect(() => {
-        const fetchQuizzes = async () => {
+    const fetchQuizzes = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/quiz/'); // Replace with your actual API endpoint
-            if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const quizzes = await response.json();
+            const response = await axios.get('http://127.0.0.1:8000/api/quiz/', {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            }); // Replace with your actual API endpoint
+            
+            const quizzes = await response.data;
             console.log(quizzes)
             setQuizList(quizzes.map(quiz => new Quiz(
-            quiz.questionList.map(question => {
-                const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
-                return new Question(question.text, question.answerList.map(answer => answer.text), correctAnswer);
-            }),
-            quiz.title
+                quiz.id,
+                quiz.questionList.map(question => {
+                    const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
+                    return new Question(question.text, question.answerList.map(answer => answer.text), correctAnswer);
+                }),
+                quiz.title,
+                quiz.user_has_upvoted,
+                quiz.ratings
             )));
         } catch (error) {
             console.error('Error fetching quizzes:', error);
         }
-        };
+    };
 
+    useEffect(() => {
         fetchQuizzes();
     }, []);
 
@@ -72,6 +78,45 @@ export default function StudyPage() {
         alert('Incorrect!');
         }
     };
+
+    const handleUpvote = async () => {
+        try {
+            console.log(quizList);
+            console.log(selectedQuiz);
+            if (selectedQuiz.user_has_upvoted) {
+                const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/remove_upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setSelectedQuiz(prevQuiz => ({
+                        ...prevQuiz,
+                        ratings: prevQuiz.ratings - 1,
+                        user_has_upvoted: false
+                    }));
+                }
+            } else {
+                const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setSelectedQuiz(prevQuiz => ({
+                        ...prevQuiz,
+                        ratings: prevQuiz.ratings + 1,
+                        user_has_upvoted: true
+                    }));
+                }
+            }
+            fetchQuizzes();
+        } catch (error) {
+            console.error('Failed to update upvote status:', error);
+        }
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -142,7 +187,18 @@ export default function StudyPage() {
                         Next
                         </Button>
                     </Box>
+                    <IconButton 
+                    color="primary" 
+                    aria-label="like"
+                    onClick={handleUpvote}
+                    >
+                    {selectedQuiz.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                    </IconButton>
+                    <Typography variant="body2" component="span">
+                        {selectedQuiz.ratings}
+                    </Typography>
                     </List>
+                    
                 )}
                 </Paper>
             </Grid>
