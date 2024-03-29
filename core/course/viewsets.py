@@ -80,4 +80,4 @@ class CourseViewSet(AbstractViewSet):
         course.remove_module(module)
         serializer = self.serializer_class(course)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+

@@ -67,8 +67,9 @@ class CourseManager(AbstractManager):
 
 # Create your models here.
 class Course(AbstractModel):
-    name = models.CharField(max_length=10, unique=True)
-    course_subject = models.CharField(max_length=10)
+    #name = models.CharField(max_length=10)
+    course_subject = models.ForeignKey(to="core_subject.Subject", related_name="courses", on_delete=models.CASCADE)
+    code = models.IntegerField(default=0)
     description = models.CharField(max_length=255)
     creator = models.ForeignKey(to="core_user.User", on_delete=models.CASCADE)
     
@@ -76,10 +77,14 @@ class Course(AbstractModel):
     objects = CourseManager()
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.description}"
     
     def subject(self):
         return f"{self.course_subject}"
     
     class Meta:
         db_table = "core.course"
+        constraints = [
+            models.UniqueConstraint(fields=['course_subject', 'code'], name='unique_course_code')
+        ]
+

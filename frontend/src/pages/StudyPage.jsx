@@ -3,9 +3,10 @@ import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
     Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import useSWR from 'swr'
+import axios from 'axios'
 import { Question, Quiz } from './CreateQuiz.jsx';
 
 const theme = createTheme({
@@ -28,33 +29,28 @@ const quiz2 = new Quiz([new Question('How is force related to mass and accelerat
 
 
 export default function StudyPage() {
-    const [quizList, setQuizList] = useState([quiz1, quiz2]);
+    const {courseID, sectionID,  moduleID} = useParams();
+    const [module, setModule] = useState({});
+    const [quizList, setQuizList] = useState([]);
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
 
     useEffect(() => {
-        const fetchQuizzes = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/quiz/'); // Replace with your actual API endpoint
-            if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const quizzes = await response.json();
-            console.log(quizzes)
-            setQuizList(quizzes.map(quiz => new Quiz(
-            quiz.questionList.map(question => {
-                const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
-                return new Question(question.text, question.answerList.map(answer => answer.text), correctAnswer);
-            }),
-            quiz.title
-            )));
-        } catch (error) {
-            console.error('Error fetching quizzes:', error);
-        }
-        };
-
-        fetchQuizzes();
+        axios.get(`http://localhost:8000/api/module/${moduleID}`)
+        .then(response => {
+            setModule(response.data);
+            setQuizList(response.data.quizzes.map(quiz => new Quiz(
+                quiz.questionList.map(question => {
+                    const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
+                    return new Question(question.text, question.answerList.map(answer => answer.text), correctAnswer);
+                }),
+                quiz.title
+                )));
+        })
+        .catch(error => {
+            console.error('Error fetching subjects:', error);
+        });
     }, []);
 
     const handleAnswerClick = (index) => {
@@ -78,9 +74,9 @@ export default function StudyPage() {
         <AppBar position="static" color="secondary">
             <Toolbar>
             <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                Physics 101 Study Page
+                {module.name + ' Study Page'}
             </Typography>
-            <Link to="/create-quiz">
+            <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid:`${moduleID}`}}>
                 <Button variant="contained">
                 Create Quiz
                 </Button>

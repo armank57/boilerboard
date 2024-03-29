@@ -4,4 +4,4 @@ from core.course.models import Course
 # Register your models here.
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin): 
-    list_display = ("name", "public_id")
+    list_display = ("description", "public_id")

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, IconButton } from '@mui/material';
+import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, IconButton, Button } from '@mui/material';
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 
 function Post() {
@@ -46,6 +46,27 @@ function Post() {
             console.error('Failed to upvote post:', error);
         }
     }
+
+    const handleDelete = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/user/${JSON.parse(localStorage.getItem('auth')).user.id}/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+                }
+            });
+            if (response.data.is_instructor === false) {
+                alert('You are not authorized to delete this post');
+                return;
+            }
+            const response2 = await axios.delete(`http://localhost:8000/api/post/${id}/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+        }
+    }
     
     // TODO: Add a chip that shows the course number next to the topic
     return (
@@ -72,6 +93,11 @@ function Post() {
                 >
                     {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
                 </IconButton>
+                <Button 
+                    color="primary" 
+                    aria-label="delete"
+                    onClick={handleDelete}
+                    >Delete</Button>
             </CardContent>
         </Card>
     </Container>
