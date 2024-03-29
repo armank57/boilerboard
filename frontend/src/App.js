@@ -108,6 +108,12 @@ function App() {
             <ViewReported />
         </ProtectedRoute>
       } />
+      <Route path="/edit-post/:id" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <EditPost />
+        </ProtectedRoute>
+      } />
       <Route path="/login/" element={<Login />} />
       <Route path="/register/" element={<Registration />} />
       <Route path="/reset-password/" element={<ResetPassword />} />
