@@ -24,6 +24,8 @@ import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
+import Module from './pages/Module';
+
 
 function App() {
   // TODO reset password path configure for user
@@ -36,12 +38,6 @@ function App() {
           <ViewProfile />
         </ProtectedRoute>
       } />
-      <Route path="/discussions/" element={
-        <ProtectedRoute>
-          <ResponsiveAppBar />
-          <Discussions />
-        </ProtectedRoute>
-      }/>
       <Route path="/courses/" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
@@ -54,10 +50,22 @@ function App() {
             <Course />
         </ProtectedRoute>
       } />
+      <Route path="/courses/:courseID/discussions" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <Discussions />
+        </ProtectedRoute>
+      } />
       <Route path="/courses/:courseID/:sectionID/new-module" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <NewModule />
+        </ProtectedRoute>
+      } />
+      <Route path="/courses/:courseID/:sectionID/:moduleID" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <StudyPage />
         </ProtectedRoute>
       } />
       <Route path="/create-post/" element={
@@ -82,12 +90,6 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <CreateQuiz />
-        </ProtectedRoute>
-      } />
-      <Route path="/study-page/" element={
-        <ProtectedRoute>
-            <ResponsiveAppBar />
-            <StudyPage />
         </ProtectedRoute>
       } />
       <Route path="/voice_chat/" element={

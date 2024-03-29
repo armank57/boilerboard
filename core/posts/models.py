@@ -43,6 +43,7 @@ class BadContent(models.Model):
 class Post(AbstractModel):
     title = models.CharField(max_length=255)
     content = models.TextField()
+    course = models.ForeignKey('core_course.Course', related_name='posts', on_delete=models.CASCADE)
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=255, null=True)
     endorsed = models.BooleanField(default=False)

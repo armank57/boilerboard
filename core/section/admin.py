@@ -7,5 +7,5 @@ class SectionAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_course')
 
     def get_course(self, obj): 
-        return obj.course.name
+        return obj.course.description
     get_course.short_description = 'Course'

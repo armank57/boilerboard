@@ -3,12 +3,12 @@ from rest_framework import serializers
 from core.abstract.serializers import AbstractSerializer
 from core.posts.models import Post, Rating, BadContent
 from core.user.models import User
+from core.course.models import Course
 
 class BadContentSerializer(AbstractSerializer):
     class Meta:
         model = BadContent
-        fields = ['reportedContent'
-                  ]
+        fields = ['reportedContent']
 
 class PostSerializer(AbstractSerializer):
     author = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
@@ -19,6 +19,7 @@ class PostSerializer(AbstractSerializer):
     author_name = serializers.SerializerMethodField()
     user_has_reported = serializers.SerializerMethodField()
     badContentList = serializers.SerializerMethodField()
+    course = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -27,6 +28,7 @@ class PostSerializer(AbstractSerializer):
             'id',
             'title',
             'content',
+            'course',
             'author',
             'topic',
             'created',
@@ -53,7 +55,7 @@ class PostSerializer(AbstractSerializer):
     
     def get_user_has_upvoted(self, obj):
         user = self.context['request'].user
-        return Rating.objects.filter(user=user, post=obj, upvote=True).exists()
+        return Rating.objects.filter(user=user.id, post=obj, upvote=True).exists()
     
     def get_is_author(self, obj):
         user = self.context['request'].user
@@ -69,5 +71,5 @@ class PostSerializer(AbstractSerializer):
         return reports
     
     def get_user_has_reported(self, obj):
-        user = self.context['request'].user
+        user = self.context['request'].user.id
         return BadContent.objects.filter(user=user, post=obj, reported=True).exists()

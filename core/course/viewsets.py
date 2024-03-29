@@ -54,30 +54,26 @@ class CourseViewSet(AbstractViewSet):
         course = self.get_object()
         user = self.request.user
         user.join_course(course)
-        serializer = self.serializer_class(course)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
     
     @action(methods=['post'], detail=True)
     def leave_course(self, request, *args, **kwargs):
         course = self.get_object()
         user = self.request.user
         user.leave_course(course)
-        serializer = self.serializer_class(course)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True)
     def add_module(self, request, *args, **kwargs):
         course = self.get_object()
         module = self.request.data.get('module')
         module.in_course(module)
-        serializer = self.serializer_class(course)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
     
     @action(methods=['post'], detail=True)
     def remove_module(self, request, *args, **kwargs):
         course = self.get_object()
         module = self.get_object()
         course.remove_module(module)
-        serializer = self.serializer_class(course)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        return Response(status=status.HTTP_200_OK)
+

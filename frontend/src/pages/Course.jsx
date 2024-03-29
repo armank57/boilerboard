@@ -1,9 +1,12 @@
 
 import React, { useEffect } from 'react'
-import { Box, Button, Card, CardContent, Container, TextField, Typography } from '@mui/material';
+import {
+    InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
+} from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useParams, useNavigate, Link } from "react-router-dom"
 import CourseButton from '../components/JoinCourseButton'
-import NewModule from '../components/NewModule'
 import useSWR from 'swr'
 import axios from 'axios'
 const fetcher = url => axios.get(url).then(res => res.data)
@@ -11,6 +14,21 @@ function Course() {
     const navigate = useNavigate()
     const { courseID } = useParams()
     const { data, error } = useSWR(`http://127.0.0.1:8000/api/course/${courseID}`, fetcher)
+
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#d3d3d3', // Black
+            },
+            secondary: {
+                main: '#ceb888', // Gold
+            },
+        },
+        typography: {
+            fontFamily: 'Quicksand, sans-serif',
+            fontWeightBold: 700,
+        },
+    });
 
     const newSectionHandler = () => {
         console.log('New Section');
@@ -48,17 +66,22 @@ function Course() {
         navigate(`/courses/${courseID}/${sectionID}/new-module`);
     }
 
-    function ModuleMapper(section) {
-        return section.modules.map((module, index) => (
+    function ModuleMapper(i, section) {
+        const sortedModules = section.modules.sort((a, b) => a.subsection - b.subsection);
+        return sortedModules.map((module, index) => (
             <Link to={`/courses/${courseID}/${section.id}/${module.id}/`}>
                 <Card key={index} style={{ 
                     backgroundColor: '#d3d3d3', 
                     marginBottom: '20px',
                     height: '100px',
-                    overflow: 'hidden',
+                    overflow: 'scroll',
+                    marginRight: '10px',
                 }}>
                     <CardContent>
                         <Typography variant="h5">
+                            {(i+1) + "." + module.subsection}
+                        </Typography>
+                        <Typography>
                             {module.name}
                         </Typography>
                         
@@ -70,30 +93,39 @@ function Course() {
 
     function SectionMapper() {
         return data.sections.map((section, index) => (
-            <Card key={index} style={{ 
-                backgroundColor: '#d3d3d3', 
-                marginBottom: '20px',
-                height: '300px',
-                overflow: 'hidden',
-            }}>
-                <CardContent>
-                    <Typography variant="h5">
-                        {section.name}
-                    </Typography>
-                    <div>
-                        {ModuleMapper(section)}
-                    </div>
-                    <Button
-                        name="createModule"
-                        variant="contained"
-                        color="secondary"
-                        fullWidth
-                        onClick={() => newModuleHandler(section.id)}
-                    >
-                        New Module
-                    </Button>
-                </CardContent>
-            </Card>
+            //<Grid container direction="row">
+                <Card key={index} style={{
+                    backgroundColor: '#d3d3d3', 
+                    marginBottom: '20px',
+                    height: '200px',
+                    overflow: 'scroll',
+                }}>
+                    <CardContent>
+                        <Grid container direction="row">
+                            <Grid item xs={8}>
+                                <Typography variant="h5">
+                                    {section.name}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Box display="flex" justifyContent="flex-end">
+                                    <Button
+                                        name="createModule"
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => newModuleHandler(section.id)}
+                                    >
+                                        New Module
+                                    </Button>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12} style={{ overflowX: 'auto', display: 'flex' }}>
+                                {ModuleMapper(index, section)}
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+            //</Grid>
         ));
     }
 
@@ -101,21 +133,42 @@ function Course() {
     if (!data) return <div>Loading...</div>
     return (
         <div>
-            <h3 style={{color: "white"}}>{data.description}</h3>
-            <CourseButton cid={data.id} />
-            
-            <div>
-                {SectionMapper()}
-            </div>
-            <Button
-                name="addSection"
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={newSectionHandler}
-            >
-                New Section
-            </Button>
+            <ThemeProvider theme={theme}>
+                <Grid container direction="row">
+                    <Grid item xs={12}>
+                        <h3 style={{color: "white"}}>{data.description}</h3>
+                    </Grid>
+                    <Grid item xs={1}>
+                        <CourseButton cid={data.id} />
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Button
+                            name="addSection"
+                            variant="contained"
+                            color="secondary"
+                            onClick={newSectionHandler}
+                        >
+                            New Section
+                        </Button>
+                    </Grid>
+                    <Grid item xs={9}>
+                        <Box display={'flex'} justifyContent={'flex-end'}>
+                        <Button
+                            name="discussions"
+                            variant="contained"
+                            color="secondary"
+                        >
+                            <Link to={`/courses/${courseID}/discussions`} style={{ textDecoration: 'none', color: 'unset' }}>
+                                Discussions
+                            </Link>
+                        </Button>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {SectionMapper()}
+                    </Grid>
+                </Grid>
+            </ThemeProvider>
         </div>
     )
 }
