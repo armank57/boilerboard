@@ -3,7 +3,7 @@ import {
     Toolbar, MenuItem, Typography,
     Box, Card, CardContent, Grid, List,
     Chip, Container, CircularProgress,
-    IconButton, Tooltip, Menu, Paper, Badge
+    IconButton, Tooltip, Menu, Paper, Badge, Button
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -12,6 +12,8 @@ import axios from 'axios';
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getUser } from "../hooks/user.actions";
+import { useNavigate } from 'react-router-dom';
+
 
 const theme = createTheme({
     palette: {
@@ -31,6 +33,7 @@ const theme = createTheme({
 export default function ViewProfile() {
     const [user, setUser] = useState(getUser());
     const [posts, setPosts] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -53,6 +56,10 @@ export default function ViewProfile() {
 
         fetchPosts();
     }, []);
+
+    function viewReportedContent() {
+        navigate('/view-reported')
+    }
 
     var total_rating = 0;
     for (let i = 0; i < posts.length; i++) {
@@ -93,6 +100,11 @@ export default function ViewProfile() {
                                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
                                             Rating: {total_upvotes}
                                         </Typography>
+                                        {user.is_instructor ? (
+                                            <Button size="small" sx={{ marginTop: 2, width: "60%" }} variant="contained" color="primary" onClick={viewReportedContent}>
+                                                View Reported Content
+                                            </Button>
+                                        ) : null}
                                     </Grid>
                                 </CardContent>
                             </Card>
