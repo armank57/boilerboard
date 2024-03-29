@@ -82,4 +82,4 @@ class Course(AbstractModel):
         return f"{self.course_subject}"
     
     class Meta:
-        db_table = "core.course"
+        db_table = "core_course"

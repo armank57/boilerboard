@@ -5,6 +5,7 @@ from core.posts.models import Post, Rating, BadContent
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 # Create your views here
 
@@ -18,9 +19,35 @@ class PostViewSet(AbstractViewSet):
         return Post.objects.all()
     
     def get_object(self):
-        obj = Post.objects.get_object_by_public_id(self.kwargs['pk'])
+        obj = get_object_or_404(Post, public_id=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
+    
+    def update(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = request.user
+
+        # Check if the user is the author of the post
+        if post.author != user:
+            return Response({'message': 'You do not have permission to edit this post.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(post, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        post = self.get_object()
+        user = request.user
+
+        # Check if the user is not the author of the post and user is not an instructor
+        if post.author != user and not user:
+            return Response({'message': 'You do not have permission to delete this post.'}, status=status.HTTP_403_FORBIDDEN)
+
+        self.perform_destroy(post)
+
+        return Response({'message': 'Post deleted.'}, status=status.HTTP_204_NO_CONTENT)
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

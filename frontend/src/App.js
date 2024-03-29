@@ -23,6 +23,7 @@ import ViewProfile from './pages/ViewProfile';
 import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
+import EditPost from './pages/EditPost';
 
 function App() {
   // TODO reset password path configure for user
@@ -71,6 +72,12 @@ function App() {
             <ViewPost />
         </ProtectedRoute>
       } />
+      <Route path="/edit-post/:id" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <EditPost />
+        </ProtectedRoute>
+      } />
       <Route path="/create-quiz/" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
@@ -99,6 +106,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ViewReported />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-post/:id" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <EditPost />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />
