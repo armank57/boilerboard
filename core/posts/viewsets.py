@@ -85,6 +85,17 @@ class PostViewSet(AbstractViewSet):
         return Response(data, status=status.HTTP_201_CREATED)
     
     @action(detail=True, methods=['post'])
+    def dismiss_report(self, request, pk=None):
+        post = self.get_object()
+        if request.user.is_instructor: 
+            bad_content = BadContent.objects.get(post=post)
+            bad_content.delete()
+        else: 
+            return Response({'status': 'Unauthorized: Need Instructor permissions to dismiss reports'}, status=status.HTTP_403_FORBIDDEN)
+        data = {'message': 'Report dismissed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
     def remove_reported_content(self, request, pk=None):
         post = self.get_object()
         user = request.user

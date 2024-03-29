@@ -33,7 +33,7 @@ class BadContent(models.Model):
     user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True)
     reported = models.BooleanField(default=False)
-    reportedContent = models.TextField(default='hi')
+    reportedContent = models.TextField(default='')
 
     # ensures that a user can only rate a post once
     class Meta:
