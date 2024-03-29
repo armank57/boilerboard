@@ -34,6 +34,7 @@ export default function ViewProfile() {
     const [user, setUser] = useState(getUser());
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
+    const [authorPosts, setAuthorPosts] = useState([]);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -47,6 +48,7 @@ export default function ViewProfile() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const posts = await response.json();
+                setAuthorPosts(posts.filter(post => post.is_author));
                 console.log(posts);
                 setPosts(posts);
             } catch (error) {
@@ -117,36 +119,46 @@ export default function ViewProfile() {
                                 Posts
                             </Typography>
                             <List>
-                                {posts.filter(post => post.is_author).map((post) => (
-                                    <Link key={post.id} to={`/post/${post.id}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                        <Card sx={{ marginBottom: 3 }}>
-                                            <CardContent>
-                                                <Grid container justifyContent="space-between">
-                                                    <Grid item xs={11}>
-                                                        <Typography variant="h5" component="h2">
-                                                            {post.title}
+                                {authorPosts.length > 0 ? (
+                                    authorPosts.map((post) => (
+                                        <Link key={post.id} to={`/post/${post.id}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Card sx={{ marginBottom: 3 }}>
+                                                <CardContent>
+                                                    <Grid container justifyContent="space-between">
+                                                        <Grid item xs={11}>
+                                                            <Typography variant="h5" component="h2">
+                                                                {post.title}
+                                                            </Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Chip label={post.topic} />
+                                                    <Typography color="textSecondary">
+                                                        Created: {new Date(post.created).toLocaleString()}
+                                                    </Typography>
+                                                    <Typography variant="body2" component="p" sx={{ marginTop: 1 }}>
+                                                        {post.content}
+                                                    </Typography>
+                                                    <Grid container sx={{ marginTop: 1 }}>
+                                                        <Badge color="primary">
+                                                            <ThumbUp />
+                                                        </Badge>
+                                                        <Typography sx={{ marginLeft: 1 }}>
+                                                            {post.ratings}
                                                         </Typography>
                                                     </Grid>
-                                                </Grid>
-                                                <Chip label={post.topic} />
-                                                <Typography color="textSecondary">
-                                                    Created: {new Date(post.created).toLocaleString()}
-                                                </Typography>
-                                                <Typography variant="body2" component="p" sx={{ marginTop: 1 }}>
-                                                    {post.content}
-                                                </Typography>
-                                                <Grid container sx={{ marginTop: 1 }}>
-                                                    <Badge color="primary">
-                                                        <ThumbUp />
-                                                    </Badge>
-                                                    <Typography sx={{ marginLeft: 1 }}>
-                                                        {post.ratings}
-                                                    </Typography>
-                                                </Grid>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
+                                                </CardContent>
+                                            </Card>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <Card sx={{ marginBottom: 3 }}>
+                                        <CardContent>
+                                            <Typography variant="body1  " component="h2">
+                                                It looks like you haven't made any posts yet...
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                )}
                             </List>
                         </Grid>
                     </Box>
