@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include,path
 
+admin.site.site_url = 'http://localhost:3000/' 
 admin.site.site_header = 'BoilerBoard Administration'
 
 urlpatterns = [
