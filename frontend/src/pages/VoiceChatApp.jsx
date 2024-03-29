@@ -18,6 +18,8 @@ const theme = createTheme({
     typography: {
         fontFamily: 'Quicksand, sans-serif',
         fontWeightBold: 700,
+        color: '#D3D3D3',
+        secondarycolor: '#A4A4A4',
     },
 });
 
@@ -79,10 +81,10 @@ function VoiceChatApp() {
         const isValidRoomName = /^[a-zA-Z0-9_]+$/.test(roomName);
         if (!isValidRoomName) {
             toast.error('Room name can only contain letters and numbers, and underscores.');
-            return;
+            return Promise.reject(new Error('Invalid room name'));
         }
         // Create daily room
-        axios.post('https://api.daily.co/v1/rooms', {
+        const createDailyRoom = axios.post('https://api.daily.co/v1/rooms', {
             name: roomName,
             privacy: 'public',
             properties: {
@@ -94,45 +96,33 @@ function VoiceChatApp() {
             headers: {
                 'Authorization': `Bearer ${dailyToken}`
             }
-        })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.error(error);
-            });
 
+        });
+       
         // Create a new room
-        axios.post('http://localhost:8000/api/voice_chat/', { name: roomName }, {
+        const createRoom = axios.post('http://localhost:8000/api/voice_chat/', { name: roomName }, {
             headers: {
                 'Authorization': `Bearer ${userToken}`
             }
-        })
-            .then(response => {
-                setRooms([...rooms, response.data]);
+        });
+     
+        return Promise.all([createDailyRoom, createRoom])
+            .then(([dailyResponse, roomResponse]) => {
+                console.log(dailyResponse.data);
+                const newRoomId = roomResponse.data.id;
+                setRooms([...rooms, roomResponse.data]);
                 toast.success('Room successfully created');
+                setRoomName('');
+                return newRoomId;
             })
             .catch(error => {
                 console.error(error);
                 toast.error('Failed to create room');
+                throw error;
             });
-    
-        setRoomName('');
-    };
+     };
 
     const handleDeleteRoom = (roomId, roomName) => {
-        axios.delete(`https://api.daily.co/v1/rooms/${roomName}`, {
-            headers: {
-                'Authorization': `Bearer ${dailyToken}`
-            }
-        })
-        .then(() => {
-            console.log('Room successfully deleted in Daily API');
-        })
-        .catch(error => {
-            console.error(error);
-        });
-
         // Delete a room
         axios.delete(`http://localhost:8000/api/voice_chat/${roomId}/`, {
             headers: {
@@ -142,6 +132,19 @@ function VoiceChatApp() {
             .then(() => {
                 setRooms(rooms.filter(room => room.id !== roomId));
                 toast.success('Room successfully deleted');
+
+                axios.delete(`https://api.daily.co/v1/rooms/${roomName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${dailyToken}`
+                    }
+                })
+                .then(() => {
+                    console.log('Room successfully deleted in Daily API');
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
             })
             .catch(error => {
                 console.error(error);
@@ -155,7 +158,7 @@ function VoiceChatApp() {
     };
 
     const handleJoinRoom = (roomId) => {
-        axios.post(`http://localhost:8000/api/voice_chat/${roomId}/join/`, {}, {
+        return axios.post(`http://localhost:8000/api/voice_chat/${roomId}/join/`, {}, {
             headers: {
                 'Authorization': `Bearer ${userToken}`
             }
@@ -165,7 +168,7 @@ function VoiceChatApp() {
                 setJoinedRoom(joinedRoom);
                 fetchRooms();
                 toast.success('Joined room successfully');
-    
+     
                 // Create a Daily.co video call iframe
                 callRef.current = DailyIframe.createFrame({
                     userName: userName,
@@ -177,18 +180,20 @@ function VoiceChatApp() {
                         height: '500px',
                     },
                 });
-                
+               
                 // Join the Daily.co video call
                 callRef.current.join({
                     url: `https://boilerboard.daily.co/${joinedRoom.name}`,
                 });
-                // console.log("Hello")
+                return joinedRoom;
             })
             .catch(error => {
                 console.error(error);
                 toast.error('Failed to join room');
+                throw error;
             });
-    };
+     };
+          
 
     const handleLeaveRoom = (roomId) => {
         axios.post(`http://localhost:8000/api/voice_chat/${roomId}/leave/`, {}, {
@@ -211,11 +216,20 @@ function VoiceChatApp() {
             });
     };
 
+    const handleCreateAndJoinRoom = async () => {
+        try {
+            const newRoomId = await handleCreateRoom();
+            console.log('returned id', newRoomId);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Toaster />
             <Container maxWidth="sm">
-                <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
+                <Typography variant="h3" style={{ paddingBottom: '20px', color: theme.typography.color}}>
                     Voice Chat Rooms
                 </Typography>
                 <TextField
@@ -225,20 +239,25 @@ function VoiceChatApp() {
                     variant="outlined"
                     margin="normal"
                     fullWidth
+                    InputLabelProps={{
+                        style: { color: theme.typography.color },
+                    }}
                 />
                 <Button
                     variant="contained"
                     color="secondary"
-                    onClick={handleCreateRoom}
+                    onClick={handleCreateAndJoinRoom}
                     fullWidth
                 >
                     Create Room
                 </Button>
                 <List>
                     {rooms.map((room) => (
-                        <ListItem key={room.id}>
+                        <ListItem key={room.id.toString()}>
                             <ListItemText 
                                 primary={room.name}
+                                primaryTypographyProps={{ style: { color: theme.typography.secondarycolor } }}
+                                secondaryTypographyProps={{ style: { color: theme.typography.color } }}
                                 secondary={
                                     <>
                                         {`Created by: ${room.creator}`}
@@ -261,14 +280,14 @@ function VoiceChatApp() {
                 </List>
                 {joinedRoom && (
                     <>
-                        <Typography variant="h6" style={{ paddingTop: '20px' }}>
+                        <Typography variant="h6" style={{ paddingTop: '20px' ,color: theme.typography.secondarycolor}}>
                             Online users in {joinedRoom.name}:
                         </Typography>
                         <div ref={callRef} />
                         <List>
                             {joinedRoom.online_users.map((user) => (
                                 <ListItem key={user.id}>
-                                    <ListItemText primary={user.username} />
+                                    <ListItemText primary={user.username} style={{ color: theme.typography.color }}/>
                                 </ListItem>
                             ))}
                         </List>
