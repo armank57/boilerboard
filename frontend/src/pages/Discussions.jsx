@@ -14,7 +14,7 @@ function Discussions() {
 
     const numPosts = 5; // Number of posts to display initially + load more
     const {courseID} = useParams();
-    const [course, setCourse] = useState([]); // State for course object which consists of course information
+    const [courseName, setCourseName] = useState([]); // State for course object which consists of course information
     const [discussions, setDiscussions] = useState([]); // State for discussions array which consists of posts that are fetched from database
     const [discLength, setDiscLength] = useState(numPosts); // State for discussions length
     const [loadCount, setLoadCount] = useState(numPosts); // State for load count, used for loading more discussions
@@ -41,22 +41,26 @@ function Discussions() {
     // TODO: add 'discussions' to dependency array
     useEffect(() => {
         // TODO: Link discussions to each course they are a part of
-        axios.get(`http://127.0.0.1:8000/api/course/${courseID}`, {
+        async function getttt() {
+        await axios.get(`http://127.0.0.1:8000/api/course/${courseID}`, { //MAKE ASYNC FUCNTIO
             headers: {
                 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
             }
-        })
+            })
             .then(response => {
-                setCourse(response.data);
+                setCourseName(response.data.name);
                 setDiscussions(response.data.posts);
-                console.log(discussions);
+                console.log(discussions)
+                setDiscLength(discussions.length);
             })
             .catch(error => {
                 console.error('Error fetching discussions:', error);
             }
             );
-        setDiscLength(discussions.length);
-    }, [loadCount, discLength, currentTopic]);
+
+        }
+        getttt();
+    }, []);
 
     function discussionMapper() {
         return discussions
@@ -150,7 +154,7 @@ function Discussions() {
             <ThemeProvider theme={theme}>
                 <Container maxWidth="md">
                     <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
-                        {course.name}
+                        {courseName}
                     </Typography>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                         <TextField label="Search" variant="outlined" />

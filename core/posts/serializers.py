@@ -53,8 +53,8 @@ class PostSerializer(AbstractSerializer):
         return BadContentSerializer(bad_contents, many=True).data
     
     def get_user_has_upvoted(self, obj):
-        user = self.context['request'].user.id
-        return Rating.objects.filter(user=user, post=obj, upvote=True).exists()
+        user = self.context['request'].user
+        return Rating.objects.filter(user=user.id, post=obj, upvote=True).exists()
     
     def get_is_author(self, obj):
         user = self.context['request'].user

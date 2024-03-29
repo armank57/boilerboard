@@ -56,7 +56,7 @@ export default function ViewProfile() {
             console.error('Error fetching posts:', error);
         }
         };
-
+        
         axios.get('http://localhost:8000/api/course')
             .then(response => {
                 setCourses(response.data.filter(course => course.students.includes(user.id)));
@@ -142,7 +142,7 @@ export default function ViewProfile() {
                 <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}}>
                     Posts
                 </Typography>
-                <Paper>
+                <Paper sx={{height: "200px", overflow: "scroll"}}>
                     <List>
                     {posts.filter(post => post.is_author).map((post) => (
                         <ListItem key={post.id}>
