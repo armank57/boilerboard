@@ -15,4 +15,4 @@ class VoiceChatRoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VoiceChatRoom
-        fields = ['id', 'public_id', 'name', 'creator', 'created_at', 'updated_at', 'online_users']
+        fields = ['id', 'public_id', 'name', 'creator', 'created_at', 'updated_at', 'is_private', 'online_users']

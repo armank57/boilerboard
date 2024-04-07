@@ -1,7 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, TextField, List, ListItem, ListItemText, Container, Typography, IconButton } from '@mui/material';
+import { Button, TextField, List, ListItem, ListItemText, Container, Typography, IconButton, Switch } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import toast, { Toaster } from 'react-hot-toast';
 import DailyIframe from '@daily-co/daily-js';
@@ -27,6 +31,7 @@ function VoiceChatApp() {
     const [roomName, setRoomName] = useState('');
     const [rooms, setRooms] = useState([]);
     const [joinedRoom, setJoinedRoom] = useState(null);
+    const [isPrivate, setIsPrivate] = useState(false);
     const callRef = useRef();
 
     let userToken = localStorage.getItem('auth');
@@ -100,7 +105,10 @@ function VoiceChatApp() {
         });
        
         // Create a new room
-        const createRoom = axios.post('http://localhost:8000/api/voice_chat/', { name: roomName }, {
+        const createRoom = axios.post('http://localhost:8000/api/voice_chat/', { 
+            name: roomName,
+            is_private: isPrivate,
+        }, {
             headers: {
                 'Authorization': `Bearer ${userToken}`
             }
@@ -123,21 +131,6 @@ function VoiceChatApp() {
      };
 
     const handleDeleteRoom = (roomId, roomName) => {
-<<<<<<< HEAD
-=======
-        axios.delete(`https://api.daily.co/v1/rooms/${roomName}`, {
-            headers: {
-                'Authorization': `Bearer ${dailyToken}`
-            }
-        })
-        .then(() => {
-            console.log('Room successfully deleted in Daily API');
-        })
-        .catch(error => {
-            console.error(error);
-        });
-
->>>>>>> 3642f6498f82887a48610f7948f4a85f5336a106
         // Delete a room
         axios.delete(`http://localhost:8000/api/voice_chat/${roomId}/`, {
             headers: {
@@ -257,6 +250,37 @@ function VoiceChatApp() {
                     InputLabelProps={{
                         style: { color: theme.typography.color },
                     }}
+                    InputProps={{
+                        style: { color: theme.typography.color },
+                    }}
+                />
+                <Grid container alignItems="center" justifyContent="flex-end">
+                    <Grid item xs={1}>
+                        <Tooltip title={isPrivate ? "Private Room" : "Public Room"}>
+                            <IconButton
+                                color={isPrivate ? "primary" : "default"}
+                                onClick={() => setIsPrivate(!isPrivate)}
+                            >
+                                {isPrivate ? <LockIcon /> : <LockOpenIcon />}
+                            </IconButton>
+                        </Tooltip>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleCreateAndJoinRoom}
+                            fullWidth
+                        >
+                            Create Room
+                        </Button>
+                    </Grid>
+                </Grid>
+                {/* <Switch
+                    checked={isPrivate}
+                    onChange={(event) => setIsPrivate(event.target.checked)}
+                    name="isPrivate"
+                    color="secondary"
                 />
                 <Button
                     variant="contained"
@@ -265,7 +289,7 @@ function VoiceChatApp() {
                     fullWidth
                 >
                     Create Room
-                </Button>
+                </Button> */}
                 <List>
                     {rooms.map((room) => (
                         <ListItem key={room.id.toString()}>
@@ -278,6 +302,8 @@ function VoiceChatApp() {
                                         {`Created by: ${room.creator}`}
                                         <br />
                                         {`Online users: ${room.online_users.length}`}
+                                        <br />
+                                        {`Room type: ${room.is_private ? 'Private' : 'Public'}`}
                                     </>
                                 }
                                 //secondary={`Created by: ${room.creator} Online users: ${room.online_users.length}`} 

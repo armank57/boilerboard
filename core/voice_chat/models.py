@@ -43,6 +43,7 @@ class VoiceChatRoom(AbstractModel):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    is_private = models.BooleanField(default=False)
     online_users = models.ManyToManyField(OnlineUser, blank=True)
 
     def __str__(self):
