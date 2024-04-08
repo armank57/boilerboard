@@ -24,6 +24,7 @@ import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
+import RegistrationEmailDialouge from './pages/RegistrationEmailDialouge';
 
 function App() {
   // TODO reset password path configure for user
@@ -119,6 +120,7 @@ function App() {
       <Route path="/reset-password/" element={<ResetPassword />} />
       <Route path="/reset-password-confirm/" element={<ResetPasswordConfirm />} />
       <Route path="/reset-password-dialogue/" element={<ResetPasswordSentDialouge />} />
+      <Route path="/registration-email-dialogue/" element={<RegistrationEmailDialouge/>}/>
     </Routes>
     </div>
   );

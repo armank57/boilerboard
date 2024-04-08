@@ -48,6 +48,8 @@ function LogIn() {
                 alert("Email or Password is incorrect");
             }
         })
+
+        /// userActions.sendRegisterEmail(data);
     }
 
 

@@ -10,6 +10,7 @@ function useUserActions() {
         register,
         logout,
         sendResetPasswordEmail,
+        sendRegisterEmail,
         resetPassword,
     };
 
@@ -32,9 +33,22 @@ function useUserActions() {
         return axios.post(`${baseURL}/auth/register/`, data).then((res) => {
             // Registering the account and tokens in the store
             setUserData(res.data);
+            // login(data);
             navigate("/login/");
+            // sendRegisterEmail(data)
         });
     } 
+
+    function sendRegisterEmail(data) {
+        axios.post(`${baseURL}/auth/send-registration-email/`, data).then((res) => {
+            navigate("/reset-password-dialogue/")
+        }).catch((err) => {
+            if (err.message) {
+                console.log(err.message)
+            }
+            // navigate("/reset-password-dialogue/")
+        })
+    }
 
     function sendResetPasswordEmail(data) {
         axios.post(`${baseURL}/auth/send-user-email/`, data).then((res) => {

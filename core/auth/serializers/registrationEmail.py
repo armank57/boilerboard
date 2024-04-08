@@ -13,6 +13,7 @@ class SendUserRegistrationEmailSerializer(serializers.Serializer):
 
     def validate(self, attrs): 
         email = attrs.get('email')
+        print(email)
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             link = 'http://localhost:3000/login'
