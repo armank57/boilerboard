@@ -76,7 +76,7 @@ function EditPost() {
 
             if (response.status === 200) {
                 alert('Post updated!');
-                navigate('/discussions');
+                navigate(-1);
             } else {
                 alert('Failed to update post');
             }

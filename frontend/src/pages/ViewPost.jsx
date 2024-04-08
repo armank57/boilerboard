@@ -45,14 +45,14 @@ function Post() {
                     setLoading(false);
                     console.log(response.data);
                 } else {
-                    navigate('/discussions');
+                    navigate(-1);
                 }
             })
             .catch(error => {
                 setLoading(false);
                 if (error.response && error.response.status === 404) {
                     console.error('Post not found:', error);
-                    navigate('/discussions');
+                    navigate(-1);
                 } else {
                     console.error('Error fetching post:', error);
                 }
@@ -140,7 +140,7 @@ function Post() {
                 } catch (error) {
                     console.error('Failed to remove post:', error);
                 }
-                navigate('/discussions');
+                navigate(-1);
             }
         } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
