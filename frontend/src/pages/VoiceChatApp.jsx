@@ -32,6 +32,7 @@ function VoiceChatApp() {
     const [rooms, setRooms] = useState([]);
     const [joinedRoom, setJoinedRoom] = useState(null);
     const [isPrivate, setIsPrivate] = useState(false);
+    const [wasKicked, setWasKicked] = useState(false);
     const callRef = useRef();
 
     let userToken = localStorage.getItem('auth');
@@ -233,6 +234,30 @@ function VoiceChatApp() {
         }
     };
 
+    const handleKickUser = (roomId, userId) => {
+        const currentUserId = JSON.parse(localStorage.getItem('auth')).user.id.replace(/-/g, '');
+        const tempUserId = userId.replace(/-/g, '');
+        console.log(tempUserId, currentUserId);
+        if (tempUserId === currentUserId) {
+            toast.error('You cannot kick yourself');
+            return;
+        }
+    
+        axios.post(`http://localhost:8000/api/voice_chat/${roomId}/kick/`, { user_id: userId }, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        })
+            .then(() => {
+                fetchRooms();
+                toast.success('User successfully kicked');
+            })
+            .catch(error => {
+                console.error(error);
+                toast.error('Failed to kick user');
+            });
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Toaster />
@@ -326,11 +351,16 @@ function VoiceChatApp() {
                         </Typography>
                         <div ref={callRef} />
                         <List>
-                            {joinedRoom.online_users.map((user) => (
+                        {joinedRoom.online_users.map((user) => {
+                            return (
                                 <ListItem key={user.id}>
                                     <ListItemText primary={user.username} style={{ color: theme.typography.color }}/>
+                                    {joinedRoom.creator === userName && (
+                                        <Button variant="contained" color="secondary" onClick={() => handleKickUser(joinedRoom.id, user.public_id)}>Kick</Button>
+                                    )}
                                 </ListItem>
-                            ))}
+                            );
+                        })}
                         </List>
                     </>
                 )}

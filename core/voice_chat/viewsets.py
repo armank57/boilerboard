@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from core.voice_chat.models import VoiceChatRoom, OnlineUser
 from core.voice_chat.serializers import VoiceChatRoomSerializer, OnlineUserSerializer
+from core.user.models import User
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 class VoiceChatRoomViewSet(viewsets.ModelViewSet):
     queryset = VoiceChatRoom.objects.all()
@@ -43,3 +46,15 @@ class VoiceChatRoomViewSet(viewsets.ModelViewSet):
             room.online_users.remove(online_user)
             room.save()
         return Response({'status': 'room left'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def kick(self, request, pk=None):
+        room = self.get_object()
+        user_to_kick = User.objects.get(public_id=request.data['user_id'])
+        if room.creator != request.user:
+            return Response({'status': 'You are not authorized to kick users from this room'}, status=status.HTTP_403_FORBIDDEN)
+        online_user_to_kick = OnlineUser.objects.filter(user=user_to_kick).first()
+        if online_user_to_kick:
+            room.online_users.remove(online_user_to_kick)
+            room.save()
+        return Response({'status': 'user kicked'}, status=status.HTTP_200_OK)

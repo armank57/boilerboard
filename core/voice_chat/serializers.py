@@ -4,10 +4,11 @@ from core.user.models import User
 
 class OnlineUserSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source='user.username')
-
+    public_id = serializers.ReadOnlyField(source='user.public_id')
+    
     class Meta:
         model = OnlineUser
-        fields = ['user', 'username']
+        fields = ['user', 'username', 'public_id']
         
 class VoiceChatRoomSerializer(serializers.ModelSerializer):
     creator = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username', required=False)
