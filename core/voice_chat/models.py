@@ -45,6 +45,7 @@ class VoiceChatRoom(AbstractModel):
     updated_at = models.DateTimeField(auto_now=True)
     is_private = models.BooleanField(default=False)
     online_users = models.ManyToManyField(OnlineUser, blank=True)
+    banned_users = models.ManyToManyField(User, related_name='banned_rooms')
 
     def __str__(self):
         return self.name

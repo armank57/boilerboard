@@ -9,11 +9,21 @@ class OnlineUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnlineUser
         fields = ['user', 'username', 'public_id']
-        
+
+class BannedUserSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField()
+    public_id = serializers.ReadOnlyField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'public_id']
+       
 class VoiceChatRoomSerializer(serializers.ModelSerializer):
     creator = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username', required=False)
     online_users = OnlineUserSerializer(many=True, read_only=True)
-
+    banned_users = BannedUserSerializer(many=True, read_only=True)
+    
     class Meta:
         model = VoiceChatRoom
-        fields = ['id', 'public_id', 'name', 'creator', 'created_at', 'updated_at', 'is_private', 'online_users']
+        fields = ['id', 'public_id', 'name', 'creator', 'created_at', 'updated_at', 'is_private', 
+                  'online_users', 'banned_users']

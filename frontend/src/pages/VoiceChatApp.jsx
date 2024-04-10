@@ -39,6 +39,7 @@ function VoiceChatApp() {
     userToken = JSON.parse(userToken).access;
     let userName = JSON.parse(localStorage.getItem('auth')).user.username;
     let dailyToken = '6baf453028501054b40fe396a23dafb4dc6a29ffa38886101b20427f95b87b59';
+    let dailyOwnerToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvIjp0cnVlLCJkIjoiYWMzNjIyMmItYjI5Mi00OWNiLThiOWItMDU2NDU2ZmJhZWJkIiwiaWF0IjoxNzEyNTQ5MTQ0fQ.-1FKoG5lgs01SyfH_fH2ZTOb9mBtGv7Rev0hvfj0pIw';
 
     const fetchRooms = () => {
         axios.get('http://localhost:8000/api/voice_chat/', {
@@ -82,6 +83,19 @@ function VoiceChatApp() {
         };
     }, [joinedRoom]);
 
+    useEffect(() => {
+        if (joinedRoom) {
+            console.log(joinedRoom.banned_users);
+            console.log(JSON.parse(localStorage.getItem('auth')).user.id);
+            const userId = JSON.parse(localStorage.getItem('auth')).user.id;
+            const isBanned = joinedRoom.banned_users.some(user => user.public_id.replace(/-/g, '') === userId);
+            if (isBanned) {
+                // Refresh the page
+                window.location.reload();
+            }
+        }
+    }, [joinedRoom]);
+
     const handleCreateRoom = () => {
         // Check if the room name only contains letters and numbers
         const isValidRoomName = /^[a-zA-Z0-9_]+$/.test(roomName);
@@ -96,7 +110,7 @@ function VoiceChatApp() {
             properties: {
                 start_video_off: true,
                 enable_prejoin_ui: false,
-                enable_people_ui: false,
+                //enable_people_ui: false,
             },
         }, {
             headers: {
@@ -191,15 +205,27 @@ function VoiceChatApp() {
                 });
                
                 // Join the Daily.co video call
-                callRef.current.join({
-                    url: `https://boilerboard.daily.co/${joinedRoom.name}`,
-                });
+                console.log(joinedRoom.creator);
+                console.log(userName);
+                if (joinedRoom.creator === userName) {
+                    callRef.current.join({
+                        url: `https://boilerboard.daily.co/${joinedRoom.name}`,
+                        token: dailyOwnerToken,
+                    });
+                } else {
+                    callRef.current.join({
+                        url: `https://boilerboard.daily.co/${joinedRoom.name}`,
+                    });
+                }
                 return joinedRoom;
             })
             .catch(error => {
                 console.error(error);
-                toast.error('Failed to join room');
-                throw error;
+                if (error.response && error.response.status === 403) {
+                    toast.error('You are banned from this room');
+                } else {
+                    toast.error('Failed to join room');
+                }
             });
      };
           
@@ -356,7 +382,9 @@ function VoiceChatApp() {
                                 <ListItem key={user.id}>
                                     <ListItemText primary={user.username} style={{ color: theme.typography.color }}/>
                                     {joinedRoom.creator === userName && (
+                                    <Tooltip title="Kicked users will be banned from this room">
                                         <Button variant="contained" color="secondary" onClick={() => handleKickUser(joinedRoom.id, user.public_id)}>Kick</Button>
+                                    </Tooltip>
                                     )}
                                 </ListItem>
                             );
