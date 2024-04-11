@@ -98,7 +98,7 @@ function CreatePost() {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit}>
                     <FormControl fullWidth required variant="outlined" style={{ marginBottom: '20px' }}>
-                        <InputLabel id="topic-label">Topic</InputLabel>
+                        <InputLabel id="topic-label" style={{ color: 'white' }}>Topic</InputLabel>
                         <Select
                             labelId="topic-label"
                             id="topic"
@@ -106,6 +106,18 @@ function CreatePost() {
                             onChange={(e) => setTopic(e.target.value)}
                             label="Topic"
                             inputProps={{style: {borderColor: "white"}}}
+                            sx={{
+                                ...fieldStyling,
+                                select: {
+                                    color: 'white',
+                                },
+                                '& .MuiInputBase-input': {
+                                    color: 'white',
+                                },
+                                '& .MuiSelect-icon': {
+                                    color: 'white',
+                                },
+                            }}
                         >
                             {topics.map((topic) => (
                                 <MenuItem key={topic} value={topic}>
