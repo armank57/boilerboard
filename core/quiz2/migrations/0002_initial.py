@@ -26,4 +26,23 @@ class Migration(migrations.Migration):
             name='quiz2',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questionList', to='core_quiz2.quiz2'),
         ),
+        migrations.AddField(
+            model_name='quizrating',
+            name='quiz2',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core_quiz2.quiz2'),
+        ),
+        migrations.AddField(
+            model_name='quizrating',
+            name='user',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AddField(
+            model_name='quiz2',
+            name='ratings',
+            field=models.ManyToManyField(related_name='rated_quizzes', through='core_quiz2.QuizRating', to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AlterUniqueTogether(
+            name='quizrating',
+            unique_together={('user', 'quiz2')},
+        ),
     ]
