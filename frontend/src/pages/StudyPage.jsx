@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton, Chip
 } from '@mui/material';
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -9,6 +9,7 @@ import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import axios from 'axios';
 import useSWR from 'swr'
 import { Question, Quiz } from './CreateQuiz.jsx';
+import { getUser } from '../hooks/user.actions';
 
 const theme = createTheme({
     palette: {
@@ -36,6 +37,7 @@ export default function StudyPage() {
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const user = getUser();
 
     const fetchQuizzes = async () => {
         try {
@@ -55,7 +57,8 @@ export default function StudyPage() {
                 }),
                 quiz.title,
                 quiz.user_has_upvoted,
-                quiz.ratings
+                quiz.ratings,
+                quiz.endorsed
             )));
         } catch (error) {
             console.error('Error fetching modules:', error);
@@ -123,6 +126,47 @@ export default function StudyPage() {
         }
     }
 
+    const handleEndorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/endorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: true
+                }));
+            }
+            fetchQuizzes();
+        } catch (error) {
+            console.error('Failed to endorse quiz:', error);
+        }
+    }
+
+    const handleUnendorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/unendorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: false
+                }));
+            }
+            fetchQuizzes();
+        }
+        catch (error) {
+            console.error('Failed to unendorse quiz:', error);
+        }
+    }
+
     return (
         <ThemeProvider theme={theme}>
         <AppBar position="static" color="secondary">
@@ -168,6 +212,7 @@ export default function StudyPage() {
                 </Typography>
                 {(selectedQuiz != null) && (
                     <List>
+                        {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}
                     <ListItem>
                         <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
                         <Button size="small" variant="contained" onClick={checkAnswer}>
@@ -202,6 +247,20 @@ export default function StudyPage() {
                     <Typography variant="body2" component="span">
                         {selectedQuiz.ratings}
                     </Typography>
+                    {user.is_instructor && !selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleEndorse}>
+                            Endorse
+                            </Button>
+                        </Box>
+                    )}
+                    {user.is_instructor && selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleUnendorse}>
+                            Unendorse
+                            </Button>
+                        </Box>
+                    )}
                     </List>
                     
                 )}

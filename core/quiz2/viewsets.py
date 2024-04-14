@@ -45,6 +45,22 @@ class Quiz2ViewSet(AbstractViewSet):
         rating.delete()
         data = {'message': 'Upvote removed successfully.'}
         return Response(data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def endorse(self, request, pk=None):
+        quiz = self.get_object()
+        quiz.endorsed = True
+        quiz.save()
+        data = {'message': 'Quiz endorsed successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def unendorse(self, request, pk=None):
+        quiz = self.get_object()
+        quiz.endorsed = False
+        quiz.save()
+        data = {'message': 'Quiz unendorsed successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
         
     
     

@@ -3,7 +3,7 @@ import {
     Toolbar, MenuItem, Typography,
     Box, Card, CardContent, Grid, List,
     Chip, Container, CircularProgress,
-    IconButton, Tooltip, Menu, Paper, Badge
+    IconButton, Tooltip, Menu, Paper, Badge, ListItem, ListItemText
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -52,7 +52,11 @@ export default function ViewProfile() {
             }
         };
         
-        axios.get('http://localhost:8000/api/course')
+        axios.get('http://localhost:8000/api/course', {
+            headers: {
+                'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            }
+        })
             .then(response => {
                 setCourses(response.data.filter(course => course.students.includes(user.id)));
             })
@@ -140,10 +144,10 @@ export default function ViewProfile() {
                             </Card>
                         </Grid>
                     </Box></Grid>
-                <Grid item xs={8}>
-                    <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
-                        <Grid container direction="column" sx={{ my: 4 }}>
-                            <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
+            <Grid item xs={6}>
+            <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
+                <Grid container direction="column" sx={{ my: 4 }}>
+                <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
                                 Posts
                             </Typography>
                             <List>
@@ -178,27 +182,6 @@ export default function ViewProfile() {
                                     </Link>
                                 ))}
                             </List>
-                        </Grid>
-                    </Box>
-                </Grid>
-            <Grid item xs={6}>
-            <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
-                <Grid container direction="column" sx={{ my: 4 }}>
-                <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}}>
-                    Posts
-                </Typography>
-                <Paper sx={{height: "200px", overflow: "scroll"}}>
-                    <List>
-                    {posts.filter(post => post.is_author).map((post) => (
-                        <ListItem key={post.id}>
-                        <ListItemText
-                            primary={post.title}
-                            secondary={post.content}
-                        />
-                        </ListItem>
-                    ))}
-                    </List>
-                </Paper>
                 </Grid>
             </Box>
             </Grid>

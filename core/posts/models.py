@@ -46,6 +46,7 @@ class Post(AbstractModel):
     course = models.ForeignKey('core_course.Course', related_name='posts', on_delete=models.CASCADE)
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=255, null=True)
+    endorsed = models.BooleanField(default=False)
 
     # to access ratings for a post, use post.ratings.all()
     # to access posts rated by a user, use user.rated_posts.all()

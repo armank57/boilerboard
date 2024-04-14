@@ -25,6 +25,7 @@ import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
 import Module from './pages/Module';
+import ContactForm from './pages/ContactForm';
 
 
 function App() {
@@ -114,6 +115,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <EditPost />
+        </ProtectedRoute>
+      } />
+      <Route path="/contact/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <ContactForm />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />
