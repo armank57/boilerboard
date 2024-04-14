@@ -284,6 +284,37 @@ function VoiceChatApp() {
             });
     };
 
+    const handleRequestToJoinRoom = (roomId) => {
+        return axios.post(`http://localhost:8000/api/voice_chat/${roomId}/request_to_join/`, {}, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        })
+            .then(response => {
+                toast.success('Request to join room sent successfully');
+            })
+            .catch(error => {
+                console.error(error);
+                toast.error('Failed to send request to join room');
+            });
+    };
+
+    const handleApproveUser = (roomId, userId) => {
+        return axios.post(`http://localhost:8000/api/voice_chat/${roomId}/approve_user/`, { user_id: userId }, {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        })
+            .then(response => {
+                toast.success('User approved successfully');
+                fetchRooms();
+            })
+            .catch(error => {
+                console.error(error);
+                toast.error('Failed to approve user');
+            });
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Toaster />
@@ -362,7 +393,17 @@ function VoiceChatApp() {
                             {joinedRoom && joinedRoom.id === room.id ? (
                                 <Button variant="contained" color="primary" onClick={() => handleLeaveRoom(room.id)}>Leave</Button>
                             ) : (
-                                <Button variant="contained" color="secondary" onClick={() => handleJoinRoom(room.id)}>Join</Button>
+                                room.is_private && room.creator !== userName ? (
+                                    room.waiting_users.some(user => user.username === userName) ? (
+                                        <Button variant="contained" color="primary" disabled style={{ backgroundColor: '#ceb888' }}>Join Request Sent</Button>
+                                    ) : room.accepted_users.some(user => user.username === userName) ? (
+                                        <Button variant="contained" color="secondary" onClick={() => handleJoinRoom(room.id)}>Approved to Join</Button>
+                                    ) : (
+                                        <Button variant="contained" color="secondary" onClick={() => handleRequestToJoinRoom(room.id)}>Request to Join</Button>
+                                    )
+                                ) : (
+                                    <Button variant="contained" color="secondary" onClick={() => handleJoinRoom(room.id)}>Join</Button>
+                                )
                             )}
                             <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteRoom(room.id, room.name)}>
                                 <DeleteIcon />
@@ -370,6 +411,23 @@ function VoiceChatApp() {
                         </ListItem>
                     ))}
                 </List>
+                {joinedRoom && joinedRoom.is_private && joinedRoom.creator === userName && (
+                    <>
+                        <Typography variant="h6" style={{ paddingTop: '20px' ,color: theme.typography.secondarycolor}}>
+                            Waiting users in {joinedRoom.name}:
+                        </Typography>
+                        <List>
+                            {joinedRoom.waiting_users.map((user) => {
+                                return (
+                                    <ListItem key={user.id}>
+                                        <ListItemText primary={user.username} style={{ color: theme.typography.color }}/>
+                                        <Button variant="contained" color="primary" onClick={() => handleApproveUser(joinedRoom.id, user.public_id)}>Approve</Button>
+                                    </ListItem>
+                                );
+                            })}
+                        </List>
+                    </>
+                )}
                 {joinedRoom && (
                     <>
                         <Typography variant="h6" style={{ paddingTop: '20px' ,color: theme.typography.secondarycolor}}>

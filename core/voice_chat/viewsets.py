@@ -59,3 +59,21 @@ class VoiceChatRoomViewSet(viewsets.ModelViewSet):
             room.banned_users.add(user_to_kick)
             room.save()
         return Response({'status': 'user kicked'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def request_to_join(self, request, pk=None):
+        room = self.get_object()
+        user = request.user
+        room.waiting_users.add(user)
+        room.save()
+        return Response({'status': 'request to join room sent'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def approve_user(self, request, pk=None):
+        room = self.get_object()
+        user_id = request.data.get('user_id')
+        user = User.objects.get(public_id=user_id)
+        room.waiting_users.remove(user)
+        room.accepted_users.add(user)
+        room.save()
+        return Response({'status': 'user approved'}, status=status.HTTP_200_OK)
