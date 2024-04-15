@@ -26,6 +26,7 @@ import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
 import Module from './pages/Module';
 import ContactForm from './pages/ContactForm';
+import CreateReply from './pages/CreateReply';
 
 
 function App() {
@@ -75,7 +76,7 @@ function App() {
             <CreatePost />
         </ProtectedRoute>
       } />
-      <Route path="/post/:id" element={
+      <Route path="/post/:id/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ViewPost />
@@ -111,7 +112,7 @@ function App() {
             <ViewReported />
         </ProtectedRoute>
       } />
-      <Route path="/edit-post/:id" element={
+      <Route path="/edit-post/:id/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <EditPost />
@@ -121,6 +122,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ContactForm />
+        </ProtectedRoute>
+      } />
+      <Route path="/reply-post/:id/:courseID" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <CreateReply />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

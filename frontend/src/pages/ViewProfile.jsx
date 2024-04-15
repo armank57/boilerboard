@@ -152,7 +152,7 @@ export default function ViewProfile() {
                             </Typography>
                             <List>
                                 {posts.filter(post => post.is_author).map((post) => (
-                                    <Link key={post.id} to={`/post/${post.id}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <Card sx={{ marginBottom: 3 }}>
                                             <CardContent>
                                                 <Grid container justifyContent="space-between">

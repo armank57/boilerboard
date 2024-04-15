@@ -83,7 +83,7 @@ function Discussions() {
             })
             .slice(0, loadCount)
             .map((discussion, index) => (
-                <Link to={`/post/${discussion.id}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
+                <Link to={`/post/${discussion.id}/${courseID}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
                     <Card style={{
                         backgroundColor: theme.palette.primary.main,
                         marginBottom: '20px',
@@ -203,9 +203,9 @@ function Discussions() {
                             <MenuItem value="rating">Rating</MenuItem>
                         </Select>
                         <Link to="/create-post" state={{cid: `${courseID}`}}>
-                        <Button variant="contained" color="primary">
-                            Create Post
-                        </Button>
+                            <Button variant="contained" color="primary">
+                                Create Post
+                            </Button>
                         </Link>
                     </div>
                     <Tabs value={currentTopic}
