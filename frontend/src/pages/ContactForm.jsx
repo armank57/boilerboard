@@ -1,26 +1,19 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography, Grid } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import { ClassNames } from '@emotion/react';
 
-
-// TODO: Connect this to be within a course!
-// TODO: Make this function return back to the Discussions page upon Submission or Cancel
-// TODO: Add a cancel button
-
-function CreatePost() {
+function ContactForm() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { cid } = location.state;
-    const [title, setTitle] = useState('');
-    const [topic, setTopic] = useState('General'); // Default topic is General
-    const [content, setContent] = useState('');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [type, setType] = useState('Report Bug'); // Default type is Bug
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
 
-    // Static list of topics to tab-by
-    const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
+    // Static list of types
+    const types = ['Report Bug', 'Report User', 'Suggest Improvement', 'Miscellaneous'];
 
     const theme = createTheme({
         palette: {
@@ -44,37 +37,29 @@ function CreatePost() {
         },
     });
 
-
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try {
-            const response = await axios.post('http://127.0.0.1:8000/api/post/', {
-                title: title,
-                topic: topic,
-                content: content,
-                course: `${cid}`,
-                author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
-                }
-            });
+        // Handle form submission here
 
-            if (response.status === 201) {
-                // Clear the form
-                alert('Post submitted!');
-                setTitle('');
-                setTopic('General');
-                setContent('');
-                navigate(`/courses/${cid}/discussions`);
-            } else {
-                alert('Failed to submit post');
-            }
+        try {
+            const response = await axios.post('https://formspree.io/f/xgegpllr', {
+                Name: name,
+                _replyto: email,
+                _type: type,
+                Subject: subject,
+                Message: message
+            });
         } catch (error) {
-            console.error('Failed to submit post:', error);
+            console.error('Failed to submit form:', error);
         }
 
+        alert('Form submitted successfully!');
+        setName('');
+        setEmail('');
+        setType('Bug');
+        setSubject('');
+        setMessage('');
+        navigate(-1);
     };
 
     const fieldStyling = {
@@ -94,18 +79,50 @@ function CreatePost() {
         <ThemeProvider theme={theme}>
             <Container maxWidth="md">
                 <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
-                    Create Post
+                    Contact Form
+                </Typography>
+                <Typography variant="body1" style={{ paddingBottom: '20px', color: "white" }}>
+                    Use this form to report any bugs you come across or any users that are misbehaving.
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit}>
+                    <TextField
+                        label="Name"
+                        variant="outlined"
+                        sx={fieldStyling}
+                        InputLabelProps={{
+                            style: { 
+                                color: 'white',
+                            },
+                        }}
+                        fullWidth
+                        required
+                        style={{ marginBottom: '20px'}}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        sx={fieldStyling}
+                        InputLabelProps={{
+                            style: { 
+                                color: 'white',
+                            },
+                        }}
+                        fullWidth
+                        required
+                        style={{ marginBottom: '20px'}}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
                     <FormControl fullWidth required variant="outlined" style={{ marginBottom: '20px' }}>
-                        <InputLabel id="topic-label" style={{ color: 'white' }}>Topic</InputLabel>
+                        <InputLabel id="type-label" style={{ color: 'white' }}>Type</InputLabel>
                         <Select
-                            labelId="topic-label"
-                            id="topic"
-                            value={topic}
-                            onChange={(e) => setTopic(e.target.value)}
-                            label="Topic"
-                            inputProps={{style: {borderColor: "white"}}}
+                            labelId="type-label"
+                            id="type"
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            label="Type"
                             sx={{
                                 ...fieldStyling,
                                 select: {
@@ -119,15 +136,15 @@ function CreatePost() {
                                 },
                             }}
                         >
-                            {topics.map((topic) => (
-                                <MenuItem key={topic} value={topic}>
-                                    {topic}
+                            {types.map((type) => (
+                                <MenuItem key={type} value={type}>
+                                    {type}
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                     <TextField
-                        label="Title"
+                        label="Subject"
                         variant="outlined"
                         sx={fieldStyling}
                         InputLabelProps={{
@@ -138,11 +155,11 @@ function CreatePost() {
                         fullWidth
                         required
                         style={{ marginBottom: '20px'}}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
                     />
                     <TextField
-                        label="Content"
+                        label="Message"
                         variant="outlined"
                         sx={ fieldStyling }
                         textareaStyle={{color: "white"}}
@@ -154,8 +171,8 @@ function CreatePost() {
                         required
                         multiline
                         rows={6}
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
                     />
                     <Grid container spacing={2} style={{paddingTop: "25px"}}>
                         <Grid item xs={6}>
@@ -175,4 +192,4 @@ function CreatePost() {
     );
 }
 
-export default CreatePost;
+export default ContactForm;

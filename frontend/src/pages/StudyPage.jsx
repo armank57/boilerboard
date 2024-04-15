@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton, Chip
 } from '@mui/material';
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
+import axios from 'axios';
 import useSWR from 'swr'
-import axios from 'axios'
 import { Question, Quiz } from './CreateQuiz.jsx';
+import { getUser } from '../hooks/user.actions';
 
 const theme = createTheme({
     palette: {
@@ -35,22 +37,38 @@ export default function StudyPage() {
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const user = getUser();
 
-    useEffect(() => {
-        axios.get(`http://localhost:8000/api/module/${moduleID}`)
-        .then(response => {
+    const fetchQuizzes = async () => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/api/module/${moduleID}`, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            }); // Replace with your actual API endpoint
+            const quizzes = await response.data;
+            console.log(quizzes)
             setModule(response.data);
             setQuizList(response.data.quizzes.map(quiz => new Quiz(
+                quiz.id,
                 quiz.questionList.map(question => {
                     const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
                     return new Question(question.text, question.answerList.map(answer => answer.text), correctAnswer);
                 }),
-                quiz.title
-                )));
-        })
-        .catch(error => {
-            console.error('Error fetching subjects:', error);
-        });
+                quiz.title,
+                quiz.user_has_upvoted,
+                quiz.ratings,
+                quiz.endorsed
+            )));
+        } catch (error) {
+            console.error('Error fetching modules:', error);
+        }
+    };
+
+
+
+    useEffect(() => {
+        fetchQuizzes();
     }, []);
 
     const handleAnswerClick = (index) => {
@@ -68,6 +86,86 @@ export default function StudyPage() {
         alert('Incorrect!');
         }
     };
+
+    const handleUpvote = async () => {
+        try {
+            console.log(quizList);
+            console.log(selectedQuiz);
+            if (selectedQuiz.user_has_upvoted) {
+                const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/remove_upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setSelectedQuiz(prevQuiz => ({
+                        ...prevQuiz,
+                        ratings: prevQuiz.ratings - 1,
+                        user_has_upvoted: false
+                    }));
+                }
+            } else {
+                const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    setSelectedQuiz(prevQuiz => ({
+                        ...prevQuiz,
+                        ratings: prevQuiz.ratings + 1,
+                        user_has_upvoted: true
+                    }));
+                }
+            }
+            fetchQuizzes();
+        } catch (error) {
+            console.error('Failed to update upvote status:', error);
+        }
+    }
+
+    const handleEndorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/endorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: true
+                }));
+            }
+            fetchQuizzes();
+        } catch (error) {
+            console.error('Failed to endorse quiz:', error);
+        }
+    }
+
+    const handleUnendorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/unendorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: false
+                }));
+            }
+            fetchQuizzes();
+        }
+        catch (error) {
+            console.error('Failed to unendorse quiz:', error);
+        }
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -114,6 +212,7 @@ export default function StudyPage() {
                 </Typography>
                 {(selectedQuiz != null) && (
                     <List>
+                        {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}
                     <ListItem>
                         <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
                         <Button size="small" variant="contained" onClick={checkAnswer}>
@@ -138,7 +237,32 @@ export default function StudyPage() {
                         Next
                         </Button>
                     </Box>
+                    <IconButton 
+                    color="primary" 
+                    aria-label="like"
+                    onClick={handleUpvote}
+                    >
+                    {selectedQuiz.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                    </IconButton>
+                    <Typography variant="body2" component="span">
+                        {selectedQuiz.ratings}
+                    </Typography>
+                    {user.is_instructor && !selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleEndorse}>
+                            Endorse
+                            </Button>
+                        </Box>
+                    )}
+                    {user.is_instructor && selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleUnendorse}>
+                            Unendorse
+                            </Button>
+                        </Box>
+                    )}
                     </List>
+                    
                 )}
                 </Paper>
             </Grid>

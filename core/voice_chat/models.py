@@ -43,7 +43,14 @@ class VoiceChatRoom(AbstractModel):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    is_private = models.BooleanField(default=False)
     online_users = models.ManyToManyField(OnlineUser, blank=True)
+    banned_users = models.ManyToManyField(User, related_name='banned_rooms', blank=True)
+    waiting_users = models.ManyToManyField(User, related_name='waiting_rooms', blank=True)
+    accepted_users = models.ManyToManyField(User, related_name='accepted_rooms', blank=True)
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        db_table = 'core_voice_chat'

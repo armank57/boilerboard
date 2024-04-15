@@ -18,7 +18,7 @@ import { getUser, useUserActions } from "./hooks/user.actions";
 import { Link, useNavigate } from 'react-router-dom';
 
 const pages = ['Courses', 'Study Sessions'];
-const settings = ['Profile', 'Logout'];
+const settings = ['Profile', 'Contact', 'Logout'];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -36,8 +36,8 @@ function ResponsiveAppBar() {
   };
 
   const handleCloseNavMenu = (event) => {
-    console.log(event.currentTarget.innerText)
-    if(event.currentTarget.innerText === "COURSES") {
+    const text = event.currentTarget.innerText.trim().toUpperCase();
+    if(text === "COURSES") {
       navigate("/courses/");
     } else {
       navigate("/voice_chat/")
@@ -53,12 +53,17 @@ function ResponsiveAppBar() {
     // console.log(event.currentTarget.innerText);
     // const { value } = event.target.innerText;
     // console.log(value)
-    if(event.currentTarget.innerText === "Profile") {
+    const text = event.currentTarget.innerText.trim().toLowerCase();
+    if(text === "profile") {
       navigate("/");
       console.log("Profile");
-    } else if(event.currentTarget.innerText === "Logout") {
+    } else if(text === "logout") {
+      console.log("Attempt logout");
       userActions.logout();
       console.log("Logout");
+    } else if (text === "contact") {
+      navigate("/contact/");
+      console.log("Contact");
     }
 
     setAnchorElUser(null);
@@ -160,7 +165,7 @@ function ResponsiveAppBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: deepOrange[500] }}>{user.first_name.charAt(0).toUpperCase()}</Avatar>
+                  <Avatar sx={{ bgcolor: "#313336", color: "white" }}>{user.first_name.charAt(0).toUpperCase()}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
