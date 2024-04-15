@@ -15,7 +15,7 @@ class ReplyViewSet(AbstractViewSet):
     serializer_class = ReplySerializer
 
     def get_queryset(self):
-        print("GETTING REPLIES")
+        #print("GETTING REPLIES")
         return Reply.objects.all()
     
     def get_object(self):
@@ -82,7 +82,7 @@ class PostViewSet(AbstractViewSet):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        print("GETTING POSTS")
+        #print("GETTING POSTS")
         return Post.objects.all()
     
     def get_object(self):

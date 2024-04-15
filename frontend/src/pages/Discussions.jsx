@@ -123,7 +123,7 @@ function Discussions() {
                                         </Typography>
                                     </Box>
                                     <Typography>
-                                        {discussion.comments}
+                                        {discussion.replies_count}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -161,10 +161,7 @@ function Discussions() {
         }
     }
 
-    // TODO: Connect this discussions page to a course
-    // TODO: Implement sorting and searching
     // TODO: Style the UI for post previews better and add number of upvotes and replies
-    // TODO: Create a new post button that links to a new post page
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>

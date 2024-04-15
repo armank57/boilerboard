@@ -132,11 +132,42 @@ function Post() {
 
     const handleReplyUpvote = async (reply_id) => {
         try {
-            const response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/upvote/`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            const reply = replies.find(reply => reply.id === reply_id);
+            if (!reply) {
+                console.error('Reply not found:', reply_id);
+                return;
+            }
+
+            let response;
+            if (reply.user_has_upvoted) {
+                response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/remove_upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                if (response.status === 200) {
+                    setReplies(prevReplies => prevReplies.map(reply => reply.id === reply_id ? {
+                        ...reply,
+                        upvotes_count: reply.upvotes_count - 1,
+                        user_has_upvoted: false
+                    } : reply));
                 }
-            });
+            } else {
+                response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    setReplies(prevReplies => prevReplies.map(reply => reply.id === reply_id ? {
+                        ...reply,
+                        upvotes_count: reply.upvotes_count + 1,
+                        user_has_upvoted: true
+                    } : reply));
+                }
+            }
+            fetchPostData();
         } catch (error) {
             console.error('Failed to update reply upvote status:', error);
         }
@@ -192,6 +223,7 @@ function Post() {
 
     function replyMapper()  {
         return replies
+            .sort((a, b) => new Date(b.created) - new Date(a.created)) // Sort replies by created date
             .map((reply, index) => (
                 <Card key={index} style={{ marginBottom: '20px' }}>
                     <CardContent>
@@ -237,7 +269,6 @@ function Post() {
     }
     
     
-    // TODO: Add a chip that shows the course number next to the topic
     return (
         <ThemeProvider theme={theme}>
         <Container maxWidth="md" style={{ marginTop: '5em' }}>
