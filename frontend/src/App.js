@@ -25,11 +25,13 @@ import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
 import Module from './pages/Module';
+import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
 
 
 function App() {
   // TODO reset password path configure for user
+  
   return (
     <div>
     <Routes>
@@ -48,6 +50,7 @@ function App() {
       <Route path="/courses/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
+            <JoinCourseButton />
             <Course />
         </ProtectedRoute>
       } />
