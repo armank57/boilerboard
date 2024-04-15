@@ -1,9 +1,36 @@
 from rest_framework import serializers
 
 from core.abstract.serializers import AbstractSerializer
-from core.posts.models import Post, Rating, BadContent
+from core.posts.models import Post, Rating, BadContent, Reply, ReplyRating
 from core.user.models import User
 from core.course.models import Course
+
+class ReplySerializer(AbstractSerializer):
+    author = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
+    post = serializers.SlugRelatedField(queryset=Post.objects.all(), slug_field='public_id')
+    author_name = serializers.SerializerMethodField()
+    ratings = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Reply
+        fields = [
+            'id',
+            'content',
+            'author',
+            'author_name',
+            'post',
+            'ratings',
+            'created',
+            'updated',
+        ]
+    
+    def get_author_name(self, obj):
+        return obj.author.username
+
+    def get_ratings(self, obj):
+        # Calculate the number of upvotes
+        ratings = ReplyRating.objects.filter(reply=obj, upvote=True).count()
+        return ratings
 
 class BadContentSerializer(AbstractSerializer):
     class Meta:
@@ -20,6 +47,8 @@ class PostSerializer(AbstractSerializer):
     user_has_reported = serializers.SerializerMethodField()
     badContentList = serializers.SerializerMethodField()
     course = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
+    course_number = serializers.SerializerMethodField()
+    replies = ReplySerializer(many=True, read_only=True)
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -29,11 +58,13 @@ class PostSerializer(AbstractSerializer):
             'title',
             'content',
             'course',
+            'course_number',
             'author',
             'topic',
             'created',
             'updated',
             'ratings',
+            'replies',
             'user_has_upvoted',
             'endorsed',
             'is_author',
@@ -73,3 +104,6 @@ class PostSerializer(AbstractSerializer):
     def get_user_has_reported(self, obj):
         user = self.context['request'].user.id
         return BadContent.objects.filter(user=user, post=obj, reported=True).exists()
+    
+    def get_course_number(self, obj):
+        return obj.course.course_subject.code + str(obj.course.code)

@@ -18,6 +18,7 @@ function Post() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [anchorElPost, setAnchorElPost] = useState(null);
+    const [replies, setReplies] = useState([]);
     const navigate = useNavigate();
     const user = getUser();
 
@@ -42,6 +43,7 @@ function Post() {
             .then(response => {
                 if (response.data) {
                     setPost(response.data);
+                    setReplies(response.data.replies);
                     setLoading(false);
                     console.log(response.data);
                 } else {
@@ -128,6 +130,18 @@ function Post() {
         }
     }
 
+    const handleReplyUpvote = async (reply_id) => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/upvote/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+        } catch (error) {
+            console.error('Failed to update reply upvote status:', error);
+        }
+    }
+
     const handleOpenPostOptions = (event) => {
         setAnchorElPost(event.currentTarget);
     }
@@ -175,6 +189,52 @@ function Post() {
         }
         setAnchorElPost(null);
     }
+
+    function replyMapper()  {
+        return replies
+            .map((reply, index) => (
+                <Card key={index} style={{ marginBottom: '20px' }}>
+                    <CardContent>
+                        <Typography variant="h5" component="h2">
+                            {reply.title}
+                        </Typography>
+                        <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                            {reply.content.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </Typography>
+                        <Box display="flex" justifyContent="space-between">
+                            <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                Created: {new Date(reply.created).toLocaleString()}
+                            </Typography>
+                            <Typography color="textSecondary" style={{ paddingTop:'16px'}}>
+                                Last Updated: {new Date(reply.updated).toLocaleString()}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                            <div>
+                                <IconButton
+                                    color="primary"
+                                    aria-label="like"
+                                    onClick={() => handleReplyUpvote(reply.id)}
+                                >
+                                    {reply.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                                </IconButton>
+                                <Typography variant="body2" component="span">
+                                    {reply.ratings}
+                                </Typography>
+                            </div>
+                            <Typography color="textSecondary" style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
+                                {reply.author_name}
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+            ));
+    }
     
     
     // TODO: Add a chip that shows the course number next to the topic
@@ -220,7 +280,12 @@ function Post() {
                     </Grid>
                 </Grid>
                 <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
-                    {post.content}
+                    {post.content.split('\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                        {line}
+                        <br />
+                    </React.Fragment>
+                    ))}
                 </Typography>
                 <Chip label={post.topic} />
                 <Chip label={post.course_number} />
@@ -229,7 +294,7 @@ function Post() {
                     <Typography color="textSecondary" style={{ paddingTop:'16px'}}>
                         Created: {new Date(post.created).toLocaleString()}
                     </Typography>
-                    <Typography color="textSecondary">
+                    <Typography color="textSecondary" style={{ paddingTop:'16px'}}>
                         Last Updated: {new Date(post.updated).toLocaleString()}
                     </Typography>
                 </Box>
@@ -257,9 +322,11 @@ function Post() {
             color="secondary" 
             onClick={handleReply}
             fullWidth
+            style={{ marginBottom: '20px' }}
         >
             Reply
         </Button>
+        {replyMapper()}
     </Container>
     </ThemeProvider>
     );
