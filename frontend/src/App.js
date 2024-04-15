@@ -24,9 +24,12 @@ import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import Module from './pages/Module';
+import JoinCourseButton from './components/JoinCourseButton';
+
 
 function App() {
   // TODO reset password path configure for user
+  
   return (
     <div>
     <Routes>
@@ -45,6 +48,7 @@ function App() {
       <Route path="/courses/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
+            <JoinCourseButton />
             <Course />
         </ProtectedRoute>
       } />
