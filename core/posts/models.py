@@ -39,6 +39,15 @@ class BadContent(models.Model):
     class Meta:
         unique_together = ('user', 'post')
 
+class Bookmark(models.Model):
+    user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True)
+    bookmarked = models.BooleanField(default=False)
+
+    # ensures that a user can only bookmark a post once
+    class Meta:
+        unique_together = ('user', 'post')
+
 
 class Post(AbstractModel):
     title = models.CharField(max_length=255)
