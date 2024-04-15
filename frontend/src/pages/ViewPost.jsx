@@ -5,7 +5,7 @@ import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, 
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getUser } from "../hooks/user.actions";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
@@ -14,7 +14,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 function Post() {
-    const { id } = useParams();
+    const { id, courseID  } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [anchorElPost, setAnchorElPost] = useState(null);
@@ -87,6 +87,10 @@ function Post() {
 
     const post_options = get_post_options();
 
+    const handleReply = () => {
+        navigate(`/reply-post/${id}/${courseID}`); // Redirect to reply post page
+    };
+    
     const handleUpvote = async () => {
         try {
             if (post.user_has_upvoted) {
@@ -145,7 +149,7 @@ function Post() {
         } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
         } else if (post_option === "Edit") { 
-            navigate(`/edit-post/${id}`);
+            navigate(`/edit-post/${id}/${courseID}`);
         } else if (post_option === "Endorse") {
             try {
                 await axios.post(`http://localhost:8000/api/post/${id}/endorse/`, {}, {
@@ -215,32 +219,47 @@ function Post() {
                             </Menu>
                     </Grid>
                 </Grid>
-                <Chip label={post.topic} />
-                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
-                <Typography color="textSecondary">
-                    Author: {post.author_name}
-                </Typography>
-                <Typography color="textSecondary">
-                    Created: {new Date(post.created).toLocaleString()}
-                </Typography>
-                <Typography color="textSecondary">
-                    Last Updated: {new Date(post.updated).toLocaleString()}
-                </Typography>
-                <Typography variant="body2" component="p">
+                <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
                     {post.content}
                 </Typography>
-                <IconButton 
-                    color="primary" 
-                    aria-label="like"
-                    onClick={handleUpvote}
-                >
-                    {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
-                </IconButton>
-                <Typography variant="body2" component="span">
-                    {post.ratings}
-                </Typography>
+                <Chip label={post.topic} />
+                <Chip label={post.course_number} />
+                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                <Box display="flex" justifyContent="space-between">
+                    <Typography color="textSecondary" style={{ paddingTop:'16px'}}>
+                        Created: {new Date(post.created).toLocaleString()}
+                    </Typography>
+                    <Typography color="textSecondary">
+                        Last Updated: {new Date(post.updated).toLocaleString()}
+                    </Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between">
+                    <div>
+                    <IconButton 
+                        color="primary" 
+                        aria-label="like"
+                        onClick={handleUpvote}
+                    >
+                        {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                    </IconButton>
+                    <Typography variant="body2" component="span">
+                        {post.ratings}
+                    </Typography>
+                    </div>
+                    <Typography color="textSecondary" style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
+                        {post.author_name}
+                    </Typography>
+                </Box>
             </CardContent>
         </Card>
+        <Button 
+            variant="contained" 
+            color="secondary" 
+            onClick={handleReply}
+            fullWidth
+        >
+            Reply
+        </Button>
     </Container>
     </ThemeProvider>
     );
