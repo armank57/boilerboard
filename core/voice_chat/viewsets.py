@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from core.voice_chat.models import VoiceChatRoom, OnlineUser
 from core.voice_chat.serializers import VoiceChatRoomSerializer, OnlineUserSerializer
+from core.user.models import User
 
 class VoiceChatRoomViewSet(viewsets.ModelViewSet):
     queryset = VoiceChatRoom.objects.all()
@@ -29,6 +30,8 @@ class VoiceChatRoomViewSet(viewsets.ModelViewSet):
     def join(self, request, pk=None):
         room = self.get_object()
         user = request.user
+        if user in room.banned_users.all():
+            return Response({'status': 'You are banned from this room'}, status=status.HTTP_403_FORBIDDEN)
         online_user, created = OnlineUser.objects.get_or_create(user=user)
         room.online_users.add(online_user)
         room.save()
@@ -43,3 +46,34 @@ class VoiceChatRoomViewSet(viewsets.ModelViewSet):
             room.online_users.remove(online_user)
             room.save()
         return Response({'status': 'room left'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def kick(self, request, pk=None):
+        room = self.get_object()
+        user_to_kick = User.objects.get(public_id=request.data['user_id'])
+        if room.creator != request.user:
+            return Response({'status': 'You are not authorized to kick users from this room'}, status=status.HTTP_403_FORBIDDEN)
+        online_user_to_kick = OnlineUser.objects.filter(user=user_to_kick).first()
+        if online_user_to_kick:
+            room.online_users.remove(online_user_to_kick)
+            room.banned_users.add(user_to_kick)
+            room.save()
+        return Response({'status': 'user kicked'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def request_to_join(self, request, pk=None):
+        room = self.get_object()
+        user = request.user
+        room.waiting_users.add(user)
+        room.save()
+        return Response({'status': 'request to join room sent'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def approve_user(self, request, pk=None):
+        room = self.get_object()
+        user_id = request.data.get('user_id')
+        user = User.objects.get(public_id=user_id)
+        room.waiting_users.remove(user)
+        room.accepted_users.add(user)
+        room.save()
+        return Response({'status': 'user approved'}, status=status.HTTP_200_OK)

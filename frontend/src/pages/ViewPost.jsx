@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, IconButton, Grid, Tooltip, Menu, MenuItem } from '@mui/material';
+import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, IconButton, Button, Grid, Tooltip, Menu, MenuItem } from '@mui/material';
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getUser } from "../hooks/user.actions";
 import { useNavigate } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 
 
 // const post_options = ['Report', 'Remove'];
@@ -19,6 +21,18 @@ function Post() {
     const navigate = useNavigate();
     const user = getUser();
 
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#3b3b3b', // Black
+            },
+            secondary: {
+                main: '#ceb888', // Gold
+            },
+        },
+    });
+
+
     const fetchPostData = () => {
         axios.get(`http://localhost:8000/api/post/${id}`, {
             headers: {
@@ -31,14 +45,14 @@ function Post() {
                     setLoading(false);
                     console.log(response.data);
                 } else {
-                    navigate('/discussions');
+                    navigate(-1);
                 }
             })
             .catch(error => {
                 setLoading(false);
                 if (error.response && error.response.status === 404) {
                     console.error('Post not found:', error);
-                    navigate('/discussions');
+                    navigate(-1);
                 } else {
                     console.error('Error fetching post:', error);
                 }
@@ -63,8 +77,10 @@ function Post() {
         } else if(user.username === post.author_name) {
             // user is the author of the post
             return ['Edit', 'Remove', 'Report']
-        } else if (user.instructor) {
-            return ['Remove']
+        } else if (user.is_instructor && !post.endorsed) {
+            return ['Endorse', 'Remove']
+        } else if (user.is_instructor && post.endorsed) {
+            return ['Unendorse', 'Remove']
         }
         return ['Report']
     }
@@ -124,12 +140,34 @@ function Post() {
                 } catch (error) {
                     console.error('Failed to remove post:', error);
                 }
-                navigate('/discussions');
+                navigate(-1);
             }
         } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
         } else if (post_option === "Edit") { 
             navigate(`/edit-post/${id}`);
+        } else if (post_option === "Endorse") {
+            try {
+                await axios.post(`http://localhost:8000/api/post/${id}/endorse/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+            } catch (error) {
+                console.error('Failed to endorse post:', error);
+            }
+        } else if (post_option === "Unendorse") {
+            try {
+                await axios.post(`http://localhost:8000/api/post/${id}/unendorse/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+            } catch (error) {
+                console.error('Failed to unendorse post:', error);
+            }
         }
         setAnchorElPost(null);
     }
@@ -137,6 +175,7 @@ function Post() {
     
     // TODO: Add a chip that shows the course number next to the topic
     return (
+        <ThemeProvider theme={theme}>
         <Container maxWidth="md" style={{ marginTop: '5em' }}>
         <Card>
             <CardContent>
@@ -177,6 +216,7 @@ function Post() {
                     </Grid>
                 </Grid>
                 <Chip label={post.topic} />
+                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
                 <Typography color="textSecondary">
                     Author: {post.author_name}
                 </Typography>
@@ -202,6 +242,7 @@ function Post() {
             </CardContent>
         </Card>
     </Container>
+    </ThemeProvider>
     );
 }
 

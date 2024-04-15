@@ -4,6 +4,7 @@ from core.quiz2.models import Quiz2
 from core.quiz2.models import Question
 from core.quiz2.models import Answer
 from core.quiz2.models import QuizRating
+from core.module.models import Module
 
 class AnswerSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(read_only=True)
@@ -39,6 +40,7 @@ class Quiz2Serializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)
     questionList = QuestionSerializer(many=True)
+    module = serializers.SlugRelatedField(queryset=Module.objects.all(), slug_field='public_id')
 
     ratings = serializers.SerializerMethodField()
     user_has_upvoted = serializers.SerializerMethodField()
@@ -49,10 +51,12 @@ class Quiz2Serializer(serializers.ModelSerializer):
             'id',
             'title',
             'author',
+            'module',
             'questionList',
             'created',
             'updated',
             'ratings',
+            'endorsed',
             'user_has_upvoted'
         ]
     def create(self, validated_data):

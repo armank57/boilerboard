@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'core.posts',
     'core.quiz2',
     'core.voice_chat',
-    
+    'core.subject',
 ]
 
 REST_FRAMEWORK = {

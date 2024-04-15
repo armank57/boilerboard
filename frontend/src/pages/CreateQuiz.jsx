@@ -6,7 +6,7 @@ import {
 
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -37,16 +37,19 @@ function Question(question, answerList, correctAnswer) {
     this.correctAnswer = correctAnswer;
 }
 
-function Quiz(id, questionList, quizName, user_has_upvoted, ratings) {
+function Quiz(id, questionList, quizName, user_has_upvoted, ratings, endorsed) {
     this.id = id;
     this.questionList = questionList;
     this.quizName = quizName;
     this.user_has_upvoted = user_has_upvoted;
     this.ratings = ratings;
+    this.endorsed = endorsed;
 }
 
 
 function CreateQuiz() {
+    const location = useLocation();
+    const { cid, sid, mid } = location.state;
     const [questionNum, setQuestionNum] = useState(0);
     const [questions, setQuestions] = useState([]);
     const [quizName, setQuizName] = useState('');
@@ -69,6 +72,7 @@ function CreateQuiz() {
     };
 
     useEffect(() => {
+
         if (questions.length < questionNum) {
             setQuestions(questions.concat(Array.from({ length: questionNum - questions.length }, () => new Question('', ['', '', '', ''], ''))));
         }
@@ -121,8 +125,9 @@ function CreateQuiz() {
     
         // Create the data object for the POST request
         const data = {
-            "author": "userid", //replace with user id
+            "author": JSON.parse(localStorage.getItem('auth')).user.id, //replace with user id
             "title": quizName,
+            "module": mid,
             "questionList": questions.map(q => ({
                 "text": q.question,
                 "answerList": q.answerList.map((a, i) => ({
@@ -135,6 +140,7 @@ function CreateQuiz() {
         let userToken = localStorage.getItem('auth');
         userToken = JSON.parse(userToken).access;
         console.log(userToken)
+        console.log(JSON.stringify(data))
     
         // Send the POST request
         try {
@@ -178,9 +184,9 @@ function CreateQuiz() {
             <AppBar position="static" color="secondary">
                 <Toolbar>
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        Quiz Creator
+                        Create Quiz
                     </Typography>
-                    <Link to="/study-page">
+                    <Link to={`/courses/${cid}/${sid}/${mid}/`}>
                         <Button variant="contained" color="primary">
                             Back to Study Page
                         </Button>

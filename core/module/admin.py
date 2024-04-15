@@ -12,5 +12,5 @@ class ModuleAdmin(admin.ModelAdmin):
     get_section.short_description = 'Section'
 
     def get_course(self, obj): 
-        return obj.section.course.name
+        return obj.section.course.description
     get_course.short_description = 'Course'

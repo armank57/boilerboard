@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
-    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton
+    Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper, IconButton, Chip
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import axios from 'axios';
+import useSWR from 'swr'
 import { Question, Quiz } from './CreateQuiz.jsx';
+import { getUser } from '../hooks/user.actions';
 
 const theme = createTheme({
     palette: {
@@ -29,22 +31,25 @@ const quiz2 = new Quiz([new Question('How is force related to mass and accelerat
 
 
 export default function StudyPage() {
-    const [quizList, setQuizList] = useState([quiz1, quiz2]);
+    const {courseID, sectionID,  moduleID} = useParams();
+    const [module, setModule] = useState({});
+    const [quizList, setQuizList] = useState([]);
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const user = getUser();
 
     const fetchQuizzes = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/api/quiz/', {
+            const response = await axios.get(`http://127.0.0.1:8000/api/module/${moduleID}`, {
                 headers: {
                     'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
                 }
             }); // Replace with your actual API endpoint
-            
             const quizzes = await response.data;
             console.log(quizzes)
-            setQuizList(quizzes.map(quiz => new Quiz(
+            setModule(response.data);
+            setQuizList(response.data.quizzes.map(quiz => new Quiz(
                 quiz.id,
                 quiz.questionList.map(question => {
                     const correctAnswer = question.answerList.findIndex(answer => answer.is_correct === true);
@@ -52,12 +57,15 @@ export default function StudyPage() {
                 }),
                 quiz.title,
                 quiz.user_has_upvoted,
-                quiz.ratings
+                quiz.ratings,
+                quiz.endorsed
             )));
         } catch (error) {
-            console.error('Error fetching quizzes:', error);
+            console.error('Error fetching modules:', error);
         }
     };
+
+
 
     useEffect(() => {
         fetchQuizzes();
@@ -118,14 +126,55 @@ export default function StudyPage() {
         }
     }
 
+    const handleEndorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/endorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: true
+                }));
+            }
+            fetchQuizzes();
+        } catch (error) {
+            console.error('Failed to endorse quiz:', error);
+        }
+    }
+
+    const handleUnendorse = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/quiz/${selectedQuiz.id}/unendorse/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                }
+            });
+
+            if (response.status === 200) {
+                setSelectedQuiz(prevQuiz => ({
+                    ...prevQuiz,
+                    endorsed: false
+                }));
+            }
+            fetchQuizzes();
+        }
+        catch (error) {
+            console.error('Failed to unendorse quiz:', error);
+        }
+    }
+
     return (
         <ThemeProvider theme={theme}>
         <AppBar position="static" color="secondary">
             <Toolbar>
             <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                Physics 101 Study Page
+                {module.name + ' Study Page'}
             </Typography>
-            <Link to="/create-quiz">
+            <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid:`${moduleID}`}}>
                 <Button variant="contained">
                 Create Quiz
                 </Button>
@@ -163,6 +212,7 @@ export default function StudyPage() {
                 </Typography>
                 {(selectedQuiz != null) && (
                     <List>
+                        {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}
                     <ListItem>
                         <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
                         <Button size="small" variant="contained" onClick={checkAnswer}>
@@ -197,6 +247,20 @@ export default function StudyPage() {
                     <Typography variant="body2" component="span">
                         {selectedQuiz.ratings}
                     </Typography>
+                    {user.is_instructor && !selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleEndorse}>
+                            Endorse
+                            </Button>
+                        </Box>
+                    )}
+                    {user.is_instructor && selectedQuiz.endorsed && (
+                        <Box ml={2}>
+                            <Button variant="contained" onClick={handleUnendorse}>
+                            Unendorse
+                            </Button>
+                        </Box>
+                    )}
                     </List>
                     
                 )}
