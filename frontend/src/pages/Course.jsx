@@ -9,7 +9,11 @@ import { useParams, useNavigate, Link } from "react-router-dom"
 import CourseButton from '../components/JoinCourseButton'
 import useSWR from 'swr'
 import axios from 'axios'
-const fetcher = url => axios.get(url).then(res => res.data)
+const fetcher = url => axios.get(url, {
+    headers: {
+        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+    }
+}).then(res => res.data)
 function Course() {
 
     const navigate = useNavigate()

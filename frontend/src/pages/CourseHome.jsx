@@ -22,7 +22,11 @@ function CourseHome() {
     });
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/subject')
+        axios.get('http://localhost:8000/api/subject', {
+            headers: {
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('auth')).access
+            }
+        })
             .then(response => {
                 setSubjects(response.data);
             })

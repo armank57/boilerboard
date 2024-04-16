@@ -37,9 +37,13 @@ function Question(question, answerList, correctAnswer) {
     this.correctAnswer = correctAnswer;
 }
 
-function Quiz(questionList, quizName) {
+function Quiz(id, questionList, quizName, user_has_upvoted, ratings, endorsed) {
+    this.id = id;
     this.questionList = questionList;
     this.quizName = quizName;
+    this.user_has_upvoted = user_has_upvoted;
+    this.ratings = ratings;
+    this.endorsed = endorsed;
 }
 
 

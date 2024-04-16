@@ -12,12 +12,15 @@ class UserSerializer(AbstractSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        i = 0
-        for f in rep['joined_courses']:
-            course = Course.objects.all().get(id=f)
-            #Course.objects.get_object_by_public_id(f)
-            rep['joined_courses'][i] = course.description
-            i += 1
+        try: 
+            i = 0
+            for f in rep['joined_courses']:
+                course = Course.objects.all().get(id=f)
+                #Course.objects.get_object_by_public_id(f)
+                rep['joined_courses'][i] = course.name
+                i += 1
+        except KeyError: 
+            print("Key Error")
         #UserSerializer(creator).data
         return rep
 

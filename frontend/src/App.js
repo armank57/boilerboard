@@ -23,6 +23,10 @@ import ViewProfile from './pages/ViewProfile';
 import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
+import EditPost from './pages/EditPost';
+import Module from './pages/Module';
+import JoinCourseButton from './components/JoinCourseButton';
+import ContactForm from './pages/ContactForm';
 
 
 function App() {
@@ -79,6 +83,12 @@ function App() {
             <ViewPost />
         </ProtectedRoute>
       } />
+      <Route path="/edit-post/:id" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <EditPost />
+        </ProtectedRoute>
+      } />
       <Route path="/create-quiz/" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
@@ -101,6 +111,18 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ViewReported />
+        </ProtectedRoute>
+      } />
+      <Route path="/edit-post/:id" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <EditPost />
+        </ProtectedRoute>
+      } />
+      <Route path="/contact/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <ContactForm />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

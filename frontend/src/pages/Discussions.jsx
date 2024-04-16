@@ -19,6 +19,8 @@ function Discussions() {
     const [discLength, setDiscLength] = useState(numPosts); // State for discussions length
     const [loadCount, setLoadCount] = useState(numPosts); // State for load count, used for loading more discussions
     const [currentTopic, setCurrentTopic] = useState('All'); // State for current topic, used for filtering discussions
+    const [searchTerm, setSearchTerm] = useState(''); // State for search term, used for searching discussions
+    const [sortType, setSortType] = useState('date'); // State for sort type, used for sorting discussions
     // Static list of topics to tab-by
     const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
 
@@ -78,6 +80,20 @@ function Discussions() {
     function discussionMapper() {
         return discussions
             .filter(discussion => currentTopic === 'All' || discussion.topic === currentTopic) // Filter discussions based on currentTopic
+            .filter(discussion =>
+                discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                discussion.content.toLowerCase().includes(searchTerm.toLowerCase())
+            ) // Filter discussions based on search term
+            .sort((a, b) => {
+                switch (sortType) {
+                    case 'date':
+                        return new Date(b.updated) - new Date(a.updated); // Sort by date
+                    case 'rating':
+                        return b.ratings - a.ratings; // Sort by rating
+                    default:
+                        return 0;
+                }
+            })
             .slice(0, loadCount)
             .map((discussion, index) => (
                 <Link to={`/post/${discussion.id}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
@@ -170,11 +186,34 @@ function Discussions() {
                         {courseName}
                     </Typography>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                        <TextField label="Search" variant="outlined" />
-                        <Select variant="outlined" sx={ {input: {color: "white"}} } >
+                        <TextField 
+                            label="Search" 
+                            variant="outlined" 
+                            value={searchTerm}
+                            onChange={event => setSearchTerm(event.target.value)}
+                            sx={{ 
+                                "& .MuiOutlinedInput-root": {
+                                    color: theme.palette.primary.main,
+                                    "& fieldset": {
+                                        borderColor: theme.palette.primary.main,
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: theme.palette.primary.main,
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: theme.palette.primary.main,
+                                    },
+                                },
+                            }}
+                        />
+                        <Select
+                            variant="outlined"
+                            value={sortType}
+                            onChange={event => setSortType(event.target.value)}
+                            sx={{ input: { color: "white" } }}
+                        >
                             <MenuItem value="date">Date</MenuItem>
-                            <MenuItem value="popularity">Popularity</MenuItem>
-                            {/* Add more options as needed */}
+                            <MenuItem value="rating">Rating</MenuItem>
                         </Select>
                         <Link to="/create-post" state={{cid: `${courseID}`}}>
                         <Button variant="contained" color="primary">

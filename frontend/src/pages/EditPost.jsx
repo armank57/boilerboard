@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography, Grid } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import { ClassNames } from '@emotion/react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-
-// TODO: Connect this to be within a course!
-// TODO: Make this function return back to the Discussions page upon Submission or Cancel
-// TODO: Add a cancel button
-
-function CreatePost() {
+function EditPost() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { cid } = location.state;
+    const { id } = useParams();
+
     const [title, setTitle] = useState('');
     const [topic, setTopic] = useState('General'); // Default topic is General
     const [content, setContent] = useState('');
@@ -44,15 +37,35 @@ function CreatePost() {
         },
     });
 
+    useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/api/post/${id}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    setTitle(response.data.title);
+                    setTopic(response.data.topic);
+                    setContent(response.data.content);
+                }
+            } catch (error) {
+                console.error('Failed to fetch post:', error);
+            }
+        };
+
+        fetchPost();
+    }, [id]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/post/', {
+            const response = await axios.put(`http://127.0.0.1:8000/api/post/${id}/`, {
                 title: title,
                 topic: topic,
                 content: content,
-                course: `${cid}`,
                 author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`
             },
             {
@@ -61,20 +74,15 @@ function CreatePost() {
                 }
             });
 
-            if (response.status === 201) {
-                // Clear the form
-                alert('Post submitted!');
-                setTitle('');
-                setTopic('General');
-                setContent('');
-                navigate(`/courses/${cid}/discussions`);
+            if (response.status === 200) {
+                alert('Post updated!');
+                navigate(-1);
             } else {
-                alert('Failed to submit post');
+                alert('Failed to update post');
             }
         } catch (error) {
-            console.error('Failed to submit post:', error);
+            console.error('Failed to update post:', error);
         }
-
     };
 
     const fieldStyling = {
@@ -94,7 +102,7 @@ function CreatePost() {
         <ThemeProvider theme={theme}>
             <Container maxWidth="md">
                 <Typography variant="h3" style={{ paddingBottom: '20px', color: "white" }}>
-                    Create Post
+                    Edit Post
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit}>
                     <FormControl fullWidth required variant="outlined" style={{ marginBottom: '20px' }}>
@@ -175,4 +183,4 @@ function CreatePost() {
     );
 }
 
-export default CreatePost;
+export default EditPost;
