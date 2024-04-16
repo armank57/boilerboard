@@ -27,6 +27,7 @@ import EditPost from './pages/EditPost';
 import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
+import CreateNote from './pages/CreateNote';
 
 
 function App() {
@@ -94,6 +95,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <CreateQuiz />
+        </ProtectedRoute>
+      } />
+      <Route path="/create-note/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <CreateNote />
         </ProtectedRoute>
       } />
       <Route path="/voice_chat/" element={
