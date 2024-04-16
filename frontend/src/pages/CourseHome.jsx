@@ -87,11 +87,6 @@ function CourseHome() {
                 <Grid container spacing={2}>
                     {SubjectMapper()}
                 </Grid>
-                <Link to="/discussions">
-                    <Button variant="contained" color="secondary">
-                        Discussions
-                    </Button>
-                </Link>
             </Container>
         </ThemeProvider>
     );

@@ -50,14 +50,13 @@ function App() {
       <Route path="/courses/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
-            <JoinCourseButton />
             <Course />
         </ProtectedRoute>
       } />
       <Route path="/courses/:courseID/discussions" element={
         <ProtectedRoute>
-            <ResponsiveAppBar />
-            <Discussions />
+              <ResponsiveAppBar />
+              <Discussions />
         </ProtectedRoute>
       } />
       <Route path="/courses/:courseID/:sectionID/new-module" element={
