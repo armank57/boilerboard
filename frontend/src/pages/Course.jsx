@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     InputLabel, FormControl, AppBar, Toolbar, Button, TextField, Select, MenuItem, Typography,
     Box, Card, CardContent, Grid, List, ListItem, ListItemText, Paper
@@ -11,9 +11,37 @@ import useSWR from 'swr'
 import axios from 'axios'
 const fetcher = url => axios.get(url).then(res => res.data)
 function Course() {
+
     const navigate = useNavigate()
     const { courseID } = useParams()
     const { data, error } = useSWR(`http://127.0.0.1:8000/api/course/${courseID}`, fetcher)
+    const [isInCourse, setIsInCourse] = useState(false);
+    const [isSuper, setIsSuper] = useState(false);
+
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+            }
+        })
+        .then(response => {
+            setIsInCourse(response.data);
+        })
+        .catch(error => {
+            console.error('Error fetching is_in_course:', error);
+        });
+        axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_super/`, {
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+            }
+        })
+        .then(response => {
+            setIsSuper(response.data);
+        })
+        .catch(error => {
+            console.error('Error fetching is_super:', error);
+        });
+    }, [courseID]);
 
     const theme = createTheme({
         palette: {
@@ -69,7 +97,7 @@ function Course() {
     function ModuleMapper(i, section) {
         const sortedModules = section.modules.sort((a, b) => a.subsection - b.subsection);
         return sortedModules.map((module, index) => (
-            <Link to={`/courses/${courseID}/${section.id}/${module.id}/`}>
+            isInCourse ? <Link to={`/courses/${courseID}/${section.id}/${module.id}/`}>
                 <Card key={index} style={{ 
                     backgroundColor: '#d3d3d3', 
                     marginBottom: '20px',
@@ -87,7 +115,24 @@ function Course() {
                         
                     </CardContent>
                 </Card>
-            </Link>
+            </Link> :
+            <Card key={index} style={{ 
+                backgroundColor: '#d3d3d3', 
+                marginBottom: '20px',
+                height: '100px',
+                overflow: 'scroll',
+                marginRight: '10px',
+            }}>
+                <CardContent>
+                    <Typography variant="h5">
+                        {(i+1) + "." + module.subsection}
+                    </Typography>
+                    <Typography>
+                        {module.name}
+                    </Typography>
+                    
+                </CardContent>
+            </Card>
         ));
     }
 
@@ -109,14 +154,14 @@ function Course() {
                             </Grid>
                             <Grid item xs={4}>
                                 <Box display="flex" justifyContent="flex-end">
-                                    <Button
+                                    {isSuper?<Button
                                         name="createModule"
                                         variant="contained"
                                         color="secondary"
                                         onClick={() => newModuleHandler(section.id)}
                                     >
                                         New Module
-                                    </Button>
+                                    </Button>:<></>}
                                 </Box>
                             </Grid>
                             <Grid item xs={12} style={{ overflowX: 'auto', display: 'flex' }}>
@@ -139,9 +184,11 @@ function Course() {
                         <h3 style={{color: "white"}}>{data.description}</h3>
                     </Grid>
                     <Grid item xs={1}>
-                        <CourseButton cid={data.id} />
+                        <CourseButton cid={data.id} inCourse={isInCourse} setCourse={setIsInCourse}/>
                     </Grid>
                     <Grid item xs={2}>
+                        {
+                        isSuper?
                         <Button
                             name="addSection"
                             variant="contained"
@@ -149,7 +196,9 @@ function Course() {
                             onClick={newSectionHandler}
                         >
                             New Section
-                        </Button>
+                        </Button>:
+                        <></>
+                        }
                     </Grid>
                     <Grid item xs={9}>
                         <Box display={'flex'} justifyContent={'flex-end'}>
@@ -158,9 +207,12 @@ function Course() {
                             variant="contained"
                             color="secondary"
                         >
+                            {isInCourse ?
                             <Link to={`/courses/${courseID}/discussions`} style={{ textDecoration: 'none', color: 'unset' }}>
                                 Discussions
-                            </Link>
+                            </Link> :
+                            "Discussions"
+                            }
                         </Button>
                         </Box>
                     </Grid>

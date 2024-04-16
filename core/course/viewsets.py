@@ -43,6 +43,12 @@ class CourseViewSet(AbstractViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     @action(methods=['get'], detail=True)
+    def is_super(self, request, *args, **kwargs):
+        user = self.request.user
+        isSuperuser = user.is_super()
+        return Response(isSuperuser, status=status.HTTP_200_OK)
+    
+    @action(methods=['get'], detail=True)
     def is_in_course(self, request, *args, **kwargs):
         course = self.get_object()
         user = self.request.user

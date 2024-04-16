@@ -19,7 +19,6 @@ function Discussions() {
     const [discLength, setDiscLength] = useState(numPosts); // State for discussions length
     const [loadCount, setLoadCount] = useState(numPosts); // State for load count, used for loading more discussions
     const [currentTopic, setCurrentTopic] = useState('All'); // State for current topic, used for filtering discussions
-
     // Static list of topics to tab-by
     const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
 
@@ -59,6 +58,20 @@ function Discussions() {
             );
 
         }
+        axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+            }
+        })
+        .then(response => {
+            //alert(response.data)
+            if(!response.data){
+                navigate(`/courses/${courseID}`)
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching is_in_course:', error);
+        });
         getttt();
     }, []);
 

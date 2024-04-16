@@ -23,8 +23,6 @@ import ViewProfile from './pages/ViewProfile';
 import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
-import Module from './pages/Module';
-import JoinCourseButton from './components/JoinCourseButton';
 
 
 function App() {
@@ -48,14 +46,13 @@ function App() {
       <Route path="/courses/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
-            <JoinCourseButton />
             <Course />
         </ProtectedRoute>
       } />
       <Route path="/courses/:courseID/discussions" element={
         <ProtectedRoute>
-            <ResponsiveAppBar />
-            <Discussions />
+              <ResponsiveAppBar />
+              <Discussions />
         </ProtectedRoute>
       } />
       <Route path="/courses/:courseID/:sectionID/new-module" element={
