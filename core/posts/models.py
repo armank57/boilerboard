@@ -19,6 +19,30 @@ class PostManager(AbstractManager):
 
         return post
     
+class ReplyRating(models.Model):
+    user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    reply = models.ForeignKey('Reply', on_delete=models.CASCADE, null=True)
+    upvote = models.BooleanField(default=False)
+
+    # ensures that a user can only rate a reply once
+    class Meta:
+        unique_together = ('user', 'reply')
+
+class Reply(AbstractModel):
+    content = models.TextField()
+    post = models.ForeignKey('Post', related_name='replies', on_delete=models.CASCADE)
+    author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+
+    # to access ratings for a reply, use reply.ratings.all()
+    # to access replies rated by a user, use user.rated_replies.all()
+    ratings = models.ManyToManyField('core_user.User', through=ReplyRating, related_name='rated_replies')
+
+    def __str__(self):
+        return f"Reply by {self.author} on {self.post}"
+    
+    class Meta:
+        db_table = 'core_replies'
+        
 class Rating(models.Model):
     user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True)

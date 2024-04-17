@@ -94,6 +94,8 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
         return self.joined_courses.remove(course)
     def in_course(self, course):
         return self.joined_courses.filter(id=course.id).exists()
+    def is_super(self):
+        return self.is_superuser
 
     def __str__(self): 
         return f"{self.email}"

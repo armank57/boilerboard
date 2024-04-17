@@ -21,7 +21,6 @@ function Discussions() {
     const [currentTopic, setCurrentTopic] = useState('All'); // State for current topic, used for filtering discussions
     const [searchTerm, setSearchTerm] = useState(''); // State for search term, used for searching discussions
     const [sortType, setSortType] = useState('date'); // State for sort type, used for sorting discussions
-
     // Static list of topics to tab-by
     const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
 
@@ -61,6 +60,20 @@ function Discussions() {
             );
 
         }
+        axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+            }
+        })
+        .then(response => {
+            //alert(response.data)
+            if(!response.data){
+                navigate(`/courses/${courseID}`)
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching is_in_course:', error);
+        });
         getttt();
     }, []);
 
@@ -83,7 +96,7 @@ function Discussions() {
             })
             .slice(0, loadCount)
             .map((discussion, index) => (
-                <Link to={`/post/${discussion.id}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
+                <Link to={`/post/${discussion.id}/${courseID}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
                     <Card style={{
                         backgroundColor: theme.palette.primary.main,
                         marginBottom: '20px',
@@ -123,7 +136,7 @@ function Discussions() {
                                         </Typography>
                                     </Box>
                                     <Typography>
-                                        {discussion.comments}
+                                        {discussion.replies_count}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -161,10 +174,7 @@ function Discussions() {
         }
     }
 
-    // TODO: Connect this discussions page to a course
-    // TODO: Implement sorting and searching
     // TODO: Style the UI for post previews better and add number of upvotes and replies
-    // TODO: Create a new post button that links to a new post page
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>
@@ -203,9 +213,9 @@ function Discussions() {
                             <MenuItem value="rating">Rating</MenuItem>
                         </Select>
                         <Link to="/create-post" state={{cid: `${courseID}`}}>
-                        <Button variant="contained" color="primary">
-                            Create Post
-                        </Button>
+                            <Button variant="contained" color="primary">
+                                Create Post
+                            </Button>
                         </Link>
                     </div>
                     <Tabs value={currentTopic}
