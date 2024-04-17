@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography, Grid } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { ClassNames } from '@emotion/react';
 
@@ -13,7 +13,8 @@ import { ClassNames } from '@emotion/react';
 
 function CreatePost() {
     const navigate = useNavigate();
-    
+    const location = useLocation();
+    const { cid } = location.state;
     const [title, setTitle] = useState('');
     const [topic, setTopic] = useState('General'); // Default topic is General
     const [content, setContent] = useState('');
@@ -51,6 +52,7 @@ function CreatePost() {
                 title: title,
                 topic: topic,
                 content: content,
+                course: `${cid}`,
                 author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`
             },
             {
@@ -65,7 +67,7 @@ function CreatePost() {
                 setTitle('');
                 setTopic('General');
                 setContent('');
-                navigate('/discussions');
+                navigate(`/courses/${cid}/discussions`);
             } else {
                 alert('Failed to submit post');
             }
@@ -96,7 +98,7 @@ function CreatePost() {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit}>
                     <FormControl fullWidth required variant="outlined" style={{ marginBottom: '20px' }}>
-                        <InputLabel id="topic-label">Topic</InputLabel>
+                        <InputLabel id="topic-label" style={{ color: 'white' }}>Topic</InputLabel>
                         <Select
                             labelId="topic-label"
                             id="topic"
@@ -104,6 +106,18 @@ function CreatePost() {
                             onChange={(e) => setTopic(e.target.value)}
                             label="Topic"
                             inputProps={{style: {borderColor: "white"}}}
+                            sx={{
+                                ...fieldStyling,
+                                select: {
+                                    color: 'white',
+                                },
+                                '& .MuiInputBase-input': {
+                                    color: 'white',
+                                },
+                                '& .MuiSelect-icon': {
+                                    color: 'white',
+                                },
+                            }}
                         >
                             {topics.map((topic) => (
                                 <MenuItem key={topic} value={topic}>

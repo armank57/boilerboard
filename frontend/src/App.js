@@ -24,7 +24,9 @@ import VoiceChatApp from './pages/VoiceChatApp';
 import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
-import RegistrationEmailDialouge from './pages/RegistrationEmailDialouge';
+import Module from './pages/Module';
+import ContactForm from './pages/ContactForm';
+
 
 function App() {
   // TODO reset password path configure for user
@@ -37,12 +39,6 @@ function App() {
           <ViewProfile />
         </ProtectedRoute>
       } />
-      <Route path="/discussions/" element={
-        <ProtectedRoute>
-          <ResponsiveAppBar />
-          <Discussions />
-        </ProtectedRoute>
-      }/>
       <Route path="/courses/" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
@@ -55,10 +51,22 @@ function App() {
             <Course />
         </ProtectedRoute>
       } />
+      <Route path="/courses/:courseID/discussions" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <Discussions />
+        </ProtectedRoute>
+      } />
       <Route path="/courses/:courseID/:sectionID/new-module" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <NewModule />
+        </ProtectedRoute>
+      } />
+      <Route path="/courses/:courseID/:sectionID/:moduleID" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <StudyPage />
         </ProtectedRoute>
       } />
       <Route path="/create-post/" element={
@@ -85,12 +93,6 @@ function App() {
             <CreateQuiz />
         </ProtectedRoute>
       } />
-      <Route path="/study-page/" element={
-        <ProtectedRoute>
-            <ResponsiveAppBar />
-            <StudyPage />
-        </ProtectedRoute>
-      } />
       <Route path="/voice_chat/" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
@@ -115,12 +117,17 @@ function App() {
             <EditPost />
         </ProtectedRoute>
       } />
+      <Route path="/contact/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <ContactForm />
+        </ProtectedRoute>
+      } />
       <Route path="/login/" element={<Login />} />
       <Route path="/register/" element={<Registration />} />
       <Route path="/reset-password/" element={<ResetPassword />} />
       <Route path="/reset-password-confirm/" element={<ResetPasswordConfirm />} />
       <Route path="/reset-password-dialogue/" element={<ResetPasswordSentDialouge />} />
-      <Route path="/registration-email-dialogue/" element={<RegistrationEmailDialouge/>}/>
     </Routes>
     </div>
   );

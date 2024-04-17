@@ -108,4 +108,25 @@ class PostViewSet(AbstractViewSet):
         data = {'message': 'Content removed successful.'}
         return Response(data, status=status.HTTP_201_CREATED)
     
+    @action(detail=True, methods=['post'])
+    def endorse(self, request, pk=None):
+        post = self.get_object()
+        if request.user.is_instructor: 
+            post.endorsed = True
+            post.save()
+        else: 
+            return Response({'status': 'Unauthorized: Need Instructor permissions to endorse post'}, status=status.HTTP_403_FORBIDDEN)
+        data = {'message': 'Post endorsed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def unendorse(self, request, pk=None):
+        post = self.get_object()
+        if request.user.is_instructor: 
+            post.endorsed = False
+            post.save()
+        else: 
+            return Response({'status': 'Unauthorized: Need Instructor permissions to unendorse post'}, status=status.HTTP_403_FORBIDDEN)
+        data = {'message': 'Post unendorsed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
     

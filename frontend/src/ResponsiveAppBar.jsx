@@ -18,7 +18,7 @@ import { getUser, useUserActions } from "./hooks/user.actions";
 import { Link, useNavigate } from 'react-router-dom';
 
 const pages = ['Courses', 'Study Sessions'];
-const settings = ['Profile', 'Logout'];
+const settings = ['Profile', 'Contact', 'Logout'];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -61,6 +61,9 @@ function ResponsiveAppBar() {
       console.log("Attempt logout");
       userActions.logout();
       console.log("Logout");
+    } else if (text === "contact") {
+      navigate("/contact/");
+      console.log("Contact");
     }
 
     setAnchorElUser(null);
