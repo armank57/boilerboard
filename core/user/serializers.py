@@ -17,7 +17,7 @@ class UserSerializer(AbstractSerializer):
             for f in rep['joined_courses']:
                 course = Course.objects.all().get(id=f)
                 #Course.objects.get_object_by_public_id(f)
-                rep['joined_courses'][i] = course.name
+                rep['joined_courses'][i] = course.description
                 i += 1
         except KeyError: 
             print("Key Error")
