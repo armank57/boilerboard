@@ -25,12 +25,14 @@ import ReportContent from './pages/ReportContent';
 import ViewReported from './pages/ViewReported';
 import EditPost from './pages/EditPost';
 import Module from './pages/Module';
+import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
 import CreateReply from './pages/CreateReply';
 
 
 function App() {
   // TODO reset password path configure for user
+  
   return (
     <div>
     <Routes>
@@ -54,8 +56,8 @@ function App() {
       } />
       <Route path="/courses/:courseID/discussions" element={
         <ProtectedRoute>
-            <ResponsiveAppBar />
-            <Discussions />
+              <ResponsiveAppBar />
+              <Discussions />
         </ProtectedRoute>
       } />
       <Route path="/courses/:courseID/:sectionID/new-module" element={
