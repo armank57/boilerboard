@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Container, Select, MenuItem, FormControl, InputLabel, Typography, Grid } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 function EditPost() {
     const navigate = useNavigate();
-    const { id } = useParams();
-
+    const { id, courseID } = useParams();
     const [title, setTitle] = useState('');
     const [topic, setTopic] = useState('General'); // Default topic is General
     const [content, setContent] = useState('');
@@ -66,6 +65,7 @@ function EditPost() {
                 title: title,
                 topic: topic,
                 content: content,
+                course: `${courseID}`,
                 author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`
             },
             {

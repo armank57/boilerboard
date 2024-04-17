@@ -96,7 +96,7 @@ function Discussions() {
             })
             .slice(0, loadCount)
             .map((discussion, index) => (
-                <Link to={`/post/${discussion.id}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
+                <Link to={`/post/${discussion.id}/${courseID}`} target="_blank" key={index} style={{ textDecoration: 'none', color: 'inherit'}}>
                     <Card style={{
                         backgroundColor: theme.palette.primary.main,
                         marginBottom: '20px',
@@ -136,7 +136,7 @@ function Discussions() {
                                         </Typography>
                                     </Box>
                                     <Typography>
-                                        {discussion.comments}
+                                        {discussion.replies_count}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -174,10 +174,7 @@ function Discussions() {
         }
     }
 
-    // TODO: Connect this discussions page to a course
-    // TODO: Implement sorting and searching
     // TODO: Style the UI for post previews better and add number of upvotes and replies
-    // TODO: Create a new post button that links to a new post page
     return (
         <div className="discussions">
             <ThemeProvider theme={theme}>
@@ -216,9 +213,9 @@ function Discussions() {
                             <MenuItem value="rating">Rating</MenuItem>
                         </Select>
                         <Link to="/create-post" state={{cid: `${courseID}`}}>
-                        <Button variant="contained" color="primary">
-                            Create Post
-                        </Button>
+                            <Button variant="contained" color="primary">
+                                Create Post
+                            </Button>
                         </Link>
                     </div>
                     <Tabs value={currentTopic}
