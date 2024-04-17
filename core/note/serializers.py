@@ -8,6 +8,9 @@ class NoteSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)   
     module = serializers.SlugRelatedField(queryset=Module.objects.all(), slug_field='public_id')
+    image = serializers.ImageField(required=False)
+    content = serializers.CharField(required=False)
+    author_name = serializers.CharField(source='author.username', read_only=True)
 
     class Meta:
         model = Note
@@ -21,4 +24,5 @@ class NoteSerializer(serializers.ModelSerializer):
             'endorsed',
             'content',
             'image',
+            'author_name',
         ]

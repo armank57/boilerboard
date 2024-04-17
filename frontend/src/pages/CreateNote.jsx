@@ -67,7 +67,9 @@ function CreateNote() {
 
         const formData = new FormData();
         formData.append('content', text);
-        formData.append('image', image);
+        if (image) {
+            formData.append('image', image);
+        }
         formData.append('module', mid);
 
         try {

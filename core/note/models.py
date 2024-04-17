@@ -23,9 +23,10 @@ class NoteManager(AbstractManager):
 class Note(AbstractModel):
     title = models.TextField(default='')
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    author_name = models.CharField(max_length=255, default='')
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)
     endorsed = models.BooleanField(default=False)
-    content = models.TextField(default='')
-    image = models.ImageField(upload_to='note_images', null=True)
+    content = models.TextField(default='', blank=True, null=True)
+    image = models.ImageField(upload_to='note_images', null=True, blank=True)
     module = models.ForeignKey('core_module.Module', related_name='notes', on_delete=models.CASCADE, default=None)

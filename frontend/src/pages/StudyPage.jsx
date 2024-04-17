@@ -37,8 +37,29 @@ export default function StudyPage() {
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
-    const [image, setImage] = useState(null);
+    const [page, setPage] = useState('quizzes');
+    const [isZoomed, setIsZoomed] = useState([]);
     const user = getUser();
+
+    useEffect(() => {
+        if (module && module.notes) {
+            setIsZoomed(module.notes.map(() => false));
+        }
+    }, [module]);
+
+    const handleImageClick = (index) => {
+        const newIsZoomed = [...isZoomed];
+        newIsZoomed[index] = !newIsZoomed[index];
+        setIsZoomed(newIsZoomed);
+    };
+
+    const handleViewQuizzes = () => {
+        setPage('quizzes');
+    };
+
+    const handleViewNotes = () => {
+        setPage('notes');
+    };
 
     const fetchQuizzes = async () => {
         try {
@@ -50,8 +71,6 @@ export default function StudyPage() {
             const quizzes = await response.data;
             console.log(quizzes)
             setModule(response.data);
-            console.log(response.data.notes[0].image);
-            setImage(response.data.notes[0].image);
             setQuizList(response.data.quizzes.map(quiz => new Quiz(
                 quiz.id,
                 quiz.questionList.map(question => {
@@ -172,7 +191,6 @@ export default function StudyPage() {
 
     return (
         <ThemeProvider theme={theme}>
-            {image ? <img src={image} alt="Note" /> : null}
             <AppBar position="static" color="secondary">
                 <Toolbar>
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>
@@ -184,99 +202,149 @@ export default function StudyPage() {
                         </Button>
                     </Link>
                     <Link to="/create-note" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid: `${moduleID}` }}>
-                        <Button variant="contained" sx={{ m: 2 }}>
+                        <Button variant="contained" sx={{ marginLeft: 2 }}>
                             Create note
                         </Button>
                     </Link>
+                    <Button variant="contained" sx={{ marginLeft: 2 }} onClick={handleViewQuizzes}>View Quizzes</Button>
+                    <Button variant="contained" sx={{ marginLeft: 2 }} onClick={handleViewNotes}>View Notes</Button>
                 </Toolbar>
             </AppBar>
-            <Box sx={{ m: 2 }}>
-                <Grid container direction="row" sx={{ my: 4 }}>
-                    <Grid item xs={3}>
-                        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                                Quiz List
-                            </Typography>
-                            {quizList.map((quiz, index) => (
-                                <Typography
-                                    variant="body1"
-                                    color="primary"
-                                    key={index}
-                                    sx={{ my: 2, cursor: 'pointer', '&:hover': { color: 'blue' } }}
-                                    onClick={() => {
-                                        setSelectedQuiz(quiz);
-                                        setSelectedAnswer(null);
-                                        setCurrentQuestionIndex(0);
-                                    }}
-                                >
-                                    {quiz.quizName}
+            {page === 'quizzes' ? (
+                <Box sx={{ m: 2 }}>
+                    <Grid container direction="row" sx={{ my: 4 }}>
+                        <Grid item xs={3}>
+                            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                                    Quiz List
                                 </Typography>
-                            ))}
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={9}>
-                        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                                {selectedQuiz ? `${selectedQuiz.quizName}` : 'No quiz selected'}
-                            </Typography>
-                            {(selectedQuiz != null) && (
-                                <List>
-                                    {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}
-                                    <ListItem>
-                                        <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
-                                        <Button size="small" variant="contained" onClick={checkAnswer}>
-                                            Check Answer
-                                        </Button>
-                                    </ListItem>
-                                    {selectedQuiz.questionList[currentQuestionIndex].answerList.map((answer, index) => (
-                                        <Button
-                                            variant="outlined"
-                                            key={index}
-                                            onClick={() => handleAnswerClick(index)}
-                                            sx={{ my: 1, backgroundColor: selectedAnswer === index ? 'lightgray' : 'white', textTransform: 'none' }}
-                                        >
-                                            {answer}
-                                        </Button>
-                                    ))}
-                                    <Box mt={2} display="flex" justifyContent="space-between">
-                                        <Button variant="contained" disabled={currentQuestionIndex === 0} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex - 1); setSelectedAnswer(null); }}>
-                                            Previous
-                                        </Button>
-                                        <Button variant="contained" disabled={currentQuestionIndex === selectedQuiz.questionList.length - 1} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex + 1); setSelectedAnswer(null) }}>
-                                            Next
-                                        </Button>
-                                    </Box>
-                                    <IconButton
+                                {quizList.map((quiz, index) => (
+                                    <Typography
+                                        variant="body1"
                                         color="primary"
-                                        aria-label="like"
-                                        onClick={handleUpvote}
+                                        key={index}
+                                        sx={{ my: 2, cursor: 'pointer', '&:hover': { color: 'blue' } }}
+                                        onClick={() => {
+                                            setSelectedQuiz(quiz);
+                                            setSelectedAnswer(null);
+                                            setCurrentQuestionIndex(0);
+                                        }}
                                     >
-                                        {selectedQuiz.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
-                                    </IconButton>
-                                    <Typography variant="body2" component="span">
-                                        {selectedQuiz.ratings}
+                                        {quiz.quizName}
                                     </Typography>
-                                    {user.is_instructor && !selectedQuiz.endorsed && (
-                                        <Box ml={2}>
-                                            <Button variant="contained" onClick={handleEndorse}>
-                                                Endorse
+                                ))}
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={9}>
+                            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                                    {selectedQuiz ? `${selectedQuiz.quizName}` : 'No quiz selected'}
+                                </Typography>
+                                {(selectedQuiz != null) && (
+                                    <List>
+                                        {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}
+                                        <ListItem>
+                                            <ListItemText primary={`Q${currentQuestionIndex + 1}: ${selectedQuiz.questionList[currentQuestionIndex].question}`} />
+                                            <Button size="small" variant="contained" onClick={checkAnswer}>
+                                                Check Answer
+                                            </Button>
+                                        </ListItem>
+                                        {selectedQuiz.questionList[currentQuestionIndex].answerList.map((answer, index) => (
+                                            <Button
+                                                variant="outlined"
+                                                key={index}
+                                                onClick={() => handleAnswerClick(index)}
+                                                sx={{ my: 1, backgroundColor: selectedAnswer === index ? 'lightgray' : 'white', textTransform: 'none' }}
+                                            >
+                                                {answer}
+                                            </Button>
+                                        ))}
+                                        <Box mt={2} display="flex" justifyContent="space-between">
+                                            <Button variant="contained" disabled={currentQuestionIndex === 0} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex - 1); setSelectedAnswer(null); }}>
+                                                Previous
+                                            </Button>
+                                            <Button variant="contained" disabled={currentQuestionIndex === selectedQuiz.questionList.length - 1} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex + 1); setSelectedAnswer(null) }}>
+                                                Next
                                             </Button>
                                         </Box>
-                                    )}
-                                    {user.is_instructor && selectedQuiz.endorsed && (
-                                        <Box ml={2}>
-                                            <Button variant="contained" onClick={handleUnendorse}>
-                                                Unendorse
-                                            </Button>
-                                        </Box>
-                                    )}
-                                </List>
+                                        <IconButton
+                                            color="primary"
+                                            aria-label="like"
+                                            onClick={handleUpvote}
+                                        >
+                                            {selectedQuiz.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                                        </IconButton>
+                                        <Typography variant="body2" component="span">
+                                            {selectedQuiz.ratings}
+                                        </Typography>
+                                        {user.is_instructor && !selectedQuiz.endorsed && (
+                                            <Box ml={2}>
+                                                <Button variant="contained" onClick={handleEndorse}>
+                                                    Endorse
+                                                </Button>
+                                            </Box>
+                                        )}
+                                        {user.is_instructor && selectedQuiz.endorsed && (
+                                            <Box ml={2}>
+                                                <Button variant="contained" onClick={handleUnendorse}>
+                                                    Unendorse
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </List>
 
-                            )}
-                        </Paper>
+                                )}
+                            </Paper>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Box>
+                </Box>
+            ) : (
+                <Box sx={{ m: 2 }}>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }} color={"white"}>
+                        Notes
+                    </Typography>
+                    {module.notes.map((note, index) => (
+                        <Card key={index} sx={{ marginBottom: 3, overflow: 'visible' }}>
+                            {note.image && (
+                                <Box display="flex" justifyContent="center" border={1}>
+                                    <img
+                                        src={note.image}
+                                        alt="Note"
+                                        style={{
+                                            width: isZoomed[index] ? '60%' : '10%',
+                                            height: 'auto',
+                                            objectFit: 'contain',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => handleImageClick(index)}
+                                    />
+                                </Box>
+                            )}
+                            <CardContent sx={{ height: 'auto', border: 'none', boxShadow: 'none' }}>
+                                <Grid container direction="column" spacing={1}>
+                                    <Grid item>
+                                        {note.content !== "" && (
+                                            <Typography variant="body1" component="p" sx={{ marginTop: 1 }}>
+                                                {note.content.split('\n').map((line, index) => (
+                                                    <React.Fragment key={index}>
+                                                        {line}
+                                                        <br />
+                                                    </React.Fragment>
+                                                ))}
+                                            </Typography>
+                                        )}
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="caption" color="textSecondary">
+                                            Author: {note.author_name} | Created: {new Date(note.created).toLocaleString()} | Last Updated: {new Date(note.updated).toLocaleString()}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Box>
+            )}
         </ThemeProvider>
     );
 }
