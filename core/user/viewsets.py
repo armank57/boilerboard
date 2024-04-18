@@ -58,26 +58,24 @@ class UserViewSet(AbstractViewSet):
     def update_quiz_history(self, request, pk=None):
         user = self.get_object()
         quiz = Quiz2.objects.get_object_by_public_id(request.data['quiz_id'])
-        quiz_history, created = QuizHistory.objects.get_or_create(
-            user=user,
-            quiz=quiz,
-            defaults={
-                'correct_answers': request.data['correct_answers'],
-                'total_questions': request.data['total_questions']
-            }
-        )
-
-        if not created:
+        try:
+            quiz_history = QuizHistory.objects.get(user=user, quiz=quiz)
             quiz_history.correct_answers = request.data['correct_answers']
             quiz_history.total_questions = request.data['total_questions']
             quiz_history.save()
-
-        return Response({'status': 'Quiz history updated'}, status=status.HTTP_200_OK)
+            return Response({'status': 'Quiz history updated'}, status=status.HTTP_200_OK)
+        except QuizHistory.DoesNotExist:
+            return Response({'status': 'Quiz history not found'}, status=status.HTTP_404_NOT_FOUND)
     
     @action(detail=True, methods=['post'])
     def get_quiz_history(self, request, pk=None):
         user = self.get_object()
         quiz = Quiz2.objects.get_object_by_public_id(request.data['quiz_id'])
-        quiz_history = QuizHistory.objects.get(user=user, quiz=quiz)
-        serializer = QuizHistorySerializer(quiz_history)
-        return Response({'quiz_history': serializer.data}, status=status.HTTP_200_OK)
+        try:
+            quiz_history = QuizHistory.objects.get(user=user, quiz=quiz)
+            serializer = QuizHistorySerializer(quiz_history)
+            return Response({'quiz_history': serializer.data}, status=status.HTTP_200_OK)
+        except QuizHistory.DoesNotExist:
+            quiz_history = QuizHistory.objects.create(user=user, quiz=quiz, correct_answers=0, total_questions=0)
+            serializer = QuizHistorySerializer(quiz_history)
+            return Response({'quiz_history': serializer.data}, status=status.HTTP_200_OK)

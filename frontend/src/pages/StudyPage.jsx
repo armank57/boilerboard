@@ -10,6 +10,7 @@ import axios from 'axios';
 import useSWR from 'swr'
 import { Question, Quiz } from './CreateQuiz.jsx';
 import { getUser } from '../hooks/user.actions';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const theme = createTheme({
     palette: {
@@ -32,7 +33,7 @@ const quiz2 = new Quiz([new Question('How is force related to mass and accelerat
 
 export default function StudyPage() {
     const navigate = useNavigate();
-    const {courseID, sectionID,  moduleID} = useParams();
+    const { courseID, sectionID, moduleID } = useParams();
     const [module, setModule] = useState({});
     const [quizList, setQuizList] = useState([]);
     const [selectedQuiz, setSelectedQuiz] = useState(null);
@@ -40,6 +41,7 @@ export default function StudyPage() {
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [page, setPage] = useState('quizzes');
     const [isZoomed, setIsZoomed] = useState([]);
+    const [quizHistory, setQuizHistory] = useState(null);
     const user = getUser();
 
     useEffect(() => {
@@ -69,15 +71,15 @@ export default function StudyPage() {
                     'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
                 }
             })
-            .then(response => {
-                //alert(response.data)
-                if(!response.data){
-                    navigate(`/courses/${courseID}`)
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching is_in_course:', error);
-            });
+                .then(response => {
+                    //alert(response.data)
+                    if (!response.data) {
+                        navigate(`/courses/${courseID}`)
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching is_in_course:', error);
+                });
             const response = await axios.get(`http://127.0.0.1:8000/api/module/${moduleID}`, {
                 headers: {
                     'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
@@ -111,30 +113,86 @@ export default function StudyPage() {
                 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
             }
         })
-        .then(response => {
-            //alert(response.data)
-            if(!response.data){
-                navigate(`/courses/${courseID}`)
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching is_in_course:', error);
-        });
+            .then(response => {
+                //alert(response.data)
+                if (!response.data) {
+                    navigate(`/courses/${courseID}`)
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching is_in_course:', error);
+            });
     }, []);
 
     const handleAnswerClick = (index) => {
         setSelectedAnswer(index);
     };
 
-    const checkAnswer = () => {
+    const checkAnswer = async () => {
         if (selectedAnswer == null) {
             alert('Please select an answer!');
         }
         else if (selectedAnswer === selectedQuiz.questionList[currentQuestionIndex].correctAnswer) {
             alert('Correct!');
+            try {
+                const response = await axios.post(
+                    `http://127.0.0.1:8000/api/user/${user.id}/update_quiz_history/`,
+                    {
+                        "quiz_id": selectedQuiz.id,
+                        "correct_answers": quizHistory.correct_answers + 1,
+                        "total_questions": quizHistory.total_questions + 1
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                        }
+                    }
+                );
+                fetchQuizHistory(selectedQuiz.id);
+            } catch (error) {
+                console.error('Error fetching quiz history:', error);
+            }
         }
         else {
             alert('Incorrect!');
+            try {
+                const response = await axios.post(
+                    `http://127.0.0.1:8000/api/user/${user.id}/update_quiz_history/`,
+                    {
+                        "quiz_id": selectedQuiz.id,
+                        "correct_answers": quizHistory.correct_answers,
+                        "total_questions": quizHistory.total_questions + 1
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                        }
+                    }
+                );
+                fetchQuizHistory(selectedQuiz.id);
+            } catch (error) {
+                console.error('Error fetching quiz history:', error);
+            }
+        }
+    };
+
+    const fetchQuizHistory = async (quizID) => {
+        try {
+            const response = await axios.post(
+                `http://127.0.0.1:8000/api/user/${user.id}/get_quiz_history/`,
+                {
+                    "quiz_id": quizID
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                }
+            );
+            console.log(response.data.quiz_history);
+            setQuizHistory(response.data.quiz_history);
+        } catch (error) {
+            console.error('Error fetching quiz history:', error);
         }
     };
 
@@ -257,6 +315,7 @@ export default function StudyPage() {
                                             setSelectedQuiz(quiz);
                                             setSelectedAnswer(null);
                                             setCurrentQuestionIndex(0);
+                                            fetchQuizHistory(quiz.id);
                                         }}
                                     >
                                         {quiz.quizName}
@@ -266,9 +325,20 @@ export default function StudyPage() {
                         </Grid>
                         <Grid item xs={9}>
                             <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                                    {selectedQuiz ? `${selectedQuiz.quizName}` : 'No quiz selected'}
-                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                                        {selectedQuiz ? `${selectedQuiz.quizName}` : 'No quiz selected'}
+                                    </Typography>
+                                    {quizHistory && (
+                                        <Box sx={{ ml: 2, width: "40%" }}>
+                                            <Typography variant="h6">
+                                                {quizHistory.correct_answers}/{quizHistory.total_questions} | {Math.round(quizHistory.score * 100 * 100) / 100}%                                          </Typography>
+                                            <Box sx={{ width: '100%', mt: 1 }}>
+                                                <LinearProgress variant="determinate" value={quizHistory.score * 100} />
+                                            </Box>
+                                        </Box>
+                                    )}
+                                </Box>
                                 {(selectedQuiz != null) && (
                                     <List>
                                         {selectedQuiz.endorsed && <Chip label="Endorsed" color="secondary" />}

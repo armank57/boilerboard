@@ -63,4 +63,6 @@ class QuizHistorySerializer(AbstractSerializer):
             'score',
         ]
     def get_score(self, obj):
+        if obj.total_questions == 0:
+            return 0
         return obj.correct_answers / obj.total_questions
