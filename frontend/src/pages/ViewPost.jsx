@@ -98,7 +98,7 @@ function Post() {
             } else if (user.is_instructor && post.endorsed) {
                 return ['Unendorse', 'Remove', 'Boomark']
             }
-            return ['Report']
+            return ['Report', 'Bookmark']
         } else {
             if (user.username === post.author_name && user.is_instructor) {
                 return ['Edit', 'Remove', 'Report', 'Unbookmark'];
@@ -110,7 +110,7 @@ function Post() {
             } else if (user.is_instructor && post.endorsed) {
                 return ['Unendorse', 'Remove', 'Unboomark']
             }
-            return ['Report']
+            return ['Report', 'Unbookmark']
         }
     }
 

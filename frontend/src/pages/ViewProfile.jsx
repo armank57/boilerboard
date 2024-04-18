@@ -36,6 +36,7 @@ export default function ViewProfile() {
     const [courses, setCourses] = useState([]);
     const navigate = useNavigate();
     const [authorPosts, setAuthorPosts] = useState([]);
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -67,6 +68,18 @@ export default function ViewProfile() {
             })
             .catch(error => {
                 console.error('Error fetching courses:', error);
+            });
+
+        axios.post(`http://127.0.0.1:8000/api/user/${user.id}/get_bookmarked_posts/`, {}, {
+            headers: {
+                'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+            }
+        })
+            .then(response => {
+                setBookmarkedPosts(response.data.bookmarked_posts);
+            })
+            .catch(error => {
+                console.error('Error fetching posts:', error);
             });
 
         fetchPosts();
@@ -159,7 +172,25 @@ export default function ViewProfile() {
                             </Card>
                         </Grid>
                     </Box></Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} sx={{ marginLeft: 8, marginTop: 10 }}>
+                    <Box sx={{ marginLeft: 5, marginRight: 5 }}>
+                        <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
+                            Courses
+                        </Typography>
+                    </Box>
+                    <Card sx={{ marginLeft: 5 }}
+                        style={{
+                            height: '150px',
+                            overflow: 'scroll',
+                        }}>
+                        <CardContent>
+                            <Grid container direction="row">
+                                {CourseMapper()}
+                            </Grid>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={5}>
                     <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
                         <Grid container direction="column" sx={{ my: 4 }}>
                             <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
@@ -179,25 +210,25 @@ export default function ViewProfile() {
                                                         </Grid>
                                                     </Grid>
                                                     <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
-                                                    {post.content.split('\n').map((line, index) => (
-                                                        <React.Fragment key={index}>
-                                                            {line}
-                                                            <br />
-                                                        </React.Fragment>
-                                                    ))}
-                                                </Typography>
-                                                <Chip label={post.topic} />
+                                                        {post.content.split('\n').map((line, index) => (
+                                                            <React.Fragment key={index}>
+                                                                {line}
+                                                                <br />
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </Typography>
+                                                    <Chip label={post.topic} />
                                                     <Chip label={post.course_number} />
-                                                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
-                                                <Box display="flex" justifyContent="space-between">
-                                                    <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                                    {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                                                    <Box display="flex" justifyContent="space-between">
+                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
                                                             Created: {new Date(post.created).toLocaleString()}
                                                         </Typography>
                                                         <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
                                                             Last Updated: {new Date(post.updated).toLocaleString()}
                                                         </Typography>
                                                     </Box>
-                                                <Grid container sx={{ marginTop: 1 }}>
+                                                    <Grid container sx={{ marginTop: 1 }}>
                                                         <Badge color="primary">
                                                             <ThumbUp />
                                                         </Badge>
@@ -219,26 +250,74 @@ export default function ViewProfile() {
                                     </Card>
                                 )}
                             </List>
-                                </Grid>
-                            </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                    <Box sx={{ marginLeft: 5, marginRight: 5 }}>
-                        <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
-                            Courses
-                        </Typography>
+                        </Grid>
                     </Box>
-                    <Card sx={{ marginLeft: 5 }}
-                        style={{
-                            height: '150px',
-                            overflow: 'scroll',
-                        }}>
-                        <CardContent>
-                            <Grid container direction="row">
-                                {CourseMapper()}
-                            </Grid>
-                        </CardContent>
-                    </Card>
+                </Grid>
+                <Grid item xs={5}>
+                    <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
+                        <Grid container direction="column" sx={{ my: 4 }}>
+                            <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
+                                Bookmarked Posts
+                            </Typography>
+                            <List>
+                                {console.log("Bookmarked Posts")}
+                            {console.log(bookmarkedPosts)}
+                            {console.log(bookmarkedPosts.length)}
+                                {bookmarkedPosts.length > 0 ? (
+                                    bookmarkedPosts.map((post) => (
+                                        <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Card sx={{ marginBottom: 3 }}>
+                                                <CardContent>
+                                                    <Grid container justifyContent="space-between">
+                                                        <Grid item xs={11}>
+                                                            <Typography variant="h5" component="h2">
+                                                                {post.title}
+                                                            </Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                                                        {post.content.split('\n').map((line, index) => (
+                                                            <React.Fragment key={index}>
+                                                                {line}
+                                                                <br />
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </Typography>
+                                                    <Chip label={post.topic} />
+                                                    <Chip label={post.course_number} />
+                                                    {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                                                    <Box display="flex" justifyContent="space-between">
+                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                                            Created: {new Date(post.created).toLocaleString()}
+                                                        </Typography>
+                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                                            Last Updated: {new Date(post.updated).toLocaleString()}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Grid container sx={{ marginTop: 1 }}>
+                                                        <Badge color="primary">
+                                                            <ThumbUp />
+                                                        </Badge>
+                                                        <Typography sx={{ marginLeft: 1 }}>
+                                                            {post.ratings}
+                                                        </Typography>
+                                                    </Grid>
+                                                </CardContent>
+                                            </Card>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <Card sx={{ marginBottom: 3 }}>
+                                        <CardContent>
+                                            <Typography variant="body1  " component="h2">
+                                                It looks like you haven't bookmarked any posts yet...
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </List>
+                        </Grid>
+                    </Box>
                 </Grid>
             </Grid>
         </ThemeProvider>
