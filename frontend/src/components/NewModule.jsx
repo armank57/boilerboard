@@ -1,5 +1,5 @@
 // import './NewModule.css';
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Button, Card, CardContent, Container, TextField, Typography } from '@mui/material';
@@ -12,6 +12,22 @@ function NewModule() {
     const [name, setName] = useState('');
     const [subsection, setSubsection] = useState('');
     //USEEFFECT HERE COURSE ID
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
+            }
+        })
+        .then(response => {
+            //alert(response.data)
+            if(!response.data){
+                navigate(`/courses/${courseID}`)
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching is_in_course:', error);
+        });
+    }, [courseID]);
 
     const theme = createTheme({
         palette: {

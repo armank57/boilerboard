@@ -168,7 +168,7 @@ export default function ViewProfile() {
                             <List>
                                 {authorPosts.length > 0 ? (
                                     authorPosts.map((post) => (
-                                        <Link key={post.id} to={`/post/${post.id}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
                                             <Card sx={{ marginBottom: 3 }}>
                                                 <CardContent>
                                                     <Grid container justifyContent="space-between">
@@ -178,14 +178,26 @@ export default function ViewProfile() {
                                                             </Typography>
                                                         </Grid>
                                                     </Grid>
-                                                    <Chip label={post.topic} />
-                                                    <Typography color="textSecondary">
-                                                        Created: {new Date(post.created).toLocaleString()}
-                                                    </Typography>
-                                                    <Typography variant="body2" component="p" sx={{ marginTop: 1 }}>
-                                                        {post.content}
-                                                    </Typography>
-                                                    <Grid container sx={{ marginTop: 1 }}>
+                                                    <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                                                    {post.content.split('\n').map((line, index) => (
+                                                        <React.Fragment key={index}>
+                                                            {line}
+                                                            <br />
+                                                        </React.Fragment>
+                                                    ))}
+                                                </Typography>
+                                                <Chip label={post.topic} />
+                                                    <Chip label={post.course_number} />
+                                                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                                                <Box display="flex" justifyContent="space-between">
+                                                    <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                                            Created: {new Date(post.created).toLocaleString()}
+                                                        </Typography>
+                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                                            Last Updated: {new Date(post.updated).toLocaleString()}
+                                                        </Typography>
+                                                    </Box>
+                                                <Grid container sx={{ marginTop: 1 }}>
                                                         <Badge color="primary">
                                                             <ThumbUp />
                                                         </Badge>
@@ -207,10 +219,10 @@ export default function ViewProfile() {
                                     </Card>
                                 )}
                             </List>
-                        </Grid>
-                    </Box>
-                </Grid>
-                <Grid item xs={6}>
+                                </Grid>
+                            </Box>
+                    </Grid>
+                    <Grid item xs={6}>
                     <Box sx={{ marginLeft: 5, marginRight: 5 }}>
                         <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
                             Courses

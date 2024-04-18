@@ -1,6 +1,6 @@
 from core.abstract.viewsets import AbstractViewSet
-from core.posts.serializers import PostSerializer
-from core.posts.models import Post, Rating, BadContent
+from core.posts.serializers import PostSerializer, ReplySerializer
+from core.posts.models import Post, Rating, BadContent, Reply, ReplyRating
 
 from rest_framework import status
 from rest_framework.decorators import action
@@ -9,13 +9,80 @@ from django.shortcuts import get_object_or_404
 
 # Create your views here
 
+class ReplyViewSet(AbstractViewSet):
+    http_method_names = ('post', 'get', 'put', 'delete')
+    permission_classes = []
+    serializer_class = ReplySerializer
+
+    def get_queryset(self):
+        #print("GETTING REPLIES")
+        return Reply.objects.all()
+    
+    def get_object(self):
+        obj = get_object_or_404(Reply, public_id=self.kwargs['pk'])
+        self.check_object_permissions(self.request, obj)
+        return obj
+    
+    def update(self, request, *args, **kwargs):
+        reply = self.get_object()
+        user = request.user
+
+        # Check if the user is the author of the reply
+        if reply.author != user:
+            return Response({'message': 'You do not have permission to edit this reply.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(reply, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        reply = self.get_object()
+        user = request.user
+
+        # Check if the user is not the author of the reply and user is not an instructor
+        if reply.author != user and not user:
+            return Response({'message': 'You do not have permission to delete this reply.'}, status=status.HTTP_403_FORBIDDEN)
+
+        self.perform_destroy(reply)
+
+        return Response({'message': 'Reply deleted.'}, status=status.HTTP_204_NO_CONTENT)
+    
+    def create(self, request, *args, **kwargs):
+        print(request.data)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def upvote(self, request, pk=None):
+        # Only should be called if the user has not already upvoted the reply
+        reply = self.get_object()
+        user = request.user
+        # author = reply.author
+        ReplyRating.objects.create(user=user, reply=reply, upvote=True)
+        data = {'message': 'Upvote added successfully.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def remove_upvote(self, request, pk=None):
+        # Only should be called if the user has already upvoted the reply
+        reply = self.get_object()
+        user = request.user
+        rating = ReplyRating.objects.get(user=user, reply=reply)
+        rating.delete()
+        data = {'message': 'Upvote removed successful.'}
+        return Response(data, status=status.HTTP_201_CREATED)
+
 class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')
     permission_classes = []
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        print("GETTING POSTS")
+        #print("GETTING POSTS")
         return Post.objects.all()
     
     def get_object(self):
