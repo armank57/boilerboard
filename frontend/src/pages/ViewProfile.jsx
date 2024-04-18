@@ -260,9 +260,6 @@ export default function ViewProfile() {
                                 Bookmarked Posts
                             </Typography>
                             <List>
-                                {console.log("Bookmarked Posts")}
-                            {console.log(bookmarkedPosts)}
-                            {console.log(bookmarkedPosts.length)}
                                 {bookmarkedPosts.length > 0 ? (
                                     bookmarkedPosts.map((post) => (
                                         <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>

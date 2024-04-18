@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from core.abstract.serializers import AbstractSerializer
 from core.course.models import Course
-from core.user.models import User
+from core.user.models import User, QuizHistory
 
 class UserSerializer(AbstractSerializer): 
     id = serializers.UUIDField(source='public_id', read_only=True, format='hex')
@@ -45,3 +45,22 @@ class UserSerializer(AbstractSerializer):
         ]
 
         read_only_fields = ['is_active']
+
+class QuizHistorySerializer(AbstractSerializer):
+    quiz = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
+    user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
+    correct_answers = serializers.IntegerField()
+    total_questions = serializers.IntegerField()
+    score = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QuizHistory
+        fields = [
+            'quiz',
+            'user',
+            'correct_answers',
+            'total_questions',
+            'score',
+        ]
+    def get_score(self, obj):
+        return obj.correct_answers / obj.total_questions
