@@ -162,7 +162,7 @@ export default function ViewProfile() {
                                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
                                             Rating: {total_upvotes}
                                         </Typography>
-                                        {user.is_instructor ? (
+                                        {user.is_staff ? (
                                             <Button size="small" sx={{ marginTop: 2, width: "60%" }} variant="contained" color="primary" onClick={viewReportedContent}>
                                                 View Reported Content
                                             </Button>
@@ -171,7 +171,8 @@ export default function ViewProfile() {
                                 </CardContent>
                             </Card>
                         </Grid>
-                    </Box></Grid>
+                    </Box>
+                </Grid>
                 <Grid item xs={6} sx={{ marginLeft: 8, marginTop: 10 }}>
                     <Box sx={{ marginLeft: 5, marginRight: 5 }}>
                         <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>

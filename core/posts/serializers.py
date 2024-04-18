@@ -133,6 +133,7 @@ class PostSerializer2(AbstractSerializer):
     author_name = serializers.SerializerMethodField()
     badContentList = serializers.SerializerMethodField()
     course = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
+    course_number = serializers.SerializerMethodField()
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -142,6 +143,7 @@ class PostSerializer2(AbstractSerializer):
             'title',
             'content',
             'course',
+            'course_number',
             'author',
             'topic',
             'created',
