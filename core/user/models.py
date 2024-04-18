@@ -82,6 +82,8 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(null=True)
     user_rating = models.IntegerField(default=0)
 
+    bookmarked_posts = models.ManyToManyField(to="core_posts.Post", related_name="bookmarked_by", blank=True)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 

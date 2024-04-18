@@ -73,3 +73,61 @@ class PostSerializer(AbstractSerializer):
     def get_user_has_reported(self, obj):
         user = self.context['request'].user.id
         return BadContent.objects.filter(user=user, post=obj, reported=True).exists()
+    
+
+class PostSerializer2(AbstractSerializer):
+    author = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
+    ratings = serializers.SerializerMethodField()
+    reports = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
+    badContentList = serializers.SerializerMethodField()
+    course = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
+    
+    # TODO: Add a foreign key for course id
+    class Meta:
+        model = Post
+        fields = [
+            'id',
+            'title',
+            'content',
+            'course',
+            'author',
+            'topic',
+            'created',
+            'updated',
+            'ratings',
+            'endorsed',
+            'author_name',
+            'reports',
+            'badContentList',
+        ]
+    
+    def get_ratings(self, obj):
+        # Calculate the number of upvotes
+        ratings = Rating.objects.filter(post=obj, upvote=True).count()
+        return ratings
+    
+    def get_badContentList(self, obj):
+        bad_contents = BadContent.objects.filter(post=obj, reported=True)
+        return BadContentSerializer(bad_contents, many=True).data
+    
+    def get_user_has_upvoted(self, obj):
+        user = self.context['request'].user
+        return Rating.objects.filter(user=user.id, post=obj, upvote=True).exists()
+    
+    def get_is_author(self, obj):
+        user = self.context['request'].user
+        return obj.author == user
+    
+    def get_author_name(self, obj):
+        return obj.author.username
+    
+    
+    def get_reports(self, obj):
+        # Calculate the number of upvotes
+        reports = BadContent.objects.filter(post=obj, reported=True).count()
+        return reports
+    
+    def get_user_has_reported(self, obj):
+        user = self.context['request'].user.id
+        return BadContent.objects.filter(user=user, post=obj, reported=True).exists()

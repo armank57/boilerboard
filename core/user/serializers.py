@@ -9,6 +9,7 @@ class UserSerializer(AbstractSerializer):
     joined_courses = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
     created = serializers.DateTimeField(read_only=True)
     updated = serializers.DateTimeField(read_only=True)
+    bookmarked_posts = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -40,6 +41,7 @@ class UserSerializer(AbstractSerializer):
             'is_instructor',
             'avatar',
             'user_rating',
+            'bookmarked_posts',
         ]
 
         read_only_fields = ['is_active']

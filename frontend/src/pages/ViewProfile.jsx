@@ -56,7 +56,7 @@ export default function ViewProfile() {
                 console.error('Error fetching posts:', error);
             }
         };
-        
+
         axios.get('http://localhost:8000/api/course', {
             headers: {
                 'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
@@ -82,38 +82,39 @@ export default function ViewProfile() {
             total_rating += posts[i].ratings;
         }
     }
+    console.log(user);
 
     const total_upvotes = total_rating;
 
     function CourseMapper() {
         return courses.map((course, index) => (
             <Grid item xs={4} key={index}>
-            <Link to={`/courses/${course.id}/`} style={{ textDecoration: 'none' }}>
-                <Card style={{ 
-                    backgroundColor: '#d3d3d3', 
-                    marginBottom: '20px',
-                    marginRight: '5px',
-                    marginLeft: '5px',
-                    height: '100px',
-                    overflow: 'hidden',
-                    cursor: 'pointer'
-                }}>
-                    <CardContent>
-                        <Typography variant="h5">
-                            {course.course_subject + ' ' + course.code}
-                        </Typography>
-                        <Typography variant="body1" style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                        }}>
-                            {course.name}
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Link>
+                <Link to={`/courses/${course.id}/`} style={{ textDecoration: 'none' }}>
+                    <Card style={{
+                        backgroundColor: '#d3d3d3',
+                        marginBottom: '20px',
+                        marginRight: '5px',
+                        marginLeft: '5px',
+                        height: '100px',
+                        overflow: 'hidden',
+                        cursor: 'pointer'
+                    }}>
+                        <CardContent>
+                            <Typography variant="h5">
+                                {course.course_subject + ' ' + course.code}
+                            </Typography>
+                            <Typography variant="body1" style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical'
+                            }}>
+                                {course.name}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Link>
             </Grid>
         ));
     }
@@ -158,11 +159,11 @@ export default function ViewProfile() {
                             </Card>
                         </Grid>
                     </Box></Grid>
-            <Grid item xs={6}>
-            <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
-                <Grid container direction="column" sx={{ my: 4 }}>
-                <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
-                                Posts
+                <Grid item xs={6}>
+                    <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
+                        <Grid container direction="column" sx={{ my: 4 }}>
+                            <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
+                                My Posts
                             </Typography>
                             <List>
                                 {authorPosts.length > 0 ? (
@@ -206,28 +207,28 @@ export default function ViewProfile() {
                                     </Card>
                                 )}
                             </List>
-                </Grid>
-            </Box>
-            </Grid>
-            <Grid item xs={6}>
-                <Box sx={{ marginLeft: 5, marginRight: 5 }}>
-                    <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{color: "white"}}>
-                        Courses
-                    </Typography>
-                </Box>
-                <Card sx={{ marginLeft: 5}} 
-                    style={{
-                    height: '150px',
-                    overflow: 'scroll',
-                }}>
-                    <CardContent>
-                        <Grid container direction="row">
-                            {CourseMapper()}
                         </Grid>
-                    </CardContent>
-                </Card>
+                    </Box>
+                </Grid>
+                <Grid item xs={6}>
+                    <Box sx={{ marginLeft: 5, marginRight: 5 }}>
+                        <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
+                            Courses
+                        </Typography>
+                    </Box>
+                    <Card sx={{ marginLeft: 5 }}
+                        style={{
+                            height: '150px',
+                            overflow: 'scroll',
+                        }}>
+                        <CardContent>
+                            <Grid container direction="row">
+                                {CourseMapper()}
+                            </Grid>
+                        </CardContent>
+                    </Card>
+                </Grid>
             </Grid>
-        </Grid>
         </ThemeProvider>
     );
 }
