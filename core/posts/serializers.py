@@ -56,6 +56,7 @@ class PostSerializer(AbstractSerializer):
     course_number = serializers.SerializerMethodField()
     replies = ReplySerializer(many=True, read_only=True)
     replies_count = serializers.SerializerMethodField()
+    user_has_bookmarked = serializers.SerializerMethodField()
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -80,7 +81,8 @@ class PostSerializer(AbstractSerializer):
             'reports',
             'badContentList',
             'user_has_upvoted',
-            'user_has_reported'
+            'user_has_reported',
+            'user_has_bookmarked'
         ]
     
     def get_ratings(self, obj):
@@ -95,6 +97,10 @@ class PostSerializer(AbstractSerializer):
     def get_user_has_upvoted(self, obj):
         user = self.context['request'].user
         return Rating.objects.filter(user=user.id, post=obj, upvote=True).exists()
+    
+    def get_user_has_bookmarked(self, obj):
+        user = self.context['request'].user
+        return user.bookmarked_posts.filter(id=obj.id).exists()
     
     def get_is_author(self, obj):
         user = self.context['request'].user

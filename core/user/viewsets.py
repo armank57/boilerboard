@@ -31,8 +31,18 @@ class UserViewSet(AbstractViewSet):
         user = self.get_object()
         post = Post.objects.get_object_by_public_id(request.data['post_id'])
         user.bookmarked_posts.add(post)
+        post.user_has_bookmarked = True
         user.save()
         return Response({'status': 'Post bookmarked'}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def unbookmark_post(self, request, pk=None):
+        user = self.get_object()
+        post = Post.objects.get_object_by_public_id(request.data['post_id'])
+        user.bookmarked_posts.remove(post)
+        post.user_has_bookmarked = False
+        user.save()
+        return Response({'status': 'Post unbookmarked'}, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
     def get_bookmarked_posts(self, request, pk=None):
