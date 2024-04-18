@@ -7,6 +7,9 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { CardMedia } from '@material-ui/core';
+
 
 const theme = createTheme({
     palette: {
@@ -50,20 +53,36 @@ function CreateNote() {
     const [text, setText] = useState('');
     const [image, setImage] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
-
+    const navigate = useNavigate();
 
     const handleTextChange = (event) => {
         setText(event.target.value);
     };
 
     const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        const maxSize = 1024 * 1024; // 1MB
+
+        if (file.size > maxSize) {
+            alert('File is too large. Please upload a file smaller than 1MB.');
+            return;
+        }
         setImage(event.target.files[0]);
         setImageUrl(URL.createObjectURL(event.target.files[0]));
 
     };
 
+    const backToStudyPage = () => {
+        navigate(-1);
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!text && !image) {
+            alert('Please upload an image or insert text.');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('content', text);
@@ -81,8 +100,12 @@ function CreateNote() {
             });
 
             console.log(response.data);
+
+            alert('Note created successfully!');
+
+            navigate(-1);
         } catch (error) {
-            console.error(error);
+            console.error('Error submitting post:', error);
         }
     };
 
@@ -98,7 +121,7 @@ function CreateNote() {
                     value={text}
                     onChange={handleTextChange}
                 />
-                <Box display="flex" alignItems="center">
+                <Box display="flex" alignItems="center" flexDirection={"column"}>
                     <Button variant="contained" component="label">
                         Upload Image
                         <input
@@ -107,10 +130,22 @@ function CreateNote() {
                             onChange={handleImageChange}
                         />
                     </Button>
-                    {imageUrl && <img src={imageUrl} alt="Selected" />}
+                    {imageUrl && <img
+                        src={imageUrl}
+                        alt="Note"
+                        style={{
+                            width: '60%',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            cursor: 'pointer'
+                        }}
+                    />}
                 </Box>
                 <Button variant="contained" color="primary" onClick={handleSubmit}>
                     Submit
+                </Button>
+                <Button sx={{ marginTop: 3 }} variant="contained" color="primary" onClick={backToStudyPage}>
+                    Back to Study Page
                 </Button>
             </Box>
         </ThemeProvider>

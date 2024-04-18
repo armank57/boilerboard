@@ -306,7 +306,7 @@ export default function StudyPage() {
                     {module.notes.map((note, index) => (
                         <Card key={index} sx={{ marginBottom: 3, overflow: 'visible' }}>
                             {note.image && (
-                                <Box display="flex" justifyContent="center" border={1}>
+                                <Box display="flex" justifyContent="center" sx={{ border: 'none', boxShadow: 'none' }}>
                                     <img
                                         src={note.image}
                                         alt="Note"
