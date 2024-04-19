@@ -53,6 +53,7 @@ function NewModule() {
         try {
             const response = await axios.post('http://localhost:8000/api/module/', {
                 name: name,
+                course: courseID,
                 section: sectionID,
                 subsection: subsection,
                 course_id: courseID,

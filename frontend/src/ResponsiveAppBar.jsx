@@ -17,6 +17,8 @@ import { deepOrange, deepPurple } from '@mui/material/colors';
 import { getUser, useUserActions } from "./hooks/user.actions";
 import { Link, useNavigate } from 'react-router-dom';
 
+const pages = ['Courses', 'Study Sessions', 'Search'];
+const settings = ['Profile', 'Contact', 'Logout'];
 
 
 function ResponsiveAppBar() {
@@ -46,6 +48,8 @@ function ResponsiveAppBar() {
     console.log(text);
     if(text === "COURSES") {
       navigate("/courses/");
+    } else if (text === "SEARCH") {
+      navigate("/search/");
     } else if (text === "ADMIN PANEL") {
       navigate('/admin-redirect/');
     } else {

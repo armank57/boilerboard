@@ -66,7 +66,6 @@ function Discussions() {
             }
         })
         .then(response => {
-            //alert(response.data)
             if(!response.data){
                 navigate(`/courses/${courseID}`)
             }

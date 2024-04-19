@@ -27,6 +27,7 @@ import EditPost from './pages/EditPost';
 import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
+import Search from './pages/Search';
 import CreateNote from './pages/CreateNote';
 import CreateReply from './pages/CreateReply';
 import AdminRedirect from './pages/AdminRedirect';
@@ -133,6 +134,12 @@ function App() {
             <ResponsiveAppBar />
             <ContactForm />
         </ProtectedRoute>
+      } />
+      <Route path="/search/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <Search />
+        </ProtectRoute>
       } />
       <Route path="/reply-post/:id/:courseID" element={
         <ProtectedRoute>
