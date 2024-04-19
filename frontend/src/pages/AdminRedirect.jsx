@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getUser, useUserActions } from "../hooks/user.actions";
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import Image from "material-ui-image";
 
 const adminLink = 'http://127.0.0.1:8000/admin'
 
@@ -28,8 +29,11 @@ function AdminRedirect() {
     return (
         <ThemeProvider theme={theme}>
             <Box textAlign='center' paddingTop="50px">
+                <Typography variant="h2" style={{color: "white", paddingBottom: "50px", fontFamily: "EB Garamond"}}>
+                    BoilerBoard Administration
+                </Typography>
                 <Button href={adminLink} variant="contained" color="secondary" style={{justifyContent: "center"}} > 
-                    Go To Admin Panel <ArrowCircleRightIcon color="primary"></ArrowCircleRightIcon>
+                    Go To Admin Panel <ArrowCircleRightIcon color="primary" ></ArrowCircleRightIcon>
                 </Button>
             </Box>
         </ThemeProvider>
