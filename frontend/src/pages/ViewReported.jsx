@@ -115,6 +115,13 @@ export default function ViewReported() {
             <Grid item xs={6}>
                 <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
                     <List>
+                        {posts.filter(post => (post.reports > 0)).length === 0 &&
+                            <Card sx={{ width:"50%" }}>
+                                <CardContent>
+                                    <Typography variant="h6" sx={{ }}>No reported posts</Typography>
+                                </CardContent>
+                            </Card>
+                        }
                         {posts.filter(post => (post.reports > 0)).map((post) => (
                             <ListItem key={post.id}>
                                 <Card sx={{ marginBottom: 3, width: "100%" }}>
@@ -123,9 +130,11 @@ export default function ViewReported() {
                                             <Grid item xs={8}>
                                                 <Grid container justifyContent="space-between">
                                                     <Grid item xs={11}>
-                                                        <Typography variant="h5" component="h2">
-                                                            {post.title}
-                                                        </Typography>
+                                                        <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                            <Typography variant="h5" component="h2">
+                                                                {post.title}
+                                                            </Typography>
+                                                        </Link>
                                                     </Grid>
                                                 </Grid>
                                                 <Chip label={post.topic} />

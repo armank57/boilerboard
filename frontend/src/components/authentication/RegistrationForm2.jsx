@@ -132,6 +132,8 @@ function RegistrationForm2() {
             }
         })
 
+        // userActions.sendResetPasswordEmail(data)
+
         // axios.post("http://localhost:8000/api/auth/register/", data).then((res) => {
         //     // Registering the Account and tokens in the store
 

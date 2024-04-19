@@ -5,7 +5,7 @@ import { Card, CardContent, Chip, Typography, Container, Box, CircularProgress, 
 import { ThumbUp, ThumbUpOutlined } from '@mui/icons-material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getUser } from "../hooks/user.actions";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
@@ -14,12 +14,15 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 function Post() {
-    const { id } = useParams();
+    const { id, courseID } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [anchorElPost, setAnchorElPost] = useState(null);
+    const [replies, setReplies] = useState([]);
     const navigate = useNavigate();
-    const user = getUser();
+    const [user, setUser] = useState(getUser());
+    const [post_options, setPostOptions] = useState([]);
+
 
     const theme = createTheme({
         palette: {
@@ -42,6 +45,7 @@ function Post() {
             .then(response => {
                 if (response.data) {
                     setPost(response.data);
+                    setReplies(response.data.replies);
                     setLoading(false);
                     console.log(response.data);
                 } else {
@@ -63,7 +67,18 @@ function Post() {
         fetchPostData();
     }, [id]);
 
-    if (loading && !post) { 
+    useEffect(() => {
+        try {
+            const postOptions = get_post_options();
+
+            if (postOptions) {
+                setPostOptions(postOptions);
+            }
+        } catch (error) {
+        }
+    }, [post]); // 'post' as a dependency
+
+    if (loading && !post) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
                 <CircularProgress />
@@ -72,20 +87,36 @@ function Post() {
     };
 
     function get_post_options() {
-        if(user.username === post.author_name && user.is_instructor) {
-            return ['Edit', 'Remove', 'Report'];
-        } else if(user.username === post.author_name) {
-            // user is the author of the post
-            return ['Edit', 'Remove', 'Report']
-        } else if (user.is_instructor && !post.endorsed) {
-            return ['Endorse', 'Remove']
-        } else if (user.is_instructor && post.endorsed) {
-            return ['Unendorse', 'Remove']
+        if (!post.user_has_bookmarked) {
+            if (user.username === post.author_name && user.is_instructor) {
+                return ['Edit', 'Remove', 'Report', 'Bookmark'];
+            } else if (user.username === post.author_name) {
+                // user is the author of the post
+                return ['Edit', 'Remove', 'Report', 'Bookmark'];
+            } else if (user.is_instructor && !post.endorsed) {
+                return ['Endorse', 'Remove', 'Bookmark']
+            } else if (user.is_instructor && post.endorsed) {
+                return ['Unendorse', 'Remove', 'Boomark']
+            }
+            return ['Report', 'Bookmark']
+        } else {
+            if (user.username === post.author_name && user.is_instructor) {
+                return ['Edit', 'Remove', 'Report', 'Unbookmark'];
+            } else if (user.username === post.author_name) {
+                // user is the author of the post
+                return ['Edit', 'Remove', 'Report', 'Unbookmark'];
+            } else if (user.is_instructor && !post.endorsed) {
+                return ['Endorse', 'Remove', 'Unbookmark']
+            } else if (user.is_instructor && post.endorsed) {
+                return ['Unendorse', 'Remove', 'Unboomark']
+            }
+            return ['Report', 'Unbookmark']
         }
-        return ['Report']
     }
 
-    const post_options = get_post_options();
+    const handleReply = () => {
+        navigate(`/reply-post/${id}/${courseID}`); // Redirect to reply post page
+    };
 
     const handleUpvote = async () => {
         try {
@@ -95,7 +126,7 @@ function Post() {
                         'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
                     }
                 });
-    
+
                 if (response.status === 200) {
                     setPost(prevPost => ({
                         ...prevPost,
@@ -109,7 +140,7 @@ function Post() {
                         'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
                     }
                 });
-    
+
                 if (response.status === 200) {
                     setPost(prevPost => ({
                         ...prevPost,
@@ -121,6 +152,49 @@ function Post() {
             fetchPostData();
         } catch (error) {
             console.error('Failed to update upvote status:', error);
+        }
+    }
+
+    const handleReplyUpvote = async (reply_id) => {
+        try {
+            const reply = replies.find(reply => reply.id === reply_id);
+            if (!reply) {
+                console.error('Reply not found:', reply_id);
+                return;
+            }
+
+            let response;
+            if (reply.user_has_upvoted) {
+                response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/remove_upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                if (response.status === 200) {
+                    setReplies(prevReplies => prevReplies.map(reply => reply.id === reply_id ? {
+                        ...reply,
+                        upvotes_count: reply.upvotes_count - 1,
+                        user_has_upvoted: false
+                    } : reply));
+                }
+            } else {
+                response = await axios.post(`http://localhost:8000/api/reply/${reply_id}/upvote/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    setReplies(prevReplies => prevReplies.map(reply => reply.id === reply_id ? {
+                        ...reply,
+                        upvotes_count: reply.upvotes_count + 1,
+                        user_has_upvoted: true
+                    } : reply));
+                }
+            }
+            fetchPostData();
+        } catch (error) {
+            console.error('Failed to update reply upvote status:', error);
         }
     }
 
@@ -144,8 +218,8 @@ function Post() {
             }
         } else if (post_option === "Report") {
             navigate(`/report-content/${id}`)
-        } else if (post_option === "Edit") { 
-            navigate(`/edit-post/${id}`);
+        } else if (post_option === "Edit") {
+            navigate(`/edit-post/${id}/${courseID}`);
         } else if (post_option === "Endorse") {
             try {
                 await axios.post(`http://localhost:8000/api/post/${id}/endorse/`, {}, {
@@ -168,81 +242,181 @@ function Post() {
             } catch (error) {
                 console.error('Failed to unendorse post:', error);
             }
+        } else if (post_option === "Bookmark") {
+            try {
+                await axios.post(`http://127.0.0.1:8000/api/user/${user.id}/bookmark_post/`, {
+                    "post_id": id,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+                setUser(getUser());
+                setPostOptions(get_post_options());
+            } catch (error) {
+                console.error('Failed to bookmark post:', error);
+            }
+        }
+        else if (post_option === "Unbookmark") {
+            try {
+                await axios.post(`http://127.0.0.1:8000/api/user/${user.id}/unbookmark_post/`, {
+                    "post_id": id,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+                setUser(getUser());
+                setPostOptions(get_post_options());
+            } catch (error) {
+                console.error('Failed to unbookmark post:', error);
+            }
         }
         setAnchorElPost(null);
     }
-    
-    
-    // TODO: Add a chip that shows the course number next to the topic
+
+    function replyMapper() {
+        return replies
+            .sort((a, b) => new Date(b.created) - new Date(a.created)) // Sort replies by created date
+            .map((reply, index) => (
+                <Card key={index} style={{ marginBottom: '20px' }}>
+                    <CardContent>
+                        <Typography variant="h5" component="h2">
+                            {reply.title}
+                        </Typography>
+                        <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                            {reply.content.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </Typography>
+                        {reply.instructor_reply && <Chip label="Instructor Answer" color="secondary" />}
+                        <Box display="flex" justifyContent="space-between">
+                            <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                Created: {new Date(reply.created).toLocaleString()}
+                            </Typography>
+                            <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                Last Updated: {new Date(reply.updated).toLocaleString()}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                            <div>
+                                <IconButton
+                                    color="primary"
+                                    aria-label="like"
+                                    onClick={() => handleReplyUpvote(reply.id)}
+                                >
+                                    {reply.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                                </IconButton>
+                                <Typography variant="body2" component="span">
+                                    {reply.ratings}
+                                </Typography>
+                            </div>
+                            <Typography color="textSecondary" style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
+                                {reply.author_name}
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+            ));
+    }
+
+
     return (
         <ThemeProvider theme={theme}>
-        <Container maxWidth="md" style={{ marginTop: '5em' }}>
-        <Card>
-            <CardContent>
-                <Grid container justifyContent="space-between">
-                    <Grid item xs={11}>
-                        <Typography variant="h5" component="h2">
-                            {post.title}
+            <Container maxWidth="md" style={{ marginTop: '5em' }}>
+                <Card>
+                    <CardContent>
+                        <Grid container justifyContent="space-between">
+                            <Grid item xs={11}>
+                                <Typography variant="h5" component="h2">
+                                    {post.title}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={0.5}>
+                                <Tooltip title="Open Options">
+                                    <IconButton onClick={handleOpenPostOptions} >
+                                        <MoreHorizIcon></MoreHorizIcon>
+                                    </IconButton>
+                                </Tooltip>
+                                <Menu
+                                    sx={{ mt: '45px' }}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElPost}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorElPost)}
+                                    onClose={handleClosePostOptions}
+                                >
+                                    {post_options.map((post_option) => (
+                                        <MenuItem key={post_option} onClick={() => handleClosePostOptions(post_option)} >
+                                            <Typography textAlign="center">{post_option}</Typography>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Grid>
+                        </Grid>
+                        <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                            {post.content.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
                         </Typography>
-                    </Grid>
-                    <Grid item xs={0.5}>
-                        <Tooltip title="Open Options">
-                            <IconButton onClick={handleOpenPostOptions} >
-                                <MoreHorizIcon></MoreHorizIcon>
-                            </IconButton>
-                        </Tooltip>
-                            <Menu
-                                sx={{ mt: '45px' }}
-                                id="menu-appbar"
-                                anchorEl={anchorElPost}
-                                anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElPost)}
-                                onClose={handleClosePostOptions}
-                            >
-                                {post_options.map((post_option) => (
-                                    <MenuItem key={post_option} onClick={() => handleClosePostOptions(post_option)} >
-                                        <Typography textAlign="center">{post_option}</Typography>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
-                    </Grid>
-                </Grid>
-                <Chip label={post.topic} />
-                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
-                <Typography color="textSecondary">
-                    Author: {post.author_name}
-                </Typography>
-                <Typography color="textSecondary">
-                    Created: {new Date(post.created).toLocaleString()}
-                </Typography>
-                <Typography color="textSecondary">
-                    Last Updated: {new Date(post.updated).toLocaleString()}
-                </Typography>
-                <Typography variant="body2" component="p">
-                    {post.content}
-                </Typography>
-                <IconButton 
-                    color="primary" 
-                    aria-label="like"
-                    onClick={handleUpvote}
+                        <Chip label={post.topic} />
+                        <Chip label={post.course_number} />
+                        {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                        <Box display="flex" justifyContent="space-between">
+                            <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                Created: {new Date(post.created).toLocaleString()}
+                            </Typography>
+                            <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                Last Updated: {new Date(post.updated).toLocaleString()}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" justifyContent="space-between">
+                            <div>
+                                <IconButton
+                                    color="primary"
+                                    aria-label="like"
+                                    onClick={handleUpvote}
+                                >
+                                    {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
+                                </IconButton>
+                                <Typography variant="body2" component="span">
+                                    {post.ratings}
+                                </Typography>
+                            </div>
+                            <Typography color="textSecondary" style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
+                                {post.author_name}
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleReply}
+                    fullWidth
+                    style={{ marginBottom: '20px' }}
                 >
-                    {post.user_has_upvoted ? <ThumbUp /> : <ThumbUpOutlined />}
-                </IconButton>
-                <Typography variant="body2" component="span">
-                    {post.ratings}
-                </Typography>
-            </CardContent>
-        </Card>
-    </Container>
-    </ThemeProvider>
+                    Reply
+                </Button>
+                {replyMapper()}
+            </Container>
+        </ThemeProvider>
     );
 }
 

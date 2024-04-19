@@ -28,6 +28,9 @@ import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
 import Search from './pages/Search';
+import CreateNote from './pages/CreateNote';
+import CreateReply from './pages/CreateReply';
+import AdminRedirect from './pages/AdminRedirect';
 
 
 function App() {
@@ -78,7 +81,7 @@ function App() {
             <CreatePost />
         </ProtectedRoute>
       } />
-      <Route path="/post/:id" element={
+      <Route path="/post/:id/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ViewPost />
@@ -94,6 +97,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <CreateQuiz />
+        </ProtectedRoute>
+      } />
+      <Route path="/create-note/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <CreateNote />
         </ProtectedRoute>
       } />
       <Route path="/voice_chat/" element={
@@ -114,7 +123,7 @@ function App() {
             <ViewReported />
         </ProtectedRoute>
       } />
-      <Route path="/edit-post/:id" element={
+      <Route path="/edit-post/:id/:courseID" element={
         <ProtectedRoute>
             <ResponsiveAppBar />
             <EditPost />
@@ -130,6 +139,18 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <Search />
+        </ProtectRoute>
+      } />
+      <Route path="/reply-post/:id/:courseID" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <CreateReply />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin-redirect/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <AdminRedirect />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

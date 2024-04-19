@@ -63,7 +63,7 @@ export default function ReportContent() {
             const quiz = await response.json();
             console.log(quiz);
             alert('Successfully reported content!');
-            navigate('/discussions');
+            navigate(-1);
         } catch (error) {
             console.error('Error reporting content:', error);
             alert('Error reporting content, you may have already reported this post.');
