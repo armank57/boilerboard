@@ -95,53 +95,96 @@ function Search() {
     }
 
     function infoMapper() {
+        const loadMoreButton = (items) => {
+            return loadCount <= items.length ? (
+                <Container maxWidth="sm" style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginTop: '20px'
+                }}>
+                    <Button onClick={loadMore}
+                        variant="contained"
+                        color="secondary"
+                        style={{ margin: '20px' }}
+                    >
+                        Load More
+                    </Button>
+                </Container>
+            ) : null;
+        }
+        
         if (currentTopic === 'Courses') {
-            return courses.filter(course => course.description.toLowerCase().includes(searchTerm.toLowerCase())).map((course, index) => {
-                return (
-                    <Card key={index} style={{ marginBottom: '20px' }}>
-                        <CardContent>
-                            <Typography variant="h5" component="div">
-                                <Link to={`/courses/${course.id}`} style={{ textDecoration: 'none', color: 'black' }}>
-                                    {course.description}
-                                </Link>
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                );
-            });
+            return (
+                <>
+                    {courses
+                        .filter(course => course.description.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .slice(0, loadCount)
+                        .map((course, index) => {
+                            return (
+                                <Card key={index} style={{ marginBottom: '20px' }}>
+                                    <CardContent>
+                                        <Typography variant="h5" component="div">
+                                            <Link to={`/courses/${course.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                                {course.description}
+                                            </Link>
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    {loadMoreButton(courses)}
+                </>);
         } else if (currentTopic === 'Modules') {
-            return modules.filter(mod => mod.name.toLowerCase().includes(searchTerm.toLowerCase())).map((module, index) => {
-                return (
-                    <Card key={index} style={{ marginBottom: '20px' }}>
-                        <CardContent>
-                            <Typography variant="h5" component="div">
-                                <Link to={`/courses/${module.course_id}/${module.section}/${module.id}`} style={{ textDecoration: 'none', color: 'black' }}>
-                                    {module.name}
-                                </Link>
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                );
-            });
+            return (
+                <>
+                    {modules
+                        .filter(mod => mod.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                        .slice(0, loadCount)
+                        .map((module, index) => {
+                            return (
+                                <Card key={index} style={{ marginBottom: '20px' }}>
+                                    <CardContent>
+                                        <Typography variant="h5" component="div">
+                                            <Link to={`/courses/${module.course_id}/${module.section}/${module.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                                {module.name}
+                                            </Link>
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    {loadMoreButton(modules)}
+                </>
+            );
         } else if (currentTopic === 'Quizzes') {
-            return quizzes.filter(quiz => quiz.title.toLowerCase().includes(searchTerm.toLowerCase())).map((quiz, index) => {
-                return (
-                    <Card key={index} style={{ marginBottom: '20px' }}>
-                        <CardContent>
-                            <Typography variant="h5" component="div">
-                                <Link to={`/courses/${quiz.link}`} style={{ textDecoration: 'none', color: 'black' }}>
-                                    {quiz.title}
-                                </Link>
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {quiz.description}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                );
-            });
+            return (<> {quizzes
+                .filter(quiz => quiz.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                .slice(0, loadCount)
+                .map((quiz, index) => {
+                    return (
+                        <Card key={index} style={{ marginBottom: '20px' }}>
+                            <CardContent>
+                                <Typography variant="h5" component="div">
+                                    <Link to={`/courses/${quiz.link}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                        {quiz.title}
+                                    </Link>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {quiz.description}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
+                {loadMoreButton(quizzes)}
+            </>
+            );
         } else {
-            return posts.filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase())).map((post, index) => {
+            return (
+            <> {posts
+                .filter(post => post.title.toLowerCase().includes(searchTerm.toLowerCase()))
+                .slice(0, loadCount)
+                .map((post, index) => {
                 return (
                     <Card key={index} style={{ marginBottom: '20px' }}>
                         <CardContent>
@@ -156,7 +199,10 @@ function Search() {
                         </CardContent>
                     </Card>
                 );
-            });
+
+            })}
+                {loadMoreButton(posts)}
+            </>);
         }
     }
 
@@ -208,22 +254,6 @@ function Search() {
 }
                     </div>
                 </Container>
-                {//(loadCount <= discussions.filter(discussion => currentTopic === 'All' || discussion.topic === currentTopic).length) ?
-                    <Container maxWidth="sm" style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        marginTop: '20px'
-                    }}>
-                        <Button onClick={loadMore}
-                            variant="contained"
-                            color="secondary"
-                            style={{ margin: '20px' }}
-                        >
-                            Load More
-                        </Button>
-                    </Container>
-                    //: null
-                }
             </ThemeProvider>
         </div>
     );
