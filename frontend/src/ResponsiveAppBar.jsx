@@ -17,8 +17,7 @@ import { deepOrange, deepPurple } from '@mui/material/colors';
 import { getUser, useUserActions } from "./hooks/user.actions";
 import { Link, useNavigate } from 'react-router-dom';
 
-const pages = ['Courses', 'Study Sessions'];
-const settings = ['Profile', 'Contact', 'Logout'];
+
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -26,6 +25,13 @@ function ResponsiveAppBar() {
   const user = getUser();
   const userActions = useUserActions();
   const navigate = useNavigate();
+
+  var pages = ['Courses', 'Study Sessions'];
+  const settings = ['Profile', 'Contact', 'Logout'];
+
+  if(user.is_superuser) {
+    pages = ['Courses', 'Study Sessions', 'Admin Panel'];
+  }
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -37,8 +43,11 @@ function ResponsiveAppBar() {
 
   const handleCloseNavMenu = (event) => {
     const text = event.currentTarget.innerText.trim().toUpperCase();
+    console.log(text);
     if(text === "COURSES") {
       navigate("/courses/");
+    } else if (text === "ADMIN PANEL") {
+      navigate('/admin-redirect/');
     } else {
       navigate("/voice_chat/")
     }

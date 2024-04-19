@@ -5,6 +5,7 @@ import {
     Chip, Container, CircularProgress,
     IconButton, Tooltip, Menu, Paper, Badge, Button
 } from '@mui/material';
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications'; 
 import { Link } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
@@ -132,6 +133,70 @@ export default function ViewProfile() {
         ));
     }
 
+    function PostMapper() {
+        return posts
+            .filter(post => post.is_author)
+            .sort((a, b) => b.new_reply - a.new_reply)
+            .map((post) => (
+                <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Card sx={{ marginBottom: 3 }}>
+                        <CardContent>
+                            <Grid container justifyContent="space-between">
+                                <Grid item xs={11}>
+                                    <Typography variant="h5" component="h2">
+                                        {post.title}
+                                    </Typography>
+                                </Grid>
+                                {post.new_reply && (
+                                    <Grid item xs={0.5}>
+                                        <CircleNotificationsIcon color="secondary"/>
+                                    </Grid>
+                                )}
+                            </Grid>
+                            <Typography
+                                variant="body2" 
+                                component="p" 
+                                style={{ 
+                                    paddingBottom: '20px',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 3,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    minHeight: '4.5em',
+                                }}
+                            >
+                                {post.content.split('\n').map((line, index) => (
+                                    <React.Fragment key={index}>
+                                        {line}
+                                        <br />
+                                    </React.Fragment>
+                                ))}
+                            </Typography>
+                            <Chip label={post.topic} />
+                            <Chip label={post.course_number} />
+                            {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                    Created: {new Date(post.created).toLocaleString()}
+                                </Typography>
+                                <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                    Last Updated: {new Date(post.updated).toLocaleString()}
+                                </Typography>
+                            </Box>
+                            <Grid container sx={{ marginTop: 1 }}>
+                                <Badge color="primary">
+                                    <ThumbUp />
+                                </Badge>
+                                <Typography sx={{ marginLeft: 1 }}>
+                                    {post.ratings}
+                                </Typography>
+                            </Grid>
+                        </CardContent>
+                    </Card>
+                </Link>
+        ));
+    }
+
     return (
         <ThemeProvider theme={theme}>
             <Typography variant="h4" sx={{ flexGrow: 1 }} style={{ color: "white", paddingLeft: "10px" }}>
@@ -147,7 +212,7 @@ export default function ViewProfile() {
                                     {user ? user.username : "View Profile"}
                                 </Typography>
                             </Toolbar>
-                            <Card sx={{ width: '100%' }}>
+                            <Card sx={{ width: '100%', height: '375px', bgcolor: 'secondary.main' }}>
                                 <CardContent>
                                     <Grid container direction="column" sx={{ my: 2 }}>
                                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
@@ -197,60 +262,11 @@ export default function ViewProfile() {
                             <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
                                 My Posts
                             </Typography>
+                            <Box sx={{ maxHeight: '400px', overflow: 'auto' }}>
                             <List>
-                                {authorPosts.length > 0 ? (
-                                    authorPosts.map((post) => (
-                                        <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                            <Card sx={{ marginBottom: 3 }}>
-                                                <CardContent>
-                                                    <Grid container justifyContent="space-between">
-                                                        <Grid item xs={11}>
-                                                            <Typography variant="h5" component="h2">
-                                                                {post.title}
-                                                            </Typography>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
-                                                        {post.content.split('\n').map((line, index) => (
-                                                            <React.Fragment key={index}>
-                                                                {line}
-                                                                <br />
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </Typography>
-                                                    <Chip label={post.topic} />
-                                                    <Chip label={post.course_number} />
-                                                    {post.endorsed && <Chip label="Endorsed" color="secondary" />}
-                                                    <Box display="flex" justifyContent="space-between">
-                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
-                                                            Created: {new Date(post.created).toLocaleString()}
-                                                        </Typography>
-                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
-                                                            Last Updated: {new Date(post.updated).toLocaleString()}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Grid container sx={{ marginTop: 1 }}>
-                                                        <Badge color="primary">
-                                                            <ThumbUp />
-                                                        </Badge>
-                                                        <Typography sx={{ marginLeft: 1 }}>
-                                                            {post.ratings}
-                                                        </Typography>
-                                                    </Grid>
-                                                </CardContent>
-                                            </Card>
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <Card sx={{ marginBottom: 3 }}>
-                                        <CardContent>
-                                            <Typography variant="body1  " component="h2">
-                                                It looks like you haven't made any posts yet...
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                )}
+                                {PostMapper()}
                             </List>
+                            </Box>
                         </Grid>
                     </Box>
                 </Grid>

@@ -32,7 +32,7 @@ router.register(r'reply', ReplyViewSet, basename='reply')
 router.register(r'quiz', Quiz2ViewSet, basename='quiz')
 router.register(r'note', NoteViewSet, basename='note')
 router.register(r'voice_chat', VoiceChatRoomViewSet, basename='voice-chat')
-router.register(r'auth/send-registration-email/', SendUserPasswordEmailViewset, basename='auth-send-registration-email')
+#router.register(r'auth/send-registration-email/', SendUserPasswordEmailViewset, basename='auth-send-registration-email')
 router.register(r'subject', SubjectViewSet, basename='subject')
 
 urlpatterns = [

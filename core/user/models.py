@@ -95,6 +95,7 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
 
     avatar = models.ImageField(null=True)
     user_rating = models.IntegerField(default=0)
+    blacklisted_from_study_sessions = models.BooleanField(default=False)
 
     bookmarked_posts = models.ManyToManyField(to="core_posts.Post", related_name="bookmarked_by", blank=True)
 

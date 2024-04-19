@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { ClassNames } from '@emotion/react';
+import { getUser, useUserActions } from "../hooks/user.actions";
+
 
 
 // TODO: Connect this to be within a course!
@@ -18,9 +20,16 @@ function CreatePost() {
     const [title, setTitle] = useState('');
     const [topic, setTopic] = useState('General'); // Default topic is General
     const [content, setContent] = useState('');
+    const user = getUser();
+    const userActions = useUserActions();
 
     // Static list of topics to tab-by
-    const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
+    var topics = [];
+    if(user.is_instructor) {
+        topics = ['General', 'Announcements', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes'];
+    } else {
+        topics = ['General','Homework', 'Exams', 'Projects', 'Labs', 'Quizzes'];
+    }
 
     const theme = createTheme({
         palette: {

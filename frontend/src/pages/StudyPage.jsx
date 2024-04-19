@@ -278,10 +278,38 @@ export default function StudyPage() {
 
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="static" color="secondary">
-                <Toolbar>
-                    <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                        {module.name + ' Study Page'}
+        <AppBar position="static" color="primary">
+            <Toolbar>
+            <Typography variant="h4" sx={{ flexGrow: 1 }}>
+                {module.name + ' Study Page'}
+            </Typography>
+            <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid:`${moduleID}`}}>
+                <Button variant="contained">
+                Create Quiz
+                </Button>
+            </Link>
+            </Toolbar>
+        </AppBar>
+        <Box sx={{ m: 2 }}>
+            <Grid container direction="row" sx={{ my: 4 }}>
+            <Grid item xs={3}>
+                <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                    Quiz List
+                </Typography>
+                {quizList.map((quiz, index) => (
+                    <Typography
+                    variant="body1"
+                    color="primary"
+                    key={index}
+                    sx={{ my: 2, cursor: 'pointer', '&:hover': { color: 'blue' } }}
+                    onClick={() => {
+                        setSelectedQuiz(quiz);
+                        setSelectedAnswer(null);
+                        setCurrentQuestionIndex(0);
+                    }}
+                    >
+                    {quiz.quizName}
                     </Typography>
                     <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid: `${moduleID}` }}>
                         <Button variant="contained">

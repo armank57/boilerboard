@@ -32,6 +32,7 @@ class Reply(AbstractModel):
     content = models.TextField()
     post = models.ForeignKey('Post', related_name='replies', on_delete=models.CASCADE)
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
+    instructor_reply = models.BooleanField(default=False)
 
     # to access ratings for a reply, use reply.ratings.all()
     # to access replies rated by a user, use user.rated_replies.all()
@@ -42,7 +43,7 @@ class Reply(AbstractModel):
     
     class Meta:
         db_table = 'core_replies'
-        
+
 class Rating(models.Model):
     user = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True)
@@ -71,6 +72,7 @@ class Post(AbstractModel):
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=255, null=True)
     endorsed = models.BooleanField(default=False)
+    new_reply = models.BooleanField(default=False)
 
     # to access ratings for a post, use post.ratings.all()
     # to access posts rated by a user, use user.rated_posts.all()

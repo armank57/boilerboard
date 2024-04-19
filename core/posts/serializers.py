@@ -24,6 +24,7 @@ class ReplySerializer(AbstractSerializer):
             'user_has_upvoted',
             'created',
             'updated',
+            'instructor_reply'
         ]
     
     def get_author_name(self, obj):
@@ -57,6 +58,7 @@ class PostSerializer(AbstractSerializer):
     replies = ReplySerializer(many=True, read_only=True)
     replies_count = serializers.SerializerMethodField()
     user_has_bookmarked = serializers.SerializerMethodField()
+    new_reply = serializers.BooleanField(read_only=True)
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -74,6 +76,7 @@ class PostSerializer(AbstractSerializer):
             'ratings',
             'replies',
             'replies_count',
+            'new_reply',
             'user_has_upvoted',
             'endorsed',
             'is_author',

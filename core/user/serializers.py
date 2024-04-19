@@ -43,6 +43,7 @@ class UserSerializer(AbstractSerializer):
             'avatar',
             'user_rating',
             'bookmarked_posts',
+            'blacklisted_from_study_sessions',
         ]
 
         read_only_fields = ['is_active']

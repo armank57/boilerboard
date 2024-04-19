@@ -22,7 +22,7 @@ function Discussions() {
     const [searchTerm, setSearchTerm] = useState(''); // State for search term, used for searching discussions
     const [sortType, setSortType] = useState('date'); // State for sort type, used for sorting discussions
     // Static list of topics to tab-by
-    const topics = ['General', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes', 'Other'];
+    const topics = ['General','Announcements', 'Homework', 'Exams', 'Projects', 'Labs', 'Quizzes'];
 
     const theme = createTheme({
         palette: {
@@ -103,6 +103,7 @@ function Discussions() {
                         height: '100px',
                         overflow: 'hidden'
                     }}>
+                        
                         <CardContent>
                             <Grid container justifyContent="space-between">
                                 <Grid item xs={11}>
