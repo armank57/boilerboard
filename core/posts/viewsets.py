@@ -50,10 +50,16 @@ class ReplyViewSet(AbstractViewSet):
         return Response({'message': 'Reply deleted.'}, status=status.HTTP_204_NO_CONTENT)
     
     def create(self, request, *args, **kwargs):
-        print(request.data)
+        #print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        # Set new_reply to True for the associated post
+        post = get_object_or_404(Post, public_id=request.data['post'])
+        post.new_reply = True
+        post.save()
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     @action(detail=True, methods=['post'])
@@ -88,6 +94,12 @@ class PostViewSet(AbstractViewSet):
     def get_object(self):
         obj = get_object_or_404(Post, public_id=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
+
+        # Set new_reply to False when the post is viewed by its author
+        if self.request.user == obj.author:
+            obj.new_reply = False
+            obj.save()
+        
         return obj
     
     def update(self, request, *args, **kwargs):

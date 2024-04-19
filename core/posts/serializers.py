@@ -56,6 +56,7 @@ class PostSerializer(AbstractSerializer):
     course_number = serializers.SerializerMethodField()
     replies = ReplySerializer(many=True, read_only=True)
     replies_count = serializers.SerializerMethodField()
+    new_reply = serializers.BooleanField(read_only=True)
     
     # TODO: Add a foreign key for course id
     class Meta:
@@ -73,6 +74,7 @@ class PostSerializer(AbstractSerializer):
             'ratings',
             'replies',
             'replies_count',
+            'new_reply',
             'user_has_upvoted',
             'endorsed',
             'is_author',
