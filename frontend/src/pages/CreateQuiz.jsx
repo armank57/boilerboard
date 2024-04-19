@@ -128,6 +128,7 @@ function CreateQuiz() {
             "author": JSON.parse(localStorage.getItem('auth')).user.id, //replace with user id
             "title": quizName,
             "module": mid,
+            "link": `${cid}/${sid}/${mid}`,
             "questionList": questions.map(q => ({
                 "text": q.question,
                 "answerList": q.answerList.map((a, i) => ({
