@@ -52,6 +52,7 @@ class Quiz2Serializer(serializers.ModelSerializer):
             'title',
             'author',
             'module',
+            'link',
             'questionList',
             'created',
             'updated',

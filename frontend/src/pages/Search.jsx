@@ -129,7 +129,7 @@ function Search() {
                     <Card key={index} style={{ marginBottom: '20px' }}>
                         <CardContent>
                             <Typography variant="h5" component="div">
-                                <Link to={`/quiz/${quiz.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                <Link to={`/courses/${quiz.link}`} style={{ textDecoration: 'none', color: 'black' }}>
                                     {quiz.title}
                                 </Link>
                             </Typography>
