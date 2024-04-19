@@ -28,7 +28,7 @@ function ResponsiveAppBar() {
   const userActions = useUserActions();
   const navigate = useNavigate();
 
-  var pages = ['Courses', 'Study Sessions'];
+  var pages = ['Courses', 'Study Sessions', 'Search'];
   const settings = ['Profile', 'Contact', 'Logout'];
 
   if(user.is_superuser) {

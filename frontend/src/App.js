@@ -139,7 +139,7 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <Search />
-        </ProtectRoute>
+        </ProtectedRoute>
       } />
       <Route path="/reply-post/:id/:courseID" element={
         <ProtectedRoute>
