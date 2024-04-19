@@ -134,10 +134,83 @@ export default function ViewProfile() {
     }
 
     function PostMapper() {
-        return posts
-            .filter(post => post.is_author)
-            .sort((a, b) => b.new_reply - a.new_reply)
-            .map((post) => (
+        const authorPosts = posts.filter(post => post.is_author);
+
+        return authorPosts.length > 0 ? (
+            authorPosts
+                .sort((a, b) => b.new_reply - a.new_reply)
+                .map((post) => (
+                    <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Card sx={{ marginBottom: 3 }}>
+                            <CardContent>
+                                <Grid container justifyContent="space-between">
+                                    <Grid item xs={11}>
+                                        <Typography variant="h5" component="h2">
+                                            {post.title}
+                                        </Typography>
+                                    </Grid>
+                                    {post.new_reply && (
+                                        <Grid item xs={0.5}>
+                                            <CircleNotificationsIcon color="secondary" />
+                                        </Grid>
+                                    )}
+                                </Grid>
+                                <Typography
+                                    variant="body2"
+                                    component="p"
+                                    style={{
+                                        paddingBottom: '20px',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 3,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden',
+                                        minHeight: '4.5em',
+                                    }}
+                                >
+                                    {post.content.split('\n').map((line, index) => (
+                                        <React.Fragment key={index}>
+                                            {line}
+                                            <br />
+                                        </React.Fragment>
+                                    ))}
+                                </Typography>
+                                <Chip label={post.topic} />
+                                <Chip label={post.course_number} />
+                                {post.endorsed && <Chip label="Endorsed" color="secondary" />}
+                                <Box display="flex" justifyContent="space-between">
+                                    <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                        Created: {new Date(post.created).toLocaleString()}
+                                    </Typography>
+                                    <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
+                                        Last Updated: {new Date(post.updated).toLocaleString()}
+                                    </Typography>
+                                </Box>
+                                <Grid container sx={{ marginTop: 1 }}>
+                                    <Badge color="primary">
+                                        <ThumbUp />
+                                    </Badge>
+                                    <Typography sx={{ marginLeft: 1 }}>
+                                        {post.ratings}
+                                    </Typography>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                ))
+        ) : (
+            <Card sx={{ marginBottom: 3 }}>
+                <CardContent>
+                    <Typography variant="body1  " component="h5">
+                        It looks like you haven't made any posts yet...
+                    </Typography>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    function BookedmarkPostMapper() {
+        return bookmarkedPosts.length > 0 ? (
+            bookmarkedPosts.map((post) => (
                 <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Card sx={{ marginBottom: 3 }}>
                         <CardContent>
@@ -147,16 +220,11 @@ export default function ViewProfile() {
                                         {post.title}
                                     </Typography>
                                 </Grid>
-                                {post.new_reply && (
-                                    <Grid item xs={0.5}>
-                                        <CircleNotificationsIcon color="secondary"/>
-                                    </Grid>
-                                )}
                             </Grid>
                             <Typography
-                                variant="body2" 
-                                component="p" 
-                                style={{ 
+                                variant="body2"
+                                component="p"
+                                style={{
                                     paddingBottom: '20px',
                                     display: '-webkit-box',
                                     WebkitLineClamp: 3,
@@ -164,13 +232,13 @@ export default function ViewProfile() {
                                     overflow: 'hidden',
                                     minHeight: '4.5em',
                                 }}
-                            >
-                                {post.content.split('\n').map((line, index) => (
-                                    <React.Fragment key={index}>
-                                        {line}
-                                        <br />
-                                    </React.Fragment>
-                                ))}
+                            >                                
+                            {post.content.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    <br />
+                                </React.Fragment>
+                            ))}
                             </Typography>
                             <Chip label={post.topic} />
                             <Chip label={post.course_number} />
@@ -194,7 +262,16 @@ export default function ViewProfile() {
                         </CardContent>
                     </Card>
                 </Link>
-        ));
+            ))
+        ) : (
+            <Card sx={{ marginBottom: 3 }}>
+                <CardContent>
+                    <Typography variant="body1  " component="h5">
+                        It looks like you haven't bookmarked any posts yet...
+                    </Typography>
+                </CardContent>
+            </Card>
+        );
     }
 
     return (
@@ -203,7 +280,7 @@ export default function ViewProfile() {
                 {user.first_name + " " + user.last_name}
             </Typography>
             <Grid container direction="row" sx={{ my: 4 }}>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                     <Box sx={{ marginTop: 5, marginLeft: 5 }}>
                         <Grid container direction="column" sx={{ my: 4 }}>
                             <Toolbar style={{ paddingBottom: "10px" }}>
@@ -212,7 +289,7 @@ export default function ViewProfile() {
                                     {user ? user.username : "View Profile"}
                                 </Typography>
                             </Toolbar>
-                            <Card sx={{ width: '100%', height: '375px', bgcolor: 'secondary.main' }}>
+                            <Card sx={{ width: '100%', height: '250px', bgcolor: 'secondary.main' }}>
                                 <CardContent>
                                     <Grid container direction="column" sx={{ my: 2 }}>
                                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
@@ -238,7 +315,7 @@ export default function ViewProfile() {
                         </Grid>
                     </Box>
                 </Grid>
-                <Grid item xs={6} sx={{ marginLeft: 8, marginTop: 10 }}>
+                <Grid item xs={5} sx={{ marginLeft: 8, marginTop: 9 }}>
                     <Box sx={{ marginLeft: 5, marginRight: 5 }}>
                         <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
                             Courses
@@ -246,7 +323,7 @@ export default function ViewProfile() {
                     </Box>
                     <Card sx={{ marginLeft: 5 }}
                         style={{
-                            height: '150px',
+                            height: '250px',
                             overflow: 'scroll',
                         }}>
                         <CardContent>
@@ -256,7 +333,7 @@ export default function ViewProfile() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={6}>
                     <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
                         <Grid container direction="column" sx={{ my: 4 }}>
                             <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
@@ -270,66 +347,17 @@ export default function ViewProfile() {
                         </Grid>
                     </Box>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={6}>
                     <Box sx={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
                         <Grid container direction="column" sx={{ my: 4 }}>
                             <Typography variant="h6" component="div" sx={{ marginRight: 2, fontSize: '1.5rem' }} style={{ color: "white" }}>
                                 Bookmarked Posts
                             </Typography>
+                            <Box sx={{ maxHeight: '400px', overflow: 'auto' }}>
                             <List>
-                                {bookmarkedPosts.length > 0 ? (
-                                    bookmarkedPosts.map((post) => (
-                                        <Link key={post.id} to={`/post/${post.id}/${post.course}`} target="_blank" style={{ textDecoration: 'none', color: 'inherit' }}>
-                                            <Card sx={{ marginBottom: 3 }}>
-                                                <CardContent>
-                                                    <Grid container justifyContent="space-between">
-                                                        <Grid item xs={11}>
-                                                            <Typography variant="h5" component="h2">
-                                                                {post.title}
-                                                            </Typography>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
-                                                        {post.content.split('\n').map((line, index) => (
-                                                            <React.Fragment key={index}>
-                                                                {line}
-                                                                <br />
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </Typography>
-                                                    <Chip label={post.topic} />
-                                                    <Chip label={post.course_number} />
-                                                    {post.endorsed && <Chip label="Endorsed" color="secondary" />}
-                                                    <Box display="flex" justifyContent="space-between">
-                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
-                                                            Created: {new Date(post.created).toLocaleString()}
-                                                        </Typography>
-                                                        <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
-                                                            Last Updated: {new Date(post.updated).toLocaleString()}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Grid container sx={{ marginTop: 1 }}>
-                                                        <Badge color="primary">
-                                                            <ThumbUp />
-                                                        </Badge>
-                                                        <Typography sx={{ marginLeft: 1 }}>
-                                                            {post.ratings}
-                                                        </Typography>
-                                                    </Grid>
-                                                </CardContent>
-                                            </Card>
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <Card sx={{ marginBottom: 3 }}>
-                                        <CardContent>
-                                            <Typography variant="body1  " component="h2">
-                                                It looks like you haven't bookmarked any posts yet...
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                )}
+                                {BookedmarkPostMapper()}
                             </List>
+                            </Box>
                         </Grid>
                     </Box>
                 </Grid>
