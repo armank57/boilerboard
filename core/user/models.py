@@ -7,6 +7,20 @@ from core.abstract.models import AbstractManager, AbstractModel
 
 
 # Create your models here.
+class QuizHistory(AbstractModel):
+    user = models.ForeignKey(to="core_user.User", on_delete=models.CASCADE)
+    quiz = models.ForeignKey(to="core_quiz2.Quiz2", on_delete=models.CASCADE)
+    correct_answers = models.IntegerField(default=0)
+    total_questions = models.IntegerField(default=0)
+    
+    def create_quiz_history(user, quiz, correct_answers, total_questions):
+        quiz_history = QuizHistory.objects.create(
+            user=user,
+            quiz=quiz,
+            correct_answers=correct_answers,
+            total_questions=total_questions
+        )
+        return quiz_history
 
 class UserManager(BaseUserManager, AbstractManager):
     def get_object_by_public_id(self, public_id):
@@ -82,6 +96,8 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(null=True)
     user_rating = models.IntegerField(default=0)
     blacklisted_from_study_sessions = models.BooleanField(default=False)
+
+    bookmarked_posts = models.ManyToManyField(to="core_posts.Post", related_name="bookmarked_by", blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

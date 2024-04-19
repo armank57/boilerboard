@@ -27,6 +27,7 @@ import EditPost from './pages/EditPost';
 import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
+import CreateNote from './pages/CreateNote';
 import CreateReply from './pages/CreateReply';
 import AdminRedirect from './pages/AdminRedirect';
 
@@ -95,6 +96,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <CreateQuiz />
+        </ProtectedRoute>
+      } />
+      <Route path="/create-note/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <CreateNote />
         </ProtectedRoute>
       } />
       <Route path="/voice_chat/" element={

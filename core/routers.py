@@ -9,6 +9,7 @@ from core.module.viewsets import ModuleViewSet
 from core.section.viewsets import SectionViewSet
 from core.posts.viewsets import PostViewSet, ReplyViewSet
 from core.quiz2.viewsets import Quiz2ViewSet
+from core.note.viewsets import NoteViewSet
 from core.subject.viewsets import SubjectViewSet
 from core.voice_chat.viewsets import VoiceChatRoomViewSet
 from core.auth.viewsets.registrationEmail import SendUserRegistrationEmailViewset
@@ -29,6 +30,7 @@ router.register(r'section', SectionViewSet, basename='section')
 router.register(r'post', PostViewSet, basename='post')
 router.register(r'reply', ReplyViewSet, basename='reply')
 router.register(r'quiz', Quiz2ViewSet, basename='quiz')
+router.register(r'note', NoteViewSet, basename='note')
 router.register(r'voice_chat', VoiceChatRoomViewSet, basename='voice-chat')
 #router.register(r'auth/send-registration-email/', SendUserPasswordEmailViewset, basename='auth-send-registration-email')
 router.register(r'subject', SubjectViewSet, basename='subject')

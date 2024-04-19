@@ -57,6 +57,7 @@ class PostSerializer(AbstractSerializer):
     course_number = serializers.SerializerMethodField()
     replies = ReplySerializer(many=True, read_only=True)
     replies_count = serializers.SerializerMethodField()
+    user_has_bookmarked = serializers.SerializerMethodField()
     new_reply = serializers.BooleanField(read_only=True)
     
     # TODO: Add a foreign key for course id
@@ -83,7 +84,78 @@ class PostSerializer(AbstractSerializer):
             'reports',
             'badContentList',
             'user_has_upvoted',
-            'user_has_reported'
+            'user_has_reported',
+            'user_has_bookmarked'
+        ]
+    
+    def get_ratings(self, obj):
+        # Calculate the number of upvotes
+        ratings = Rating.objects.filter(post=obj, upvote=True).count()
+        return ratings
+    
+    def get_badContentList(self, obj):
+        bad_contents = BadContent.objects.filter(post=obj, reported=True)
+        return BadContentSerializer(bad_contents, many=True).data
+    
+    def get_user_has_upvoted(self, obj):
+        user = self.context['request'].user
+        return Rating.objects.filter(user=user.id, post=obj, upvote=True).exists()
+    
+    def get_user_has_bookmarked(self, obj):
+        user = self.context['request'].user
+        return user.bookmarked_posts.filter(id=obj.id).exists()
+    
+    def get_is_author(self, obj):
+        user = self.context['request'].user
+        return obj.author == user
+    
+    def get_author_name(self, obj):
+        return obj.author.username
+    
+    
+    def get_reports(self, obj):
+        # Calculate the number of upvotes
+        reports = BadContent.objects.filter(post=obj, reported=True).count()
+        return reports
+    
+    def get_user_has_reported(self, obj):
+        user = self.context['request'].user.id
+        return BadContent.objects.filter(user=user, post=obj, reported=True).exists()
+    
+    def get_course_number(self, obj):
+        return obj.course.course_subject.code + str(obj.course.code)
+    
+    def get_replies_count(self, obj):
+        return obj.replies.count()
+    
+
+class PostSerializer2(AbstractSerializer):
+    author = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='public_id')
+    ratings = serializers.SerializerMethodField()
+    reports = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
+    badContentList = serializers.SerializerMethodField()
+    course = serializers.SlugRelatedField(queryset=Course.objects.all(), slug_field='public_id')
+    course_number = serializers.SerializerMethodField()
+    
+    # TODO: Add a foreign key for course id
+    class Meta:
+        model = Post
+        fields = [
+            'id',
+            'title',
+            'content',
+            'course',
+            'course_number',
+            'author',
+            'topic',
+            'created',
+            'updated',
+            'ratings',
+            'endorsed',
+            'author_name',
+            'reports',
+            'badContentList',
         ]
     
     def get_ratings(self, obj):
