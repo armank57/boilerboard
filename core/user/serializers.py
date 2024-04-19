@@ -38,6 +38,7 @@ class UserSerializer(AbstractSerializer):
             'created',
             'updated',
             'is_superuser',
+            'is_instructor',
             'is_staff',
             'avatar',
             'user_rating',

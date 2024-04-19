@@ -41,7 +41,7 @@ export default function ViewReported() {
 
     useEffect(() => {
         const fetchPosts = async () => {
-            if (user.is_staff === false) {
+            if (user.is_instructor === false) {
                 alert("You do not have permission to view this page.");
                 return;
             }

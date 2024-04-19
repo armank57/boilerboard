@@ -88,6 +88,7 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
     joined_courses = models.ManyToManyField(to="core_course.Course", related_name="students", blank=True)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False) # This is the same thing as admin
+    is_instructor = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now_add=True)

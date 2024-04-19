@@ -162,7 +162,7 @@ export default function ViewProfile() {
                                         <Typography variant="h6" component="div" sx={{ marginRight: 2 }} >
                                             Rating: {total_upvotes}
                                         </Typography>
-                                        {user.is_staff ? (
+                                        {user.is_instructor ? (
                                             <Button size="small" sx={{ marginTop: 2, width: "60%" }} variant="contained" color="primary" onClick={viewReportedContent}>
                                                 View Reported Content
                                             </Button>
