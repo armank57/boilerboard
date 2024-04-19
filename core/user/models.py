@@ -81,6 +81,7 @@ class User(AbstractModel, AbstractBaseUser, PermissionsMixin):
 
     avatar = models.ImageField(null=True)
     user_rating = models.IntegerField(default=0)
+    blacklisted_from_study_sessions = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

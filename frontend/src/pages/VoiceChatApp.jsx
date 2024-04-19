@@ -9,6 +9,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import toast, { Toaster } from 'react-hot-toast';
 import DailyIframe from '@daily-co/daily-js';
+import { getUser, useUserActions } from "../hooks/user.actions";
+import BlockSharpIcon from '@mui/icons-material/BlockSharp';
 
 const theme = createTheme({
     palette: {
@@ -34,6 +36,8 @@ function VoiceChatApp() {
     const [isPrivate, setIsPrivate] = useState(false);
     const [wasKicked, setWasKicked] = useState(false);
     const callRef = useRef();
+    const user = getUser();
+    const userActions = useUserActions();
 
     let userToken = localStorage.getItem('auth');
     userToken = JSON.parse(userToken).access;
@@ -191,7 +195,7 @@ function VoiceChatApp() {
                 setJoinedRoom(joinedRoom);
                 fetchRooms();
                 toast.success('Joined room successfully');
-     
+
                 // Create a Daily.co video call iframe
                 callRef.current = DailyIframe.createFrame({
                     userName: userName,
@@ -203,7 +207,7 @@ function VoiceChatApp() {
                         height: '500px',
                     },
                 });
-               
+                
                 // Join the Daily.co video call
                 console.log(joinedRoom.creator);
                 console.log(userName);
@@ -314,6 +318,33 @@ function VoiceChatApp() {
                 toast.error('Failed to approve user');
             });
     };
+
+    if(user.blacklisted_from_study_sessions) {
+        return (
+            <div className="Restricted">
+                <ThemeProvider theme={theme}>
+                    <Container maxWidth="sm" style={{ 
+                        height: '50vh', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                    }}>
+                        <Grid container direction="row" sx={{}}>
+                            <BlockSharpIcon style={{color: "white", height: "50", width: "50"}} ></BlockSharpIcon>
+                            <Typography variant="h3" style={{ paddingBottom: '20px', paddingLeft: "40px", color: "white", fontFamily: "Helvetica Neue" }}>
+                                UNAUTHORIZED
+                            </Typography>
+                        </Grid>
+                        
+                        <Typography variant="p" style={{ paddingBottom: '20px', color: "white"}}>
+                            You have been restricted access to view study rooms. Please contact your Administrator for more details.
+                        </Typography>
+                    </Container>
+                </ThemeProvider>
+            </div>
+        );
+    }
 
     return (
         <ThemeProvider theme={theme}>

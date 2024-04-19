@@ -40,6 +40,7 @@ class UserSerializer(AbstractSerializer):
             'is_instructor',
             'avatar',
             'user_rating',
+            'blacklisted_from_study_sessions',
         ]
 
         read_only_fields = ['is_active']

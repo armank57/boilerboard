@@ -238,6 +238,7 @@ function Post() {
                                 </React.Fragment>
                             ))}
                         </Typography>
+                        {reply.instructor_reply && <Chip label="Instructor Answer" color="secondary" />}
                         <Box display="flex" justifyContent="space-between">
                             <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
                                 Created: {new Date(reply.created).toLocaleString()}
