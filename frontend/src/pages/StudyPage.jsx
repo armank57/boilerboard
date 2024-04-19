@@ -283,35 +283,7 @@ export default function StudyPage() {
             <Typography variant="h4" sx={{ flexGrow: 1 }}>
                 {module.name + ' Study Page'}
             </Typography>
-            <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid:`${moduleID}`}}>
-                <Button variant="contained">
-                Create Quiz
-                </Button>
-            </Link>
-            </Toolbar>
-        </AppBar>
-        <Box sx={{ m: 2 }}>
-            <Grid container direction="row" sx={{ my: 4 }}>
-            <Grid item xs={3}>
-                <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                    Quiz List
-                </Typography>
-                {quizList.map((quiz, index) => (
-                    <Typography
-                    variant="body1"
-                    color="primary"
-                    key={index}
-                    sx={{ my: 2, cursor: 'pointer', '&:hover': { color: 'blue' } }}
-                    onClick={() => {
-                        setSelectedQuiz(quiz);
-                        setSelectedAnswer(null);
-                        setCurrentQuestionIndex(0);
-                    }}
-                    >
-                    {quiz.quizName}
-                    </Typography>
-                    <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid: `${moduleID}` }}>
+            <Link to="/create-quiz" state={{ cid: `${courseID}`, sid: `${sectionID}`, mid: `${moduleID}` }}>
                         <Button variant="contained">
                             Create Quiz
                         </Button>
@@ -323,8 +295,8 @@ export default function StudyPage() {
                     </Link>
                     <Button variant="contained" sx={{ marginLeft: 2 }} onClick={handleViewQuizzes}>View Quizzes</Button>
                     <Button variant="contained" sx={{ marginLeft: 2 }} onClick={handleViewNotes}>View Notes</Button>
-                </Toolbar>
-            </AppBar>
+            </Toolbar>
+        </AppBar>
             {page === 'quizzes' ? (
                 <Box sx={{ m: 2 }}>
                     <Grid container direction="row" sx={{ my: 4 }}>
