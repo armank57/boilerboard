@@ -28,6 +28,7 @@ import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
 import CreateReply from './pages/CreateReply';
+import AdminRedirect from './pages/AdminRedirect';
 
 
 function App() {
@@ -130,6 +131,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <CreateReply />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin-redirect/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <AdminRedirect />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

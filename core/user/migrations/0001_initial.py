@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now_add=True)),
                 ('avatar', models.ImageField(null=True, upload_to='')),
                 ('user_rating', models.IntegerField(default=0)),
+                ('blacklisted_from_study_sessions', models.BooleanField(default=False)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
                 ('joined_courses', models.ManyToManyField(blank=True, related_name='students', to='core_course.course')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),

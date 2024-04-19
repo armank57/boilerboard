@@ -181,7 +181,7 @@ function CreateQuiz() {
     
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="static" color="secondary">
+            <AppBar position="static" color="primary">
                 <Toolbar>
                     <Typography variant="h4" sx={{ flexGrow: 1 }}>
                         Create Quiz

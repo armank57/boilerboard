@@ -4,6 +4,7 @@ import { ThumbUp } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { getUser, useUserActions } from "../hooks/user.actions";
 
 function CreateReply() {
     const navigate = useNavigate();
@@ -11,6 +12,8 @@ function CreateReply() {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [post, setPost] = useState({});
+    const user = getUser();
+    const userActions = useUserActions();
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -58,11 +61,14 @@ function CreateReply() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/reply/', {
                 content: content,
                 post: `${id}`,
-                author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`
+                author: `${(JSON.parse(localStorage.getItem('auth'))).user.id}`,
+                instructor_reply: user.is_instructor
+                
             },
             {
                 headers: {
