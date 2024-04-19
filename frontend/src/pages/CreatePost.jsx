@@ -154,7 +154,7 @@ function CreatePost() {
                         label="Content"
                         variant="outlined"
                         sx={ fieldStyling }
-                        textareaStyle={{color: "white"}}
+                        textareastyle={{color: "white"}}
                         InputLabelProps={{
                             style: { color: 'white' },
                         }}
