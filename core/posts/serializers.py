@@ -24,6 +24,7 @@ class ReplySerializer(AbstractSerializer):
             'user_has_upvoted',
             'created',
             'updated',
+            'instructor_reply'
         ]
     
     def get_author_name(self, obj):
