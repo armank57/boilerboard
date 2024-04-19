@@ -81,6 +81,22 @@ class ReplyViewSet(AbstractViewSet):
         rating.delete()
         data = {'message': 'Upvote removed successful.'}
         return Response(data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'])
+    def mark(self, request, pk=None):
+        reply = self.get_object()
+        reply.correct = True
+        reply.save()
+        data = {'message': 'Reply Marked successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def unmark(self, request, pk=None):
+        reply = self.get_object()
+        reply.correct = False
+        reply.save()
+        data = {'message': 'Reply Unmarked successfully.'}
+        return Response(data, status=status.HTTP_200_OK)
 
 class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')

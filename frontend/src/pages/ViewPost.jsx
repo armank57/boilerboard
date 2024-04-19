@@ -17,11 +17,14 @@ function Post() {
     const { id, courseID } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedReply, setSelectedReply] = useState(null)
     const [anchorElPost, setAnchorElPost] = useState(null);
+    const [anchorElReply, setAnchorElReply] = useState(null);
     const [replies, setReplies] = useState([]);
     const navigate = useNavigate();
     const [user, setUser] = useState(getUser());
     const [post_options, setPostOptions] = useState([]);
+    const [isAuth, setIsAuth] = useState(false)
 
 
     const theme = createTheme({
@@ -48,6 +51,9 @@ function Post() {
                     setReplies(response.data.replies);
                     setLoading(false);
                     console.log(response.data);
+                    const st = response.data.author.replace(/-/g,"");
+                    setIsAuth(st === user.id);
+                    //console.log(st === user.id);
                 } else {
                     navigate(-1);
                 }
@@ -202,6 +208,9 @@ function Post() {
         setAnchorElPost(event.currentTarget);
     }
 
+    const handleOpenReplyOptions = (event) => {
+        setAnchorElReply(event.currentTarget);
+    }
     const handleClosePostOptions = async (post_option) => {
         if (post_option === "Remove") {
             if (window.confirm('Are you sure you want to remove this post?')) {
@@ -277,23 +286,87 @@ function Post() {
         setAnchorElPost(null);
     }
 
+    const handleCloseReplyOptions = async (reply_option) => {
+        if (reply_option === "Mark Correct") {
+            try {
+                await axios.post(`http://localhost:8000/api/reply/${selectedReply.id}/mark/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+            } catch (error) {
+                console.error('Failed to mark correct:', error);
+            }
+        } else if (reply_option === "Unmark Correct") {
+            try {
+                await axios.post(`http://localhost:8000/api/reply/${selectedReply.id}/unmark/`, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
+                    }
+                });
+                fetchPostData();
+            } catch (error) {
+                console.error('Failed to unmark correct:', error);
+            }
+        }
+        setAnchorElReply(null);
+    }
+
     function replyMapper() {
+    const createClickHandler = (action,id) => () => handleCloseReplyOptions(action,id);
         return replies
             .sort((a, b) => new Date(b.created) - new Date(a.created)) // Sort replies by created date
             .map((reply, index) => (
                 <Card key={index} style={{ marginBottom: '20px' }}>
                     <CardContent>
-                        <Typography variant="h5" component="h2">
-                            {reply.title}
-                        </Typography>
-                        <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
-                            {reply.content.split('\n').map((line, index) => (
-                                <React.Fragment key={index}>
-                                    {line}
-                                    <br />
-                                </React.Fragment>
-                            ))}
-                        </Typography>
+                        <Grid container justifyContent="space-between">
+                            <Grid item xs={11}> 
+                                <Typography variant="body2" component="p" style={{ paddingBottom: '16px' }}>
+                                    {reply.content.split('\n').map((line, index) => (
+                                        <React.Fragment key={index}>
+                                        {line}
+                                        <br />
+                                        </React.Fragment>
+                                    ))}
+                                </Typography>
+                            </Grid>
+                            {
+                            isAuth?<Grid item xs={0.5}>
+                                    <Tooltip title="Open Options">
+                                        <IconButton onClick={handleOpenReplyOptions} >
+                                            <MoreHorizIcon onClick={() => {setSelectedReply(reply)}}></MoreHorizIcon>
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Menu
+                                        sx={{ mt: '45px' }}
+                                        id="menu-appbar"
+                                        anchorEl={anchorElReply}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        keepMounted
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        open={Boolean(anchorElReply)}
+                                        onClose={handleCloseReplyOptions}
+                                    >
+                                        
+                                                <MenuItem key="Unmark Correct" onClick={createClickHandler("Unmark Correct")} >
+                                                <Typography textAlign="center">Unmark Correct</Typography>
+                                                </MenuItem>
+                                                <MenuItem key="Mark Correct" onClick={createClickHandler("Mark Correct")} >
+                                                <Typography textAlign="center">Mark Correct</Typography>
+                                                </MenuItem>
+                                        
+                                    </Menu>
+                            </Grid> : null
+                            }
+                        </Grid>
+                        {reply.correct && <Chip label="Correct" style={{backgroundColor: '#228B22', color: '#FFFFFF'}} />}
                         {reply.instructor_reply && <Chip label="Instructor Answer" color="secondary" />}
                         <Box display="flex" justifyContent="space-between">
                             <Typography color="textSecondary" style={{ paddingTop: '16px' }}>
@@ -364,6 +437,7 @@ function Post() {
                                             <Typography textAlign="center">{post_option}</Typography>
                                         </MenuItem>
                                     ))}
+
                                 </Menu>
                             </Grid>
                         </Grid>

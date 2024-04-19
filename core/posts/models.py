@@ -33,6 +33,7 @@ class Reply(AbstractModel):
     post = models.ForeignKey('Post', related_name='replies', on_delete=models.CASCADE)
     author = models.ForeignKey('core_user.User', on_delete=models.CASCADE, null=True)
     instructor_reply = models.BooleanField(default=False)
+    correct = models.BooleanField(default=False)
 
     # to access ratings for a reply, use reply.ratings.all()
     # to access replies rated by a user, use user.rated_replies.all()
