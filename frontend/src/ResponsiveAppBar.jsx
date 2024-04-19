@@ -17,7 +17,7 @@ import { deepOrange, deepPurple } from '@mui/material/colors';
 import { getUser, useUserActions } from "./hooks/user.actions";
 import { Link, useNavigate } from 'react-router-dom';
 
-const pages = ['Courses', 'Study Sessions'];
+const pages = ['Courses', 'Study Sessions', 'Search'];
 const settings = ['Profile', 'Contact', 'Logout'];
 
 function ResponsiveAppBar() {
@@ -39,6 +39,8 @@ function ResponsiveAppBar() {
     const text = event.currentTarget.innerText.trim().toUpperCase();
     if(text === "COURSES") {
       navigate("/courses/");
+    } else if (text === "SEARCH") {
+      navigate("/search/");
     } else {
       navigate("/voice_chat/")
     }

@@ -27,6 +27,7 @@ import EditPost from './pages/EditPost';
 import Module from './pages/Module';
 import JoinCourseButton from './components/JoinCourseButton';
 import ContactForm from './pages/ContactForm';
+import Search from './pages/Search';
 
 
 function App() {
@@ -123,6 +124,12 @@ function App() {
         <ProtectedRoute>
             <ResponsiveAppBar />
             <ContactForm />
+        </ProtectedRoute>
+      } />
+      <Route path="/search/" element={
+        <ProtectedRoute>
+            <ResponsiveAppBar />
+            <Search />
         </ProtectedRoute>
       } />
       <Route path="/login/" element={<Login />} />

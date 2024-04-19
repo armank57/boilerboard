@@ -42,20 +42,6 @@ export default function StudyPage() {
 
     const fetchQuizzes = async () => {
         try {
-            axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
-                headers: {
-                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
-                }
-            })
-            .then(response => {
-                //alert(response.data)
-                if(!response.data){
-                    navigate(`/courses/${courseID}`)
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching is_in_course:', error);
-            });
             const response = await axios.get(`http://127.0.0.1:8000/api/module/${moduleID}`, {
                 headers: {
                     'Authorization': `Bearer ${(JSON.parse(localStorage.getItem('auth'))).access}`
@@ -83,7 +69,6 @@ export default function StudyPage() {
 
 
     useEffect(() => {
-        fetchQuizzes();
         axios.get(`http://127.0.0.1:8000/api/course/${courseID}/is_in_course/`, {
             headers: {
                 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')).access}`
@@ -98,6 +83,7 @@ export default function StudyPage() {
         .catch(error => {
             console.error('Error fetching is_in_course:', error);
         });
+        fetchQuizzes();
     }, []);
 
     const handleAnswerClick = (index) => {

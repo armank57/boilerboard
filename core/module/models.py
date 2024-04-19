@@ -59,6 +59,7 @@ class ModuleManager(AbstractManager):
     
 class Module(AbstractModel):
     name = models.CharField(max_length=255)
+    course_id = models.ForeignKey('core_course.Course', related_name="course_id", on_delete=models.CASCADE)
     section = models.ForeignKey('core_section.Section', related_name="modules", on_delete=models.CASCADE)
     subsection = models.IntegerField(default=0)
     
