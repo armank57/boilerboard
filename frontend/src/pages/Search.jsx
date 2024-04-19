@@ -146,7 +146,7 @@ function Search() {
                     <Card key={index} style={{ marginBottom: '20px' }}>
                         <CardContent>
                             <Typography variant="h5" component="div">
-                                <Link to={`/post/${post.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                <Link to={`/post/${post.id}/${post.course}`} style={{ textDecoration: 'none', color: 'black' }}>
                                     {post.title}
                                 </Link>
                             </Typography>
